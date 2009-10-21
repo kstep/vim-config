@@ -1,0 +1,92 @@
+#!/bin/bash
+# Script: downloadvimscripts
+# Author: Frank Sun <frank.sun.319@gmail.com>
+# Date: 11-19-2008
+# Description: auto-load vim plugins
+# Options:
+#       (1) -o, directory to restore downloaded files. If it is absent, package will be restored to the directory of scripts_list_file.
+# Version: 1.5.2
+
+max_option_num=3
+usage='usage: downloadvimscripts [-o restore_dir] scripts_list_file'
+
+[[ $# -eq 0 ]] || [[ $# -gt $max_option_num ]] && { echo $usage ; exit 0 ; }
+
+# handle options
+while getopts ":o:" opt; do
+    case $opt in
+        o) [[ -d $OPTARG ]] && restore_dir="${OPTARG%/}/" || { echo "$OPTARG is not exist." ; exit 0 ; } ;;
+        \?) echo "$usage"
+        exit 0 ;;
+    esac
+done
+shift $(($OPTIND - 1))
+
+# define and verify $scripts_list
+[[ -n $1 ]] && scripts_list=$1 || { echo "$usage" ; exit 0 ; }
+[[ ! -w $scripts_list ]] && { echo "$scripts_list is not writable." ; exit 0 ; }
+
+# define and verify $restore_dir
+if [[ -z $restore_dir ]]; then
+    [[ $scripts_list =~ '/' ]] && restore_dir="${1%/*}/" || restore_dir="$(pwd)/"
+fi
+[[ ! -w $restore_dir ]] && { echo "$restore_dir is not writable." ; exit 0; }
+
+# define download tool
+if [[ -f /usr/bin/wget ]]; then
+    downloadtool='wget -q -O'
+elif [[ -f /usr/bin/curl ]]; then
+    downloadtool='curl -s -o'
+else
+    echo 'Both wget and curl are not exist!'
+    exit 0
+fi
+
+# make $items_list file
+items_list='/tmp/'${scripts_list##*/}.tmp
+function Filter()
+{
+    while read line; do
+        line=$(echo $line | grep '^[[:digit:]]\+ [[:digit:]]\+ [[:alnum:]]\+')
+        [[ -n $line ]] && echo $line
+    done
+}
+Filter < $scripts_list > $items_list
+
+# make $scripts_list_bak file
+scripts_list_bak=${items_list%.tmp}.bak
+echo -e 'ScriptID SourceID Filename\n--------------------------' > $scripts_list_bak
+cat $items_list >> $scripts_list_bak
+
+# core algorithm
+# get vim scripts and update scripts_list_file
+page_prefix='http://www.vim.org/scripts/script.php?script_id='
+package_prefix='http://www.vim.org/scripts/download_script.php?src_id='
+lineno=3
+{
+    while read line; do
+        script_id=$(echo $line | awk '{print $1}')
+        old_src_id=$(echo $line | awk '{print $2}')
+        script_name=$(echo $line | awk '{print $3}')
+		echo -n "Checking $script_name..."
+        tmpfile='/tmp/'$script_id
+        $downloadtool $tmpfile $page_prefix$script_id
+        tmpline=$(grep 'download_script\.php?src_id' $tmpfile | head -1)
+        src_id=$(echo $tmpline | sed -e 's/^.*download_script\.php?src_id=//' | sed -e 's/^\([0-9]\+\).*$/\1/')
+        if (( $old_src_id < $src_id )); then
+			echo -ne "\nUpdating $script_name..." >&2
+            src_name=$(echo $tmpline | sed 's/^\([^>]*>\)\{2\}//' | sed 's/\(<[^>]*>\)\{2\}$//')
+            $downloadtool $restore_dir$src_name $package_prefix$src_id
+            vim -e -c $lineno's/^\s*\(\d\+ \)\d\+\( .*\)$/\1'$src_id'\2/' -c wq $scripts_list_bak
+			echo " done!" >&1
+		else
+			echo " done!"
+        fi
+        rm -rf $tmpfile
+        ((lineno += 1))
+    done
+} < $items_list
+
+# clean up
+rm -rf $items_list
+mv $scripts_list_bak $scripts_list

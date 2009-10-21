@@ -1,0 +1,168 @@
+"=============================================================================
+" File:             my_snippets.template
+" Brief:            the complete file of the code_complete.vim script
+" Original Author:  Mingbai <mbbill AT gmail DOT com> 
+" Maintainer:       StarWing <weasley_wx AT qq DOT com>
+" Last Change:      2008-11-11 17:14:38
+" Version:          2.8.1
+" Example: {{{1
+"           some new file type, e.g. 'newft'
+"           first define a function named
+"           Set_complete_type_newft, the second argument is
+"           template file-list of newft, create by
+"           code_complete automatically
+"
+"           function! Set_complete_type_newft(dict, ...)
+"               " then, add filetype-spec complete list in
+"               this function
+"               let a:dict['hello'] = "Hello, ".
+"                           \ MakeRegion('your name')." !"
+"           endfunction
+"
+"           you can use some redefined helper function and
+"           variables.  e.g. let a:dict['cool'] = "Oh!! it's
+"           ".s:sr('cool')."!!!\<cr>" \<cr> means 'enter' or
+"           'return' button on your keyboard
+"
+"           you can add common template with adding items
+"           into the function Set_complete_type_COMMON, it
+"           will be called each UpdateTemplate command
+"           called.
+" }}}
+" ============================================================================
+" Must have loaded code_complete {{{1
+if !exists('g:loaded_code_complete')
+    finish
+endif
+let s:cpo_save = &cpo
+set cpo&vim
+
+" }}}
+" ----------------------------------------------------------------------------
+" some helper {{{1
+
+if !exists('s:sr')
+    let s:sr = function('MakeRegion')
+endif
+let s:dr = s:sr('...')
+
+" }}}
+" set common Complete {{{1
+
+function! Set_complete_type_COMMON(dict, ...)
+
+    let a:dict['dt'] = "\<c-r>=strftime('%Y-%m-%d')\<cr>"
+    let a:dict['xt'] = "\<c-r>=strftime('%Y-%m-%d %H:%M:%S')\<cr>"
+
+endfunction
+
+" }}}
+" set the template for C and C++ {{{1
+
+function! Set_complete_type_c(dict, ...)
+
+    let a:dict['df'] = "#define "
+    let a:dict['ic'] = "#include \"\"\<left>"
+    let a:dict['ii'] = "#include <>\<left>"
+    let a:dict['ud'] = "#undef "
+    let a:dict['fc'] = "#if 0\<cr>".s:dr."\<cr>#endif"
+    let a:dict['ff'] = "#ifndef \<c-r>=GetFileName()\<cr>".
+                \ "\<cr>#define \<c-r>=GetFileName()\<cr>".
+                \ repeat("\<cr>",5)."#endif  /* \<c-r>=GetFileName()".
+                \ "\<cr>*/\<cr>".repeat("\<up>",4)
+
+    let a:dict['co'] = "/*  */\<left>\<left>\<left>"
+    let a:dict['cc'] = "/**<  */\<left>\<left>\<left>"
+    let a:dict['cr'] = "\<c-r>=repeat(' ', 60-strlen(getline('.')))\<cr>".
+                \ "\/*  */\<left>\<left>\<left>"
+    let a:dict['cb'] = "/".repeat('*', 59)."\<cr>"
+    let a:dict['ce'] = "\<bs>".repeat('*', 57)."/\<cr>"
+    let a:dict['fh'] = '/'.repeat('*', 59)."\<cr>File Name:   ".
+                \ s:sr('File Name')."\<cr>Author:      ".s:sr('Author').
+                \ "\<cr>Version:     ".s:sr('Version')."\<cr>Last Change:  ".
+                \ "\<c-r>=strftime('%Y-%m-%d %H:%M:%S')\<cr>\<cr>\<bs>".
+                \ repeat('*', 57)."/\<cr>"
+
+    let a:dict['bc'] = "/".repeat('*', 58)."\\\<cr>".s:sr('Commets').
+                \ "\<cr>\<bs>\<bs>\<bs>\\".repeat('*', 58)."/\<cr>"
+
+    let a:dict['main'] = "int main(int argc, char \*argv\[\])".
+                \ "\<cr>{\<cr>".s:sr('Write Code Here!')."\<cr>\<bs>return 0;".
+                \ "\<cr>}\<cr>"
+    let a:dict['WinMain'] = "int CALLBACK WinMain(HINSTANCE hInstance, ".
+                \ "HINSTANCE hPrevInstance,\<cr>".repeat(' ',13).
+                \ "LPSTR lpszCmdLine, int nCmdShow)\<cr>{\<cr>".
+                \ s:sr('Write Win32 Code Here!')."\<cr>\<bs>return 0;\<cr>}"
+
+    let a:dict['if'] = "if (".s:dr.")\<cr>{\<cr>".s:dr."\<cr>}\<cr>".s:dr
+    let a:dict['else'] = "else\<cr>{\<cr>".s:dr."\<cr>}\<cr>".s:dr
+    let a:dict['while'] = "while (".s:dr.")\<cr>{\<cr>".s:dr."\<cr>}\<cr>".s:dr
+    let a:dict['do'] = "do\<cr>{\<cr>".s:dr."\<cr>}\<cr>while (".
+                \ s:dr.");\<cr>".s:dr
+    let a:dict['for'] = "for (".s:dr."; ".s:dr."; ".s:dr.")\<cr>{\<cr>".
+                \ s:dr."\<cr>}\<cr>".s:dr
+    let a:dict['case'] = "case ".s:dr.":\<cr>".s:dr."\<cr>\<bs>break;".
+                \ "\<cr>\<bs>".s:dr
+    let a:dict['switch'] = "switch (".s:dr.")\<cr>{\<cr>\<bs>".a:dict['case'].
+                \ "\<cr>\<bs>default:\<cr>".s:dr."\<cr>}\<cr>".s:dr
+    let a:dict['struct'] = "struct ".s:dr."\<cr>{\<cr>".s:dr."\<cr>}".s:sr(';')
+
+    let a:dict['printf'] = 'printf("\n", '.s:sr('args').");\<c-\>\<c-n>F\\i".
+                \ "\<c-r>=SkipMarks()\<cr>"
+    let a:dict['malloc'] = "\<c-r>=GetInput('input type you want to malloc:',".
+                \ "'ma_type')\<cr>(\<c-r>=ma_type\<cr>*)malloc(".s:sr('len').
+                \ " * sizeof(\<c-r>=ma_type\<cr>));"
+    let a:dict['calloc'] = "\<c-r>=GetInput('input type you want to calloc:',".
+                \ "'ma_type')\<cr>(\<c-r>=ma_type\<cr>*)calloc(".s:sr('len').
+                \ ", sizeof(\<c-r>=ma_type\<cr>));"
+
+endfunction
+
+function! Set_complete_type_cpp(dict, fdict)
+
+	call Set_complete_type_c(a:dict)
+    let a:dict['usi'] = "using namespace ".s:dr
+
+    " add C templates
+    for fname in split(globpath(&rtp, g:CodeCompl_Template_Folder.'/*.c'))
+        let l:key = fnamemodify(fname, ':t:r')
+        if !has_key(a:fdict, l:key)
+            let a:fdict[l:key] = fname
+        endif
+    endfor
+
+endfunction
+
+" }}}
+" set the template for vim script file {{{1
+"
+function! Set_complete_type_vim(dict, ...)
+
+    let a:dict['adict'] = "let a:dict['".s:dr."'] = ".s:dr
+
+    let a:dict['lb'] = '" '.repeat('=', 58)."\<NL>"
+    let a:dict['le'] = repeat('=', 58)."\<NL>\<BS>\<BS>"
+    let a:dict['fh'] = '" '.repeat('=', 58)."\<cr>File Name:    ".
+                \ s:sr('File Name')."\<cr>Author:       ".s:sr('Author').
+                \ "\<cr>Version:      ".s:sr('Version')."\<cr>Last Change:  ".
+                \ "\<c-r>=strftime('%Y-%m-%d %H:%M:%S')\<cr>\<cr>".
+                \ repeat('=', 58)
+
+    let a:dict['func'] = "\" ".s:dr." \{\{\{\<cr>\<cr>\<bs>\<bs>function! ".
+                \ s:dr."\<cr>".s:dr."\<cr>endfunction\<cr>\"\<cr> \}\}\}"
+
+    let a:dict['if'] = "if ".s:dr."\<cr>".s:dr."\<cr>endif\<cr>".s:dr
+    let a:dict['while'] = "while ".s:dr."\<cr>".s:dr."\<cr>endwhile\<cr>".s:dr
+    let a:dict['for'] = "for ".s:dr." in ".s:dr."\<cr>".s:dr."\<cr>endfor\<cr>".
+                \ s:dr 
+    let a:dict['try'] = "try\<cr>".s:dr."\<cr>catch ".s:dr."\<cr>".s:dr.
+                \ "\<cr>endtry\<cr>".s:dr
+
+endfunction
+
+" }}}
+" Some terminalize work {{{1
+let &cpo = s:cpo_save
+unlet s:cpo_save
+" }}}
+" vim: ft=vim:fdm=marker:co=84:ts=4:sts=4:sw=4:nu:et:sta:ai
