@@ -1,0 +1,4 @@
+.*
+update/*
+doc/tags
+doc/*.dat
