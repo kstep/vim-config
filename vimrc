@@ -1,7 +1,6 @@
 " .vimrc file
 
 " Basic config & plugins loading {{{
-colorscheme candycode
 syntax on
 filetype plugin on
 filetype indent on
@@ -166,6 +165,11 @@ let g:netrw_keepdir=0
 " }}}
 
 " Custom highlighting {{{
+if &term =~ 'builtin_gui'
+    colorscheme lucius
+else
+    colorscheme zenburn
+endif
 " }}}
 
 " vim: set ft=vim :
