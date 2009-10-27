@@ -19,7 +19,7 @@ function! s:GitGraph()
     g/refs\/remotes\//s/refs\/remotes\//remote:/ge
     g/refs\/heads/s/refs\/heads\///ge
     goto 1 | delete
-    setl ft=gitgraph fde=GitFolder(v:lnum) fdm=expr noma nomod
+    setl ft=gitgraph fde=GitFolder(v:lnum) fdm=expr nowrap noma nomod
 endfunction
 
 function! s:GitRebase(l1, l2, ...)
