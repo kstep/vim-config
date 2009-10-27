@@ -1,3 +1,13 @@
+
+function! GitFolder(lnum)
+    let l:regex = '\([0-9][|] \)* [*] '
+    let l:bline = matchstr(getline(a:lnum-1), l:regex)
+    let l:aline = matchstr(getline(a:lnum+1), l:regex)
+    let l:line = matchstr(getline(a:lnum), l:regex)
+    "echo "<".l:bline . "> - <" . l:line . "> - <" . l:aline .">"
+    return l:bline ==# l:line && l:aline ==# l:line
+endfunction
+
 function! s:GitGraph() 
     set ma
     1,$delete
@@ -9,7 +19,7 @@ function! s:GitGraph()
     g/refs\/remotes\//s/refs\/remotes\//remote:/ge
     g/refs\/heads/s/refs\/heads\///ge
     goto 1 | delete
-    setl ft=gitgraph noma nomod
+    setl ft=gitgraph fde=GitFolder(v:lnum) fdm=expr noma nomod
 endfunction
 
 function! s:GitRebase(pars)
