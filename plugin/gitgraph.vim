@@ -57,6 +57,8 @@ command! GitGraph :call <SID>GitGraph()
 command! -nargs=? -range GitRebase :call <SID>GitRebase(<line1>, <line2>, <args>)
 command! GitDelete :call <SID>GitDelete(expand('<cWORD>'), <SID>GetSynName('.', '.'))
 
-noremap ,gg :GitGraph<cr><cr>
-vnoremap ,gr <esc>:GitRebase ""<space>
-vnoremap ,gri <esc>:GitRebase "-i"<cr>
+map <buffer> dw :GitDelete<cr>
+map <buffer> ,gg :GitGraph<cr><cr>
+vmap <buffer> ,gr :GitRebase <space>
+vmap <buffer> ,gri :GitRebase "-i"<cr>
+
