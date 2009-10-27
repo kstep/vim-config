@@ -15,7 +15,7 @@ function! s:GitGraph()
     %s/\*\( \+\)/ *\1/ge
     %s/\[3\([0-9]\)m\([\|/]\)\[m/\1\2/ge
     %s/\[[0-9]*m//ge
-    g/tag: refs\/tags\//s/tag: refs\/tags\//tag:/ge
+    g/refs\/tags\//s/\(tag: \)\?refs\/tags\//tag:/ge
     g/refs\/remotes\//s/refs\/remotes\//remote:/ge
     g/refs\/heads/s/refs\/heads\///ge
     goto 1 | delete
