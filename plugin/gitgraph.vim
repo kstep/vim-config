@@ -36,6 +36,15 @@ function! s:GetSynName(l, c)
     return synIDattr(synID(line(a:l), col(a:c), 1), 'name')
 endfunction
 
+function! s:GitPush(word, syng)
+    let word = substitute(a:word, '[^:a-zA-Z0-9_/-]', '', 'g')
+    if a:syng == 'gitgraphRemoteItem'
+        let parts = split(word[7:], "/")
+        exec "!git push " . parts[0] . " " . join(parts[1:], "/")
+        call s:GitGraph()
+    endif
+endfunction
+
 function! s:GitDelete(word, syng)
     let word = substitute(a:word, '[^:a-zA-Z0-9_/-]', '', 'g')
     if a:syng == 'gitgraphRefItem'
@@ -56,9 +65,11 @@ endfunction
 command! GitGraph :call <SID>GitGraph()
 command! -nargs=? -range GitRebase :call <SID>GitRebase(<line1>, <line2>, <args>)
 command! GitDelete :call <SID>GitDelete(expand('<cWORD>'), <SID>GetSynName('.', '.'))
+command! GitPush :call <SID>GitPush(expand('<cWORD>'), <SID>GetSynName('.', '.'))
 
 map <buffer> dw :GitDelete<cr>
 map <buffer> ,gg :GitGraph<cr><cr>
+map <buffer> ,gp :GitPush<cr><cr>
 vmap <buffer> ,gr :GitRebase <space>
 vmap <buffer> ,gri :GitRebase "-i"<cr>
 
