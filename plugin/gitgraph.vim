@@ -23,8 +23,8 @@ function! s:GitGraph()
 endfunction
 
 function! s:GitRebase(l1, l2, ...)
-    let fcomm = matchstr(getline(a:l1), "[a-f0-9]\\{6,40}")
-    let tcomm = matchstr(getline(a:l2), "[a-f0-9]\\{6,40}")
+    let fcomm = matchstr(getline(a:l1), "[a-f0-9]\\{7,40}")
+    let tcomm = matchstr(getline(a:l2), "[a-f0-9]\\{7,40}")
     if fcomm != "" && tcomm != ""
         let branch = "rebase-branch-" . fcomm
         exec "!git branch " . branch . " " . fcomm . " && git rebase " . join(a:000, " ") . " " . tcomm . " " . branch

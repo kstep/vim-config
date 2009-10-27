@@ -1,6 +1,6 @@
-syn match gitgraphTree "^[ 0-9\|/*]\+\( [0-9a-f]\{5,40}\)\?\( ([:a-zA-Z0-9_/, -]\+)\)\? " contains=gitgraphTree1,gitgraphTree2,gitgraphTree3,gitgraphTree4,gitgraphTree5,gitgraphTree6,gitgraphTree7,gitgraphTree8,gitgraphTree9,gitgraphTreeC,gitgraphCommittish,gitgraphRefsList
+syn match gitgraphTree "^[ 0-9\|/*]\+\( [0-9a-f]\{7,40}\)\?\( ([:.a-zA-Z0-9_/, -]\+)\)\? " contains=gitgraphTree1,gitgraphTree2,gitgraphTree3,gitgraphTree4,gitgraphTree5,gitgraphTree6,gitgraphTree7,gitgraphTree8,gitgraphTree9,gitgraphTreeC,gitgraphCommittish,gitgraphRefsList
 
-syn match gitgraphCommittish "\<[0-9a-f]\{5,40}\>" nextgroup=gitgraphRefsList contained
+syn match gitgraphCommittish "\<[0-9a-f]\{7,40}\>" nextgroup=gitgraphRefsList contained
 
 syn region gitgraphRefsList start="(" end=")" contains=gitgraphRefItem,gitgraphRemoteItem,gitgraphTagItem,gitgraphRefSep contained
 syn match gitgraphRefItem "[a-zA-Z0-9_/-]\+" nextgroup=gitgraphRefSep contained
