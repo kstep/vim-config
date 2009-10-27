@@ -6,7 +6,7 @@ syn region gitgraphRefsList start="(" end=")" contains=gitgraphRefItem,gitgraphR
 syn match gitgraphRefItem "[a-zA-Z0-9_/-]\+" nextgroup=gitgraphRefSep contained
 syn match gitgraphTagItem "tag:[a-zA-Z0-9_/-]\+" nextgroup=gitgraphRefSep contained
 syn match gitgraphRemoteItem "remote:[a-zA-Z0-9_/-]\+" nextgroup=gitgraphRefSep contained
-syn match gitgraphRefSep ", " nextgroup=gitgraphRefItem,gitgraphTagItem contained
+syn match gitgraphRefSep ", " nextgroup=gitgraphRefItem,gitgraphTagItem,gitgraphRemoteItem contained
 
 syn match gitgraphTree1 "1[\|/]" contained contains=gitgraphTreeMarker
 syn match gitgraphTree2 "2[\|/]" contained contains=gitgraphTreeMarker
