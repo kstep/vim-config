@@ -168,7 +168,7 @@ let g:netrw_keepdir=0
 if &term =~ 'builtin_gui'
     colorscheme lucius
 else
-    colorscheme zenburn
+    colorscheme candycode
 endif
 " }}}
 
