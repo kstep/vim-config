@@ -32,6 +32,16 @@ function! s:GitRebase(l1, l2, ...)
     endif
 endfunction
 
+function! s:GitDiff(l1, l2, ...)
+    let fcomm = matchstr(getline(a:l1), "[a-f0-9]\\{7,40}")
+    let tcomm = matchstr(getline(a:l2), "[a-f0-9]\\{7,40}")
+    if fcomm != "" && tcomm != ""
+        new
+        exec "read !git diff " . join(a:000, " ") . " " . tcomm . " " . fcomm
+        setl ft=diff noma nomod
+    endif
+endfunction
+
 function! s:GetSynName(l, c)
     return synIDattr(synID(line(a:l), col(a:c), 1), 'name')
 endfunction
@@ -64,12 +74,14 @@ endfunction
 
 command! GitGraph :call <SID>GitGraph()
 command! -nargs=? -range GitRebase :call <SID>GitRebase(<line1>, <line2>, <args>)
+command! -nargs=? -range GitDiff :call <SID>GitDiff(<line1>, <line2>, <args>)
 command! GitDelete :call <SID>GitDelete(expand('<cWORD>'), <SID>GetSynName('.', '.'))
 command! GitPush :call <SID>GitPush(expand('<cWORD>'), <SID>GetSynName('.', '.'))
 
 map <buffer> dw :GitDelete<cr>
 map <buffer> ,gg :GitGraph<cr><cr>
 map <buffer> ,gp :GitPush<cr><cr>
-vmap <buffer> ,gr :GitRebase <space>
+vmap <buffer> ,gr :GitRebase<space>
 vmap <buffer> ,gri :GitRebase "-i"<cr>
+vmap <buffer> ,gd :GitDiff<cr><cr>
 
