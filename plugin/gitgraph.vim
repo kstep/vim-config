@@ -32,9 +32,13 @@ function! s:GitRebase(l1, l2, ...)
     endif
 endfunction
 
-function! GitDelete()
-    let word = substitute(expand('<cWORD>'), '[^:a-zA-Z0-9_/-]', '', 'g')
-    let synname = synIDattr(synID(line('.'), col('.'), 1), 'name')
+function! s:GetSynName(l, c)
+    return synIDattr(synID(line(a:l), col(a:c), 1), 'name')
+endfunction
+
+function! s:GitDelete(word, syng)
+    let word = substitute(a:word, '[^:a-zA-Z0-9_/-]', '', 'g')
+    if a:syng == 'gitgraphRefItem'
         let cmd = "!git branch -d " . word
     elseif a:syng == 'gitgraphTagItem'
         let cmd = "!git tag -d " . word[4:]
@@ -45,10 +49,13 @@ function! GitDelete()
         return
     endif
     exec cmd
+    "echo cmd
+    call s:GitGraph()
 endfunction
 
 command! GitGraph :call <SID>GitGraph()
 command! -nargs=? -range GitRebase :call <SID>GitRebase(<line1>, <line2>, <args>)
+command! GitDelete :call <SID>GitDelete(expand('<cWORD>'), <SID>GetSynName('.', '.'))
 
 noremap ,gg :GitGraph<cr><cr>
 vnoremap ,gr <esc>:GitRebase ""<space>
