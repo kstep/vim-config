@@ -22,9 +22,9 @@ function! s:GitGraph()
     setl ft=gitgraph fde=GitFolder(v:lnum) fdm=expr noma nomod
 endfunction
 
-function! s:GitRebase(pars)
-    let fcomm = matchstr(getline("'<"), "[a-f0-9]\\{6,40}")
-    let tcomm = matchstr(getline("'>"), "[a-f0-9]\\{6,40}")
+function! s:GitRebase(l1, l2, ...)
+    let fcomm = matchstr(getline(a:l1), "[a-f0-9]\\{6,40}")
+    let tcomm = matchstr(getline(a:l2), "[a-f0-9]\\{6,40}")
     if fcomm != "" && tcomm != ""
         let branch = "rebase-branch-" . fcomm
         exec "!git branch " . branch . " " . fcomm . " && git rebase " . join(a:000, " ") . " " . tcomm . " " . branch
@@ -48,7 +48,7 @@ function! GitDelete()
 endfunction
 
 command! GitGraph :call <SID>GitGraph()
-command! -nargs=1 GitRebase :call <SID>GitRebase(<args>)
+command! -nargs=? -range GitRebase :call <SID>GitRebase(<line1>, <line2>, <args>)
 
 noremap ,gg :GitGraph<cr><cr>
 vnoremap ,gr <esc>:GitRebase ""<space>
