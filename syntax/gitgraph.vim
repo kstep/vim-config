@@ -20,6 +20,8 @@ syn match gitgraphTree9 "9[\|/]" contained contains=gitgraphTreeMarker
 syn match gitgraphTreeC " \*" contained
 syn match gitgraphTreeMarker "[0-9]" contained
 
+syn keyword gitgraphKeywords Merge
+
 hi link gitgraphTree Special
 hi link gitgraphCommittish Number
 
@@ -28,6 +30,7 @@ hi link gitgraphRefItem Keyword
 hi link gitgraphTagItem Identifier
 hi link gitgraphRemoteItem Identifier
 hi link gitgraphRefSep Delimiter
+hi link gitgraphKeywords Keyword
 
 hi gitgraphTree1 ctermfg=1 guifg=blue
 hi gitgraphTree2 ctermfg=2 guifg=green
