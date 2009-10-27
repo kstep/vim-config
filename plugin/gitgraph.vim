@@ -70,6 +70,15 @@ function! s:GitPush(word, syng)
     endif
 endfunction
 
+function! s:GitPull(word, syng)
+    let word = substitute(a:word, '[^:a-zA-Z0-9_/-]', '', 'g')
+    if a:syng == 'gitgraphRemoteItem'
+        let parts = split(word[7:], "/")
+        exec "!git pull " . parts[0] . " " . join(parts[1:], "/")
+        call s:GitGraph()
+    endif
+endfunction
+
 function! s:GitDelete(word, syng)
     let word = substitute(a:word, '[^:a-zA-Z0-9_/-]', '', 'g')
     if a:syng == 'gitgraphRefItem'
