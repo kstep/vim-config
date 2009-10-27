@@ -96,16 +96,23 @@ function! s:GitDelete(word, syng)
     call s:GitGraph()
 endfunction
 
-command! GitGraph :call <SID>GitGraph()
-command! -nargs=? -range GitRebase :call <SID>GitRebase(<line1>, <line2>, <args>)
-command! -nargs=? -range GitDiff :call <SID>GitDiff(<line1>, <line2>, <args>)
-command! GitDelete :call <SID>GitDelete(expand('<cWORD>'), <SID>GetSynName('.', '.'))
-command! GitPush :call <SID>GitPush(expand('<cWORD>'), <SID>GetSynName('.', '.'))
+function! s:GitMappings()
+    command! -buffer -nargs=? -range GitRebase :call <SID>GitRebase(<line1>, <line2>, <args>)
+    command! -buffer -nargs=? -range GitDiff :call <SID>GitDiff(<line1>, <line2>, <args>)
+    command! -buffer GitDelete :call <SID>GitDelete(expand('<cWORD>'), <SID>GetSynName('.', '.'))
+    command! -buffer GitPush :call <SID>GitPush(expand('<cWORD>'), <SID>GetSynName('.', '.'))
+    command! -buffer GitPull :call <SID>GitPull(expand('<cWORD>'), <SID>GetSynName('.', '.'))
 
-map <buffer> dw :GitDelete<cr>
-map <buffer> ,gg :GitGraph<cr><cr>
-map <buffer> ,gp :GitPush<cr><cr>
-vmap <buffer> ,gr :GitRebase<space>
-vmap <buffer> ,gri :GitRebase "-i"<cr>
-vmap <buffer> ,gd :GitDiff<cr><cr>
+    map <buffer> dw :GitDelete<cr>
+    map <buffer> ,gp :GitPush<cr><cr>
+    map <buffer> ,gu :GitPull<cr><cr>
+
+    vmap <buffer> ,gr :GitRebase<space>
+    vmap <buffer> ,gri :GitRebase "-i"<cr>
+    vmap <buffer> ,gd :GitDiff<cr><cr>
+endfunction
+
+command! -nargs=* GitGraph :call <SID>GitGraph(<args>)
+
+map ,gg :GitGraph<cr><cr>
 
