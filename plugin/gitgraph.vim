@@ -1,11 +1,11 @@
 
 function! GitFolder(lnum)
-    let l:regex = '\([0-9][|] \)* [*] '
-    let l:bline = matchstr(getline(a:lnum-1), l:regex)
-    let l:aline = matchstr(getline(a:lnum+1), l:regex)
-    let l:line = matchstr(getline(a:lnum), l:regex)
-    "echo "<".l:bline . "> - <" . l:line . "> - <" . l:aline .">"
-    return l:bline ==# l:line && l:aline ==# l:line
+    let regex = '\([0-9][|] \)* [*] '
+    let bline = matchstr(getline(a:lnum-1), regex)
+    let aline = matchstr(getline(a:lnum+1), regex)
+    let line = matchstr(getline(a:lnum), regex)
+    "echo "<".bline . "> - <" . line . "> - <" . aline .">"
+    return bline ==# line && aline ==# line
 endfunction
 
 function! s:GitGraph() 
@@ -23,28 +23,28 @@ function! s:GitGraph()
 endfunction
 
 function! s:GitRebase(pars)
-    let l:fcomm = matchstr(getline("'<"), "[a-f0-9]\\{6,40}")
-    let l:tcomm = matchstr(getline("'>"), "[a-f0-9]\\{6,40}")
-    if l:fcomm != "" && l:tcomm != ""
-        let l:branch = "rebase-branch-" . l:fcomm
-        exec "!git branch " . l:branch . " " . l:fcomm . " && git rebase " . a:pars . " " . l:tcomm . " " . l:branch
-        "quit!
+    let fcomm = matchstr(getline("'<"), "[a-f0-9]\\{6,40}")
+    let tcomm = matchstr(getline("'>"), "[a-f0-9]\\{6,40}")
+    if fcomm != "" && tcomm != ""
+        let branch = "rebase-branch-" . fcomm
+        exec "!git branch " . branch . " " . fcomm . " && git rebase " . join(a:000, " ") . " " . tcomm . " " . branch
         call s:GitGraph()
     endif
 endfunction
 
 function! GitDelete()
-    let l:word = substitute(expand('<cWORD>'), '[^:a-zA-Z0-9_/-]', '', 'g')
-    let l:synname = synIDattr(synID(line('.'), col('.'), 1), 'name')
-    if l:synname == 'gitgraphRefItem'
-        let l:cmd = "!git branch -d " . l:word
-    elseif l:synname == 'gitgraphTagItem'
-        let l:cmd = "!git tag -d " . l:word[4:]
-    elseif l:synname == 'gitgraphRemoteItem'
-        let l:parts = split(l:word[7:], "/")
-        let l:cmd = "!git push " . l:parts[0] . " " . join(l:parts[1:], "/") . ":"
+    let word = substitute(expand('<cWORD>'), '[^:a-zA-Z0-9_/-]', '', 'g')
+    let synname = synIDattr(synID(line('.'), col('.'), 1), 'name')
+        let cmd = "!git branch -d " . word
+    elseif a:syng == 'gitgraphTagItem'
+        let cmd = "!git tag -d " . word[4:]
+    elseif a:syng == 'gitgraphRemoteItem'
+        let parts = split(word[7:], "/")
+        let cmd = "!git push " . parts[0] . " " . join(parts[1:], "/") . ":"
+    else
+        return
     endif
-    exec l:cmd
+    exec cmd
 endfunction
 
 command! GitGraph :call <SID>GitGraph()
