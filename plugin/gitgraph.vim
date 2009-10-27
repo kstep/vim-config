@@ -8,13 +8,26 @@ function! GitFolder(lnum)
     return bline ==# line && aline ==# line
 endfunction
 
-function! s:GitGraph() 
-    set ma
-    1,$delete
-    read !git log --graph --decorate --format=oneline --abbrev-commit --color --all
+" a:0 - branch, a:1 - order
+function! s:GitGraph(...) 
+    if bufname("%") ==# "[Git Graph]"
+        set ma
+        1,$delete
+    else
+        new
+        file [Git\ Graph]
+        call s:GitMappings()
+    endif
+
+    let order = exists("a:2") && a:2 ? "date" : "topo"
+    let branch = exists("a:1") && a:1 != "" ? a:1 : "\--all"
+    let cmd = "read !git log --graph --decorate --format=oneline --abbrev-commit --color --" . order . "-order " . branch
+    exec cmd
+
     %s/\*\( \+\)/ *\1/ge
     %s/\[3\([0-9]\)m\([\|/]\)\[m/\1\2/ge
     %s/\[[0-9]*m//ge
+
     g/refs\/tags\//s/\(tag: \)\?refs\/tags\//tag:/ge
     g/refs\/remotes\//s/refs\/remotes\//remote:/ge
     g/refs\/heads/s/refs\/heads\///ge
