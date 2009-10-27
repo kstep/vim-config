@@ -3,9 +3,9 @@ syn match gitgraphTree "^[ 0-9\|/*]\+\( [0-9a-f]\{7,40}\)\?\( ([:.a-zA-Z0-9_/, -
 syn match gitgraphCommittish "\<[0-9a-f]\{7,40}\>" nextgroup=gitgraphRefsList contained
 
 syn region gitgraphRefsList start="(" end=")" contains=gitgraphRefItem,gitgraphRemoteItem,gitgraphTagItem,gitgraphRefSep contained
-syn match gitgraphRefItem "[a-zA-Z0-9_/-]\+" nextgroup=gitgraphRefSep contained
-syn match gitgraphTagItem "tag:[a-zA-Z0-9_/-]\+" nextgroup=gitgraphRefSep contained
-syn match gitgraphRemoteItem "remote:[a-zA-Z0-9_/-]\+" nextgroup=gitgraphRefSep contained
+syn match gitgraphRefItem "[.a-zA-Z0-9_/-]\+" nextgroup=gitgraphRefSep contained
+syn match gitgraphTagItem "tag:[.a-zA-Z0-9_/-]\+" nextgroup=gitgraphRefSep contained
+syn match gitgraphRemoteItem "remote:[.a-zA-Z0-9_/-]\+" nextgroup=gitgraphRefSep contained
 syn match gitgraphRefSep ", " nextgroup=gitgraphRefItem,gitgraphTagItem,gitgraphRemoteItem contained
 
 syn match gitgraphTree1 "1[\|/]" contained contains=gitgraphTreeMarker
