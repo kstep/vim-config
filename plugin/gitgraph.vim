@@ -66,7 +66,7 @@ function! s:GitDiff(l1, l2, ...)
     if fcomm != "" && tcomm != ""
         if fcomm == tcomm | let tcomm = "" | endif
         new
-        exec "read !git diff " . join(a:000, " ") . " " . tcomm . " " . fcomm
+        exec "0read !git diff " . join(a:000, " ") . " " . tcomm . " " . fcomm
         setl ft=diff noma nomod
     endif
 endfunction
