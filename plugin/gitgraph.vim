@@ -37,14 +37,14 @@ function! s:GitGraph(...)
     let cmd = "0read !git log --graph --decorate --format=oneline --abbrev-commit --color --" . order . "-order " . branch . " -- " . afile
     exec cmd
 
-    %s/\*\( \+\)/ *\1/ge
-    %s/\[3\([0-9]\)m\([\|/]\)\[m/\1\2/ge
-    %s/\[[0-9]*m//ge
+    silent! %s/\*\( \+\)/ *\1/ge
+    silent! %s/\[3\([0-9]\)m\([\|/]\)\[m/\1\2/ge
+    silent! %s/\[[0-9]*m//ge
 
-    g/refs\/tags\//s/\(tag: \)\?refs\/tags\//tag:/ge
-    g/refs\/remotes\//s/refs\/remotes\//remote:/ge
-    g/refs\/heads/s/refs\/heads\///ge
-
+    silent! g/refs\/tags\//s/\(tag: \)\?refs\/tags\//tag:/ge
+    silent! g/refs\/remotes\//s/refs\/remotes\//remote:/ge
+    silent! g/refs\/heads/s/refs\/heads\///ge
+    silent! g/refs\/stash/s/refs\/stash/stash/ge
 
     goto 1
     setl bt=nofile bh=delete ft=gitgraph fde=GitFolder(v:lnum) fdm=expr nowrap noma nomod noswf
@@ -132,6 +132,7 @@ function! s:GitMappings()
     command! -buffer -nargs=? -range GitRebase :call <SID>GitRebase(<line1>, <line2>, <args>)
     command! -buffer -nargs=? -range GitDiff :call <SID>GitDiff(<line1>, <line2>, <args>)
     command! -buffer GitDelete :call <SID>GitDelete(expand('<cWORD>'), <SID>GetSynName('.', '.'))
+
     command! -buffer GitPush :call <SID>GitPush(expand('<cWORD>'), <SID>GetSynName('.', '.'))
     command! -buffer GitPull :call <SID>GitPull(expand('<cWORD>'), <SID>GetSynName('.', '.'))
     command! -buffer GitCheckout :call <SID>GitCheckout(expand('<cWORD>'), <SID>GetSynName('.', '.'))
