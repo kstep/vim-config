@@ -77,11 +77,13 @@ function! s:GetSynName(l, c)
     return synIDattr(synID(line(a:l), col(a:c), 1), 'name')
 endfunction
 
-function! s:GitPush(word, syng)
+" a:1 - force
+function! s:GitPush(word, syng, ...)
     let word = substitute(a:word, '[^:a-zA-Z0-9_/-]', '', 'g')
     if a:syng == 'gitgraphRemoteItem'
         let parts = split(word[7:], "/")
-        exec "!git push " . parts[0] . " " . join(parts[1:], "/")
+        let force = exists("a:1") && a:1 ? " -f " : ""
+        exec "!git push " . force . " " . parts[0] . " " . join(parts[1:], "/")
         call s:GitGraph()
     endif
 endfunction
@@ -102,15 +104,19 @@ function! s:GitPull(word, syng)
     endif
 endfunction
 
-function! s:GitDelete(word, syng)
+" a:1 - force
+function! s:GitDelete(word, syng, ...)
+    let force = exists("a:1") && a:1
     let word = substitute(a:word, '[^:a-zA-Z0-9_/-]', '', 'g')
     if a:syng == 'gitgraphRefItem'
-        let cmd = "!git branch -d " . word
+        let par = force ? "-D" : "-d"
+        let cmd = "!git branch " . par . " " . word
     elseif a:syng == 'gitgraphTagItem'
         let cmd = "!git tag -d " . word[4:]
     elseif a:syng == 'gitgraphRemoteItem'
+        let par = force ? "-f" : ""
         let parts = split(word[7:], "/")
-        let cmd = "!git push " . parts[0] . " " . join(parts[1:], "/") . ":"
+        let cmd = "!git push " . par . " " . parts[0] . " " . join(parts[1:], "/") . ":"
     else
         return
     endif
@@ -132,11 +138,11 @@ function! s:GitSVNDcommit(word, syng)
 endfunction
 
 function! s:GitMappings()
-    command! -buffer GitDelete :call <SID>GitDelete(expand('<cWORD>'), <SID>GetSynName('.', '.'))
     command! -buffer -nargs=* -range GitRebase :call <SID>GitRebase(<line1>, <line2>, <f-args>)
     command! -buffer -nargs=* -range GitDiff :call <SID>GitDiff(<line1>, <line2>, <f-args>)
+    command! -buffer -nargs=? GitDelete :call <SID>GitDelete(expand('<cWORD>'), <SID>GetSynName('.', '.'), <f-args>)
 
-    command! -buffer GitPush :call <SID>GitPush(expand('<cWORD>'), <SID>GetSynName('.', '.'))
+    command! -buffer -nargs=? GitPush :call <SID>GitPush(expand('<cWORD>'), <SID>GetSynName('.', '.'), <f-args>)
     command! -buffer GitPull :call <SID>GitPull(expand('<cWORD>'), <SID>GetSynName('.', '.'))
     command! -buffer GitCheckout :call <SID>GitCheckout(expand('<cWORD>'), <SID>GetSynName('.', '.'))
 
