@@ -22,7 +22,7 @@ function! s:GitGraph(...)
 
     if bufname('%') =~# '^\[Git Graph\]'
         if afile == '' | let afile = b:gitgraph_file | endif
-        if branch == '' | let afile = b:gitgraph_branch | endif
+        if branch == '' | let branch = b:gitgraph_branch | endif
         set ma
         1,$delete
     else
