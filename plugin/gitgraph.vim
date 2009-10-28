@@ -129,8 +129,8 @@ function! s:GitSVNDcommit(word, syng)
 endfunction
 
 function! s:GitMappings()
-    command! -buffer -nargs=? -range GitRebase :call <SID>GitRebase(<line1>, <line2>, <args>)
-    command! -buffer -nargs=? -range GitDiff :call <SID>GitDiff(<line1>, <line2>, <args>)
+    command! -buffer -nargs=? -range GitRebase :call <SID>GitRebase(<line1>, <line2>, <f-args>)
+    command! -buffer -nargs=? -range GitDiff :call <SID>GitDiff(<line1>, <line2>, <f-args>)
     command! -buffer GitDelete :call <SID>GitDelete(expand('<cWORD>'), <SID>GetSynName('.', '.'))
 
     command! -buffer GitPush :call <SID>GitPush(expand('<cWORD>'), <SID>GetSynName('.', '.'))
