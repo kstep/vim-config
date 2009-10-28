@@ -34,7 +34,7 @@ function! s:GitGraph(...)
         call s:GitMappings()
     endif
 
-    let cmd = "0read !git log --graph --decorate --format=oneline --abbrev-commit --color --" . order . "-order " . branch . " -- " . afile
+    let cmd = "0read !git log --graph --decorate=full --format=format:'\\%Creset\\%h\\%d [\\%aN] \\%s' --abbrev-commit --color --" . order . "-order " . branch . " -- " . afile
     exec cmd
 
     silent! %s/\*\( \+\)/ *\1/ge

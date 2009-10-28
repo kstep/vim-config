@@ -1,4 +1,4 @@
-syn match gitgraphTree "^[ 0-9\|/*]\+\( [0-9a-f]\{7,40}\)\?\( ([:.a-zA-Z0-9_/, -]\+)\)\? " contains=gitgraphTree1,gitgraphTree2,gitgraphTree3,gitgraphTree4,gitgraphTree5,gitgraphTree6,gitgraphTree7,gitgraphTree8,gitgraphTree9,gitgraphTreeC,gitgraphCommittish,gitgraphRefsList
+syn match gitgraphTree "^[ 0-9\|/*]\+\( [0-9a-f]\{7,40}\)\?\( ([:.a-zA-Z0-9_/, -]\+)\)\?\( \[[^]]\+\]\)\? " contains=gitgraphTree1,gitgraphTree2,gitgraphTree3,gitgraphTree4,gitgraphTree5,gitgraphTree6,gitgraphTree7,gitgraphTree8,gitgraphTree9,gitgraphTreeC,gitgraphCommittish,gitgraphRefsList,gitgraphAuthor
 
 syn match gitgraphCommittish "\<[0-9a-f]\{7,40}\>" nextgroup=gitgraphRefsList contained
 
@@ -8,6 +8,8 @@ syn match gitgraphTagItem "tag:[.a-zA-Z0-9_/-]\+" nextgroup=gitgraphRefSep conta
 syn match gitgraphRemoteItem "remote:[.a-zA-Z0-9_/-]\+" nextgroup=gitgraphRefSep contained
 syn keyword gitgraphStashItem stash nextgroup=gitgraphRefSep contained
 syn match gitgraphRefSep ", " nextgroup=gitgraphRefItem,gitgraphTagItem,gitgraphStashItem,gitgraphRemoteItem contained
+
+syn match gitgraphAuthor "\[.*\]" contained
 
 syn match gitgraphTree1 "1[\|/]" contained contains=gitgraphTreeMarker
 syn match gitgraphTree2 "2[\|/]" contained contains=gitgraphTreeMarker
@@ -33,6 +35,7 @@ hi link gitgraphTagItem Identifier
 hi link gitgraphRemoteItem Identifier
 hi link gitgraphRefSep Delimiter
 hi link gitgraphKeywords Keyword
+hi link gitgraphAuthor Constant
 
 hi gitgraphTree1 ctermfg=1 guifg=blue
 hi gitgraphTree2 ctermfg=2 guifg=green
