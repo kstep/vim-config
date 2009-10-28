@@ -103,6 +103,18 @@ function! s:GitDelete(word, syng)
     call s:GitGraph()
 endfunction
 
+function! s:GitSVNRebase(word, syng)
+    call s:GitCheckout(a:word, a:syng)
+    exec "!git svn rebase"
+    call s:GitGraph()
+endfunction
+
+function! s:GitSVNDcommit(word, syng)
+    call s:GitCheckout(a:word, a:syng)
+    exec "!git svn dcommit"
+    call s:GitGraph()
+endfunction
+
 function! s:GitMappings()
     command! -buffer -nargs=? -range GitRebase :call <SID>GitRebase(<line1>, <line2>, <args>)
     command! -buffer -nargs=? -range GitDiff :call <SID>GitDiff(<line1>, <line2>, <args>)
@@ -110,6 +122,9 @@ function! s:GitMappings()
     command! -buffer GitPush :call <SID>GitPush(expand('<cWORD>'), <SID>GetSynName('.', '.'))
     command! -buffer GitPull :call <SID>GitPull(expand('<cWORD>'), <SID>GetSynName('.', '.'))
     command! -buffer GitCheckout :call <SID>GitCheckout(expand('<cWORD>'), <SID>GetSynName('.', '.'))
+
+    command! -buffer GitSVNRebase :call <SID>GitSVNRebase(expand('<cWORD>'), <SID>GetSynName('.', '.'))
+    command! -buffer GitSVNDcommit :call <SID>GitSVNDcommit(expand('<cWORD>'), <SID>GetSynName('.', '.'))
 
     map <buffer> dw :GitDelete<cr>
     map <buffer> ,gp :GitPush<cr><cr>
@@ -119,6 +134,9 @@ function! s:GitMappings()
     vmap <buffer> ,gr :GitRebase<space>
     vmap <buffer> ,gri :GitRebase "-i"<cr>
     vmap <buffer> ,gd :GitDiff<cr><cr>
+
+    map <buffer> ,su :GitSVNRebase<cr><cr>
+    map <buffer> ,sp :GitSVNDcommit<cr><cr>
 endfunction
 
 command! -nargs=* GitGraph :call <SID>GitGraph(<args>)
