@@ -50,6 +50,14 @@ function! s:GitGraph(...)
     setl bt=nofile bh=delete ft=gitgraph fde=GitFolder(v:lnum) fdm=expr nowrap noma nomod noswf
 endfunction
 
+function! s:GitBranch(line, branch)
+    let commit = matchstr(getline(a:line), "[a-f0-9]\\{7,40}")
+    if a:branch != ""
+        exec "!git branch " . shellescape(a:branch) . " " . commit
+        call s:GitGraph()
+    endif
+endfunction
+
 " a:000 - additional params
 function! s:GitRebase(l1, l2, ...)
     let fcomm = matchstr(getline(a:l1), "[a-f0-9]\\{7,40}")
@@ -141,6 +149,7 @@ function! s:GitMappings()
     command! -buffer -nargs=* -range GitRebase :call <SID>GitRebase(<line1>, <line2>, <f-args>)
     command! -buffer -nargs=* -range GitDiff :call <SID>GitDiff(<line1>, <line2>, <f-args>)
     command! -buffer -nargs=? GitDelete :call <SID>GitDelete(expand('<cWORD>'), <SID>GetSynName('.', '.'), <f-args>)
+    command! -buffer GitBranch :call <SID>GitBranch('.', input("Enter new branch name: "))
 
     command! -buffer -nargs=? GitPush :call <SID>GitPush(expand('<cWORD>'), <SID>GetSynName('.', '.'), <f-args>)
     command! -buffer GitPull :call <SID>GitPull(expand('<cWORD>'), <SID>GetSynName('.', '.'))
@@ -153,6 +162,7 @@ function! s:GitMappings()
     map <buffer> ,gp :GitPush<cr><cr>
     map <buffer> ,gu :GitPull<cr><cr>
     map <buffer> ,gc :GitCheckout<cr><cr>
+    map <buffer> ,gb :GitBranch<cr>
 
     vmap <buffer> ,gr :GitRebase<space>
     vmap <buffer> ,gri :GitRebase "-i"<cr>
