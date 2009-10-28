@@ -2,11 +2,12 @@ syn match gitgraphTree "^[ 0-9\|/*]\+\( [0-9a-f]\{7,40}\)\?\( ([:.a-zA-Z0-9_/, -
 
 syn match gitgraphCommittish "\<[0-9a-f]\{7,40}\>" nextgroup=gitgraphRefsList contained
 
-syn region gitgraphRefsList start="(" end=")" contains=gitgraphRefItem,gitgraphRemoteItem,gitgraphTagItem,gitgraphRefSep contained
+syn region gitgraphRefsList start="(" end=")" contains=gitgraphRefItem,gitgraphRemoteItem,gitgraphTagItem,gitgraphStashItem,gitgraphRefSep contained
 syn match gitgraphRefItem "[.a-zA-Z0-9_/-]\+" nextgroup=gitgraphRefSep contained
 syn match gitgraphTagItem "tag:[.a-zA-Z0-9_/-]\+" nextgroup=gitgraphRefSep contained
 syn match gitgraphRemoteItem "remote:[.a-zA-Z0-9_/-]\+" nextgroup=gitgraphRefSep contained
-syn match gitgraphRefSep ", " nextgroup=gitgraphRefItem,gitgraphTagItem,gitgraphRemoteItem contained
+syn keyword gitgraphStashItem stash nextgroup=gitgraphRefSep contained
+syn match gitgraphRefSep ", " nextgroup=gitgraphRefItem,gitgraphTagItem,gitgraphStashItem,gitgraphRemoteItem contained
 
 syn match gitgraphTree1 "1[\|/]" contained contains=gitgraphTreeMarker
 syn match gitgraphTree2 "2[\|/]" contained contains=gitgraphTreeMarker
@@ -27,6 +28,7 @@ hi link gitgraphCommittish Number
 
 hi link gitgraphRefsList String
 hi link gitgraphRefItem Keyword
+hi link gitgraphStashItem Special
 hi link gitgraphTagItem Identifier
 hi link gitgraphRemoteItem Identifier
 hi link gitgraphRefSep Delimiter
