@@ -64,6 +64,7 @@ function! s:GitDiff(l1, l2, ...)
     let fcomm = matchstr(getline(a:l1), "[a-f0-9]\\{7,40}")
     let tcomm = matchstr(getline(a:l2), "[a-f0-9]\\{7,40}")
     if fcomm != "" && tcomm != ""
+        if fcomm == tcomm | let tcomm = "" | endif
         new
         exec "read !git diff " . join(a:000, " ") . " " . tcomm . " " . fcomm
         setl ft=diff noma nomod
