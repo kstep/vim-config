@@ -8,7 +8,13 @@ function! GitFolder(lnum)
     return bline ==# line && aline ==# line
 endfunction
 
-" a:0 - branch, a:1 - order
+function! GitBranchCompleter(arg, cline, cpos)
+    let cmd = 'git branch | cut -c 3-'
+    let lst = system(cmd)
+    return lst
+endfunction
+
+" a:1 - branch, a:2 - order, a:3 - file
 function! s:GitGraph(...) 
     if bufname("%") ==# "[Git Graph]"
         set ma
@@ -139,7 +145,7 @@ function! s:GitMappings()
     map <buffer> ,sp :GitSVNDcommit<cr><cr>
 endfunction
 
-command! -nargs=* GitGraph :call <SID>GitGraph(<args>)
+command! -nargs=* -complete=custom,GitBranchCompleter GitGraph :call <SID>GitGraph(<f-args>)
 
 map ,gg :GitGraph<cr><cr>
 
