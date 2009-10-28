@@ -50,6 +50,7 @@ function! s:GitGraph(...)
     setl bt=nofile bh=delete ft=gitgraph fde=GitFolder(v:lnum) fdm=expr nowrap noma nomod noswf
 endfunction
 
+" a:000 - additional params
 function! s:GitRebase(l1, l2, ...)
     let fcomm = matchstr(getline(a:l1), "[a-f0-9]\\{7,40}")
     let tcomm = matchstr(getline(a:l2), "[a-f0-9]\\{7,40}")
@@ -60,6 +61,7 @@ function! s:GitRebase(l1, l2, ...)
     endif
 endfunction
 
+" a:000 - additional params
 function! s:GitDiff(l1, l2, ...)
     let fcomm = matchstr(getline(a:l1), "[a-f0-9]\\{7,40}")
     let tcomm = matchstr(getline(a:l2), "[a-f0-9]\\{7,40}")
@@ -130,9 +132,9 @@ function! s:GitSVNDcommit(word, syng)
 endfunction
 
 function! s:GitMappings()
-    command! -buffer -nargs=? -range GitRebase :call <SID>GitRebase(<line1>, <line2>, <f-args>)
-    command! -buffer -nargs=? -range GitDiff :call <SID>GitDiff(<line1>, <line2>, <f-args>)
     command! -buffer GitDelete :call <SID>GitDelete(expand('<cWORD>'), <SID>GetSynName('.', '.'))
+    command! -buffer -nargs=* -range GitRebase :call <SID>GitRebase(<line1>, <line2>, <f-args>)
+    command! -buffer -nargs=* -range GitDiff :call <SID>GitDiff(<line1>, <line2>, <f-args>)
 
     command! -buffer GitPush :call <SID>GitPush(expand('<cWORD>'), <SID>GetSynName('.', '.'))
     command! -buffer GitPull :call <SID>GitPull(expand('<cWORD>'), <SID>GetSynName('.', '.'))
