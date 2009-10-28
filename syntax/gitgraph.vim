@@ -26,13 +26,13 @@ syn match gitgraphTreeMarker "[0-9]" contained
 syn keyword gitgraphKeywords Merge
 
 hi link gitgraphTree Special
-hi link gitgraphCommittish Number
+hi link gitgraphCommittish Identifier
 
 hi link gitgraphRefsList String
-hi link gitgraphRefItem Keyword
-hi link gitgraphStashItem Special
-hi link gitgraphTagItem Identifier
-hi link gitgraphRemoteItem Identifier
+hi link gitgraphRefItem Label
+hi link gitgraphStashItem Todo
+hi link gitgraphTagItem Tag
+hi link gitgraphRemoteItem Include
 hi link gitgraphRefSep Delimiter
 hi link gitgraphKeywords Keyword
 hi link gitgraphAuthor Constant
