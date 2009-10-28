@@ -70,6 +70,13 @@ function! s:GitPush(word, syng)
     endif
 endfunction
 
+function! s:GitCheckout(word, syng)
+    let word = substitute(a:word, '[^:a-zA-Z0-9_/-]', '', 'g')
+    if a:syng == 'gitgraphRefItem'
+        exec "!git checkout " . word
+    endif
+endfunction
+
 function! s:GitPull(word, syng)
     let word = substitute(a:word, '[^:a-zA-Z0-9_/-]', '', 'g')
     if a:syng == 'gitgraphRemoteItem'
@@ -102,10 +109,12 @@ function! s:GitMappings()
     command! -buffer GitDelete :call <SID>GitDelete(expand('<cWORD>'), <SID>GetSynName('.', '.'))
     command! -buffer GitPush :call <SID>GitPush(expand('<cWORD>'), <SID>GetSynName('.', '.'))
     command! -buffer GitPull :call <SID>GitPull(expand('<cWORD>'), <SID>GetSynName('.', '.'))
+    command! -buffer GitCheckout :call <SID>GitCheckout(expand('<cWORD>'), <SID>GetSynName('.', '.'))
 
     map <buffer> dw :GitDelete<cr>
     map <buffer> ,gp :GitPush<cr><cr>
     map <buffer> ,gu :GitPull<cr><cr>
+    map <buffer> ,gc :GitCheckout<cr><cr>
 
     vmap <buffer> ,gr :GitRebase<space>
     vmap <buffer> ,gri :GitRebase "-i"<cr>
