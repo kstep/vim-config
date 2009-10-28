@@ -121,6 +121,7 @@ noremap <F10> :set list!<CR>
 noremap <Leader>= :call SignMark("mark")<CR>
 noremap <Leader>- :call UnSignMark()<CR>
 noremap <Leader>_ :sign unplace *<CR>
+noremap <Leader>ca :VCSAnnotate<CR>
 
 vnoremap ,aa :Align =><CR>
 vnoremap ,a= :Align =<CR>
