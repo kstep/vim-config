@@ -38,7 +38,7 @@ function! s:GitGraph(...)
     exec cmd
 
     silent! %s/\*\( \+\)/ *\1/ge
-    silent! %s/\[3\([0-9]\)m\([\|/]\)\[m/\1\2/ge
+    silent! %s/\[3\([0-9]\)m\([\|/_]\)\[m/\1\2/ge
     silent! %s/\[[0-9]*m//ge
 
     silent! g/refs\/tags\//s/\(tag: \)\?refs\/tags\//tag:/ge

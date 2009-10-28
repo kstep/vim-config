@@ -1,4 +1,4 @@
-syn match gitgraphTree "^[ 0-9\|/*]\+\( [0-9a-f]\{7,40}\)\?\( ([:.a-zA-Z0-9_/, -]\+)\)\?\( \[[^]]\+\]\)\? " contains=gitgraphTree1,gitgraphTree2,gitgraphTree3,gitgraphTree4,gitgraphTree5,gitgraphTree6,gitgraphTree7,gitgraphTree8,gitgraphTree9,gitgraphTreeC,gitgraphCommittish,gitgraphRefsList,gitgraphAuthor
+syn match gitgraphTree "^[ 0-9\|/_*]\+\( [0-9a-f]\{7,40}\)\?\( ([:.a-zA-Z0-9_/, -]\+)\)\?\( \[[^]]\+\]\)\? " contains=gitgraphTree1,gitgraphTree2,gitgraphTree3,gitgraphTree4,gitgraphTree5,gitgraphTree6,gitgraphTree7,gitgraphTree8,gitgraphTree9,gitgraphTreeC,gitgraphCommittish,gitgraphRefsList,gitgraphAuthor
 
 syn match gitgraphCommittish "\<[0-9a-f]\{7,40}\>" nextgroup=gitgraphRefsList contained
 
@@ -11,15 +11,15 @@ syn match gitgraphRefSep ", " nextgroup=gitgraphRefItem,gitgraphTagItem,gitgraph
 
 syn match gitgraphAuthor "\[.*\]" contained
 
-syn match gitgraphTree1 "1[\|/]" contained contains=gitgraphTreeMarker
-syn match gitgraphTree2 "2[\|/]" contained contains=gitgraphTreeMarker
-syn match gitgraphTree3 "3[\|/]" contained contains=gitgraphTreeMarker
-syn match gitgraphTree4 "4[\|/]" contained contains=gitgraphTreeMarker
-syn match gitgraphTree5 "5[\|/]" contained contains=gitgraphTreeMarker
-syn match gitgraphTree6 "6[\|/]" contained contains=gitgraphTreeMarker
-syn match gitgraphTree7 "7[\|/]" contained contains=gitgraphTreeMarker
-syn match gitgraphTree8 "8[\|/]" contained contains=gitgraphTreeMarker
-syn match gitgraphTree9 "9[\|/]" contained contains=gitgraphTreeMarker
+syn match gitgraphTree1 "1[\|/_]" contained contains=gitgraphTreeMarker
+syn match gitgraphTree2 "2[\|/_]" contained contains=gitgraphTreeMarker
+syn match gitgraphTree3 "3[\|/_]" contained contains=gitgraphTreeMarker
+syn match gitgraphTree4 "4[\|/_]" contained contains=gitgraphTreeMarker
+syn match gitgraphTree5 "5[\|/_]" contained contains=gitgraphTreeMarker
+syn match gitgraphTree6 "6[\|/_]" contained contains=gitgraphTreeMarker
+syn match gitgraphTree7 "7[\|/_]" contained contains=gitgraphTreeMarker
+syn match gitgraphTree8 "8[\|/_]" contained contains=gitgraphTreeMarker
+syn match gitgraphTree9 "9[\|/_]" contained contains=gitgraphTreeMarker
 syn match gitgraphTreeC " \*" contained
 syn match gitgraphTreeMarker "[0-9]" contained
 
