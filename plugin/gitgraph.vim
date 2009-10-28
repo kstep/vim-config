@@ -16,18 +16,25 @@ endfunction
 
 " a:1 - branch, a:2 - order, a:3 - file
 function! s:GitGraph(...) 
-    if bufname("%") ==# "[Git Graph]"
+    let branch = exists('a:1') && a:1 != '' ? a:1 : ''
+    let order = exists('a:2') && a:2 ? 'date' : 'topo'
+    let afile = exists('a:3') && a:3 != '' ? a:3 : ''
+
+    if bufname('%') =~# '^\[Git Graph\]'
+        if afile == '' | let afile = b:gitgraph_file | endif
+        if branch == '' | let afile = b:gitgraph_branch | endif
         set ma
         1,$delete
     else
         new
         file [Git\ Graph]
+        let b:gitgraph_file = afile
+        let b:gitgraph_branch = branch
+        au ColorScheme <buffer> setl ft=gitgraph
         call s:GitMappings()
     endif
 
-    let order = exists("a:2") && a:2 ? "date" : "topo"
-    let branch = exists("a:1") && a:1 != "" ? a:1 : "\--all"
-    let cmd = "read !git log --graph --decorate --format=oneline --abbrev-commit --color --" . order . "-order " . branch
+    let cmd = "0read !git log --graph --decorate --format=oneline --abbrev-commit --color --" . order . "-order " . branch . " -- " . afile
     exec cmd
 
     %s/\*\( \+\)/ *\1/ge
@@ -38,8 +45,8 @@ function! s:GitGraph(...)
     g/refs\/remotes\//s/refs\/remotes\//remote:/ge
     g/refs\/heads/s/refs\/heads\///ge
 
-    goto 1 | delete
 
+    goto 1
     setl bt=nofile bh=delete ft=gitgraph fde=GitFolder(v:lnum) fdm=expr nowrap noma nomod noswf
 endfunction
 
@@ -147,5 +154,6 @@ endfunction
 
 command! -nargs=* -complete=custom,GitBranchCompleter GitGraph :call <SID>GitGraph(<f-args>)
 
-map ,gg :GitGraph<cr><cr>
+map ,gg :GitGraph "--all"<cr><cr>
+map ,gf :exec 'GitGraph "--all" 0 '.expand('%:p')<cr><cr>
 
