@@ -102,6 +102,13 @@ function! s:GitBranch(commit, branch)
     endif
 endfunction
 
+function! s:GitMerge(tobranch, frombranch, ...)
+    if a:tobranch != "" && a:frombranch != ""
+        exec "!git checkout " . shellescape(a:tobranch) . " && git merge " . join(a:000, " ") . " " . shellescape(a:frombranch)
+        call s:GitGraph()
+    endif
+endfunction
+
 " a:000 - additional params
 function! s:GitRebase(fcomm, tcomm, ...)
     if a:fcomm != "" && a:tcomm != ""

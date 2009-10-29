@@ -141,6 +141,8 @@ sign define stop text=!! texthl=Error linehl=SignLine
 " }}}
 
 " Plugins config {{{
+let g:gitgraph_date_format="relative"
+
 let g:Tlist_Ctags_Cmd="/usr/bin/ctags"
 let g:VCSCommandSVNExec="/usr/bin/svn"
 
