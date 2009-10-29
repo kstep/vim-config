@@ -146,6 +146,14 @@ function! s:GitDiff(fcomm, tcomm, ...)
     endif
 endfunction
 
+function! s:GitShow(commit, ...)
+    if a:commit != ""
+        let cmd = "0read !git show " . join(a:000, " ") . " " . a:commit
+        call s:Scratch("[Git Show]", 20, cmd)
+        setl ft=diff
+    endif
+endfunction
+
 function! s:GetSynName(l, c)
     return synIDattr(synID(line(a:l), col(a:c), 1), 'name')
 endfunction
@@ -214,6 +222,8 @@ endfunction
 function! s:GitGraphMappings()
     command! -buffer -nargs=* -range GitRebase :call <SID>GitRebase(<SID>GetLineCommit(<line1>), <SID>GetLineCommit(<line2>), <f-args>)
     command! -buffer -nargs=* -range GitDiff :call <SID>GitDiff(<SID>GetLineCommit(<line1>), <SID>GetLineCommit(<line2>), <f-args>)
+    command! -buffer GitShow :call <SID>GitShow(<SID>GetLineCommit('.'))
+
     command! -buffer -nargs=? GitDelete :call <SID>GitDelete(<SID>GetRefName(expand('<cWORD>')), <SID>GetSynName('.', '.'), <f-args>)
     command! -buffer GitBranch :call <SID>GitBranch(<SID>GetLineCommit('.'), input("Enter new branch name: "))
 
@@ -234,6 +244,7 @@ function! s:GitGraphMappings()
     vmap <buffer> ,gri :GitRebase "-i"<cr>
     vmap <buffer> ,gd :GitDiff<cr><cr>
     map <buffer> <CR> :GitDiff<cr><cr>
+    map <buffer> ,gs :GitShow<cr><cr>
 
     map <buffer> ,su :GitSVNRebase<cr><cr>
     map <buffer> ,sp :GitSVNDcommit<cr><cr>
