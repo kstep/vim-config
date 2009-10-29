@@ -47,8 +47,15 @@ function! s:GitGraphNew(branch, afile)
     exec 'file [Git\ Graph:' . reponame . ']'
     let b:gitgraph_file = a:afile
     let b:gitgraph_branch = a:branch
-    au ColorScheme <buffer> setl ft=gitgraph
+    au ColorScheme <buffer> setl ft=gitgraph | call s:GitGraphMarkHead()
     call s:GitGraphMappings()
+endfunction
+
+function! s:GitGraphMarkHead()
+    let commit = system('git rev-parse --short HEAD')[:-2]
+    silent! syn clear gitgraphHeadRefItem
+    exec 'syn match gitgraphHeadRefItem "\<'. commit . '\>"'
+    echo commit
 endfunction
 
 " a:1 - branch, a:2 - order, a:3 - file
@@ -79,7 +86,9 @@ function! s:GitGraph(...)
     silent! g/refs\/stash/s/refs\/stash/stash/ge
 
     goto 1
+
     setl bt=nofile bh=delete ft=gitgraph fde=<SID>GitGraphFolder(v:lnum) fdm=expr nowrap noma nomod noswf cul
+    call s:GitGraphMarkHead()
 endfunction
 
 function! s:GetLineCommit(line)
@@ -151,6 +160,7 @@ endfunction
 function! s:GitCheckout(word, syng)
     if a:syng == 'gitgraphRefItem'
         exec "!git checkout " . a:word
+        call s:GitGraphMarkHead()
     endif
 endfunction
 

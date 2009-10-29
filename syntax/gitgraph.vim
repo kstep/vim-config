@@ -1,4 +1,4 @@
-syn match gitgraphTree "^[ 0-9\|/_*]\+\( [0-9a-f]\{7,40}\)\?\( ([:.a-zA-Z0-9_/, -]\+)\)\? " contains=gitgraphTree1,gitgraphTree2,gitgraphTree3,gitgraphTree4,gitgraphTree5,gitgraphTree6,gitgraphTree7,gitgraphTree8,gitgraphTree9,gitgraphTreeC,gitgraphCommittish,gitgraphRefsList
+syn match gitgraphTree "^[ 0-9\|/_*]\+\( [0-9a-f]\{7,40}\)\?\( ([:.a-zA-Z0-9_/, -]\+)\)\? " contains=gitgraphTree1,gitgraphTree2,gitgraphTree3,gitgraphTree4,gitgraphTree5,gitgraphTree6,gitgraphTree7,gitgraphTree8,gitgraphTree9,gitgraphTreeC,gitgraphCommittish,gitgraphHeadRefItem,gitgraphRefsList
 syn region gitgraphAuthorship start=" \[" end="\]$" matchgroup=Comment contains=gitgraphAuthor,gitgraphDate keepend
 
 syn match gitgraphCommittish "\<[0-9a-f]\{7,40}\>" nextgroup=gitgraphRefsList contained
@@ -42,6 +42,10 @@ hi link gitgraphTagItem Tag
 hi link gitgraphRemoteItem Include
 hi link gitgraphRefSep Delimiter
 hi link gitgraphKeywords Keyword
+
+" placeholder
+"syn keyword gitgraphHeadRefItem xxxxxxx
+hi link gitgraphHeadRefItem Statement
 
 hi link gitgraphAuthorship Comment
 hi link gitgraphAuthor Comment
