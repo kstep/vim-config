@@ -13,7 +13,7 @@ syn match gitgraphRefSep ", " nextgroup=gitgraphRefItem,gitgraphTagItem,gitgraph
 syn match gitgraphAuthor "[^],[]\{-1,}" contained nextgroup=gitgraphDate
 syn match gitgraphDate "[0-9]\{4}\(-[0-9]\{2}\)\{2} [0-9]\{1,2}\(:[0-9]\{2}\)\{2} [+-][0-9]\{4}" contained
 syn match gitgraphDate "\([A-Z][a-z]\{2} \)\{2}[0-9]\{1,2} [0-9]\{1,2}\([0-9]\{2}:\)\{2} [0-9]\{4}" contained
-syn match gitgraphDate "\([0-9]\+ \(minute\|hour\|days\|week\|month\|year\)s\?\(, \)\?\)\+ ago" contained
+syn match gitgraphDate "\([0-9]\+ \(second\|minute\|hour\|days\|week\|month\|year\)s\?\(, \)\?\)\+ ago" contained
 syn match gitgraphDate "[A-Z][a-z]\{2}, [0-9]\{1,2} [A-Z][a-z]\{2} [0-9]\{4} [0-9]\{1,2}\(:[0-9]\{2}\)\{2} [+-][0-9]\{4}" contained
 syn match gitgraphDate "[0-9]\{4}\(-[0-9]\{2}\)\{2}" contained
 syn match gitgraphDate "[0-9]\{10,} [+-][0-9]\{4}" contained
