@@ -111,31 +111,38 @@ function! s:GitRebase(fcomm, tcomm, ...)
     endif
 endfunction
 
-function! s:Scratch(bufname)
+function! s:Scratch(bufname, size, cmd)
     let bufno = bufnr(a:bufname)
     if bufno == -1
         new
+        exec a:size."wincmd _"
         setl noswf bt=nofile bh=hide
         exec "file " . escape(a:bufname, " ")
     else
         let winno = bufwinnr(bufno)
         if winno == -1
             exec "split +buffer" . bufno
+            exec a:size."wincmd _"
         elseif winno != winnr()
             exec winno."wincmd w"
         endif
     endif
+
+    if a:cmd != ''
+        setl ma
+        exec a:cmd
+        setl noma nomod
+    endif
+    goto 1
 endfunction
 
 " a:000 - additional params
 function! s:GitDiff(fcomm, tcomm, ...)
     if a:fcomm != "" && a:tcomm != ""
-        call s:Scratch("[Git Diff]")
         let cmd = "0read !git diff " . join(a:000, " ") . " " . a:tcomm
         if a:fcomm != a:tcomm | let cmd = cmd . " " . a:fcomm | endif
-        setl ma
-        exec cmd
-        setl ft=diff noma nomod
+        call s:Scratch("[Git Diff]", 20, cmd)
+        setl ft=diff
     endif
 endfunction
 
