@@ -242,8 +242,7 @@ function! s:GitGraphMappings()
 
     vmap <buffer> ,gr :GitRebase<space>
     vmap <buffer> ,gri :GitRebase "-i"<cr>
-    vmap <buffer> ,gd :GitDiff<cr><cr>
-    map <buffer> <CR> :GitDiff<cr><cr>
+    map <buffer> ,gd :GitDiff<cr><cr>
     map <buffer> ,gs :GitShow<cr><cr>
 
     map <buffer> ,su :GitSVNRebase<cr><cr>
