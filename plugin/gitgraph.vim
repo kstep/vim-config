@@ -1,5 +1,5 @@
 
-function! GitFolder(lnum)
+function! s:GitGraphFolder(lnum)
     let regex = '\([0-9][|] \)* [*] '
     let bline = matchstr(getline(a:lnum-1), regex)
     let aline = matchstr(getline(a:lnum+1), regex)
@@ -8,33 +8,65 @@ function! GitFolder(lnum)
     return bline ==# line && aline ==# line
 endfunction
 
-function! GitBranchCompleter(arg, cline, cpos)
+function! s:GitGraphBranchCompleter(arg, cline, cpos)
     let cmd = 'git branch | cut -c 3-'
     let lst = system(cmd)
     return lst
 endfunction
 
+function! s:GitGraphInit()
+    if !exists('g:gitgraph_date_format') || g:gitgraph_date_format == ''
+        let g:gitgraph_date_format = "short"
+    end
+
+    if !exists('g:gitgraph_authorship_format') || g:gitgraph_authorship_format == ''
+        let g:gitgraph_authorship_format = '%aN, %ad'
+    end
+
+    if !exists('g:gitgraph_subject_format') || g:gitgraph_subject_format == ''
+        let g:gitgraph_subject_format = '%s'
+    end
+
+    let s:gitgraph_graph_format = shellescape('%Creset%h%d ' . g:gitgraph_subject_format . ' [' . g:gitgraph_authorship_format . ']', '%')
+
+    command! -nargs=* -complete=custom,<SID>GitGraphBranchCompleter GitGraph :call <SID>GitGraph(<f-args>)
+
+    map ,gg :GitGraph "--all"<cr><cr>
+    map ,gf :exec 'GitGraph "--all" 0 '.expand('%:p')<cr><cr>
+endfunction
+
+function! s:GitGraphNew(branch, afile)
+    let reponame = system('git rev-parse --git-dir')[:-2]
+    if reponame ==# '.git'
+        let reponame = fnamemodify(getcwd(), ':t')
+    else
+        let reponame = fnamemodify(reponame, ':h:t')
+    endif
+
+    new
+    exec 'file [Git\ Graph:' . reponame . ']'
+    let b:gitgraph_file = a:afile
+    let b:gitgraph_branch = a:branch
+    au ColorScheme <buffer> setl ft=gitgraph
+    call s:GitGraphMappings()
+endfunction
+
 " a:1 - branch, a:2 - order, a:3 - file
-function! s:GitGraph(...) 
+function! s:GitGraph(...)
     let branch = exists('a:1') && a:1 != '' ? a:1 : ''
     let order = exists('a:2') && a:2 ? 'date' : 'topo'
     let afile = exists('a:3') && a:3 != '' ? a:3 : ''
 
-    if bufname('%') =~# '^\[Git Graph\]'
+    if bufname('%') =~# '^\[Git Graph'
         if afile == '' | let afile = b:gitgraph_file | endif
         if branch == '' | let branch = b:gitgraph_branch | endif
-        set ma
-        1,$delete
     else
-        new
-        file [Git\ Graph]
-        let b:gitgraph_file = afile
-        let b:gitgraph_branch = branch
-        au ColorScheme <buffer> setl ft=gitgraph
-        call s:GitMappings()
+        call s:GitGraphNew(branch, afile)
     endif
 
-    let cmd = "0read !git log --graph --decorate=full --format=format:'\\%Creset\\%h\\%d [\\%aN] \\%s' --abbrev-commit --color --" . order . "-order " . branch . " -- " . afile
+    let cmd = "0read !git log --graph --decorate=full --date=" . g:gitgraph_date_format . " --format=format:" . s:gitgraph_graph_format . " --abbrev-commit --color --" . order . "-order " . branch . " -- " . afile
+    set ma
+    1,$delete
     exec cmd
 
     silent! %s/\*\( \+\)/ *\1/ge
@@ -47,36 +79,53 @@ function! s:GitGraph(...)
     silent! g/refs\/stash/s/refs\/stash/stash/ge
 
     goto 1
-    setl bt=nofile bh=delete ft=gitgraph fde=GitFolder(v:lnum) fdm=expr nowrap noma nomod noswf
+    setl bt=nofile bh=delete ft=gitgraph fde=<SID>GitGraphFolder(v:lnum) fdm=expr nowrap noma nomod noswf cul
 endfunction
 
-function! s:GitBranch(line, branch)
-    let commit = matchstr(getline(a:line), "[a-f0-9]\\{7,40}")
+function! s:GetLineCommit(line)
+    return matchstr(getline(a:line), '\<[a-f0-9]\{7,40}\>')
+endfunction
+
+function! s:GitBranch(commit, branch)
     if a:branch != ""
-        exec "!git branch " . shellescape(a:branch) . " " . commit
+        exec "!git branch " . shellescape(a:branch) . " " . a:commit
         call s:GitGraph()
     endif
 endfunction
 
 " a:000 - additional params
-function! s:GitRebase(l1, l2, ...)
-    let fcomm = matchstr(getline(a:l1), "[a-f0-9]\\{7,40}")
-    let tcomm = matchstr(getline(a:l2), "[a-f0-9]\\{7,40}")
-    if fcomm != "" && tcomm != ""
-        let branch = "rebase-branch-" . fcomm
-        exec "!git branch " . branch . " " . fcomm . " && git rebase " . join(a:000, " ") . " " . tcomm . " " . branch
+function! s:GitRebase(fcomm, tcomm, ...)
+    if a:fcomm != "" && a:tcomm != ""
+        let branch = "rebase-branch-" . a:fcomm
+        exec "!git branch " . branch . " " . a:fcomm . " && git rebase " . join(a:000, " ") . " " . a:tcomm . " " . branch
         call s:GitGraph()
     endif
 endfunction
 
-" a:000 - additional params
-function! s:GitDiff(l1, l2, ...)
-    let fcomm = matchstr(getline(a:l1), "[a-f0-9]\\{7,40}")
-    let tcomm = matchstr(getline(a:l2), "[a-f0-9]\\{7,40}")
-    if fcomm != "" && tcomm != ""
-        if fcomm == tcomm | let tcomm = "" | endif
+function! s:Scratch(bufname)
+    let bufno = bufnr(a:bufname)
+    if bufno == -1
         new
-        exec "0read !git diff " . join(a:000, " ") . " " . tcomm . " " . fcomm
+        setl noswf bt=nofile bh=hide
+        exec "file " . escape(a:bufname, " ")
+    else
+        let winno = bufwinnr(bufno)
+        if winno == -1
+            exec "split +buffer" . bufno
+        elseif winno != winnr()
+            exec winno."wincmd w"
+        endif
+    endif
+endfunction
+
+" a:000 - additional params
+function! s:GitDiff(fcomm, tcomm, ...)
+    if a:fcomm != "" && a:tcomm != ""
+        call s:Scratch("[Git Diff]")
+        let cmd = "0read !git diff " . join(a:000, " ") . " " . a:tcomm
+        if a:fcomm != a:tcomm | let cmd = cmd . " " . a:fcomm | endif
+        setl ma
+        exec cmd
         setl ft=diff noma nomod
     endif
 endfunction
@@ -85,11 +134,14 @@ function! s:GetSynName(l, c)
     return synIDattr(synID(line(a:l), col(a:c), 1), 'name')
 endfunction
 
+function! s:GetRefName(word)
+    return substitute(a:word, '[^:a-zA-Z0-9_/-]', '', 'g')
+endfunction
+
 " a:1 - force
 function! s:GitPush(word, syng, ...)
-    let word = substitute(a:word, '[^:a-zA-Z0-9_/-]', '', 'g')
     if a:syng == 'gitgraphRemoteItem'
-        let parts = split(word[7:], "/")
+        let parts = split(a:word[7:], "/")
         let force = exists("a:1") && a:1 ? " -f " : ""
         exec "!git push " . force . " " . parts[0] . " " . join(parts[1:], "/")
         call s:GitGraph()
@@ -97,16 +149,14 @@ function! s:GitPush(word, syng, ...)
 endfunction
 
 function! s:GitCheckout(word, syng)
-    let word = substitute(a:word, '[^:a-zA-Z0-9_/-]', '', 'g')
     if a:syng == 'gitgraphRefItem'
-        exec "!git checkout " . word
+        exec "!git checkout " . a:word
     endif
 endfunction
 
 function! s:GitPull(word, syng)
-    let word = substitute(a:word, '[^:a-zA-Z0-9_/-]', '', 'g')
     if a:syng == 'gitgraphRemoteItem'
-        let parts = split(word[7:], "/")
+        let parts = split(a:word[7:], "/")
         exec "!git pull " . parts[0] . " " . join(parts[1:], "/")
         call s:GitGraph()
     endif
@@ -115,15 +165,14 @@ endfunction
 " a:1 - force
 function! s:GitDelete(word, syng, ...)
     let force = exists("a:1") && a:1
-    let word = substitute(a:word, '[^:a-zA-Z0-9_/-]', '', 'g')
     if a:syng == 'gitgraphRefItem'
         let par = force ? "-D" : "-d"
-        let cmd = "!git branch " . par . " " . word
+        let cmd = "!git branch " . par . " " . a:word
     elseif a:syng == 'gitgraphTagItem'
-        let cmd = "!git tag -d " . word[4:]
+        let cmd = "!git tag -d " . a:word[4:]
     elseif a:syng == 'gitgraphRemoteItem'
         let par = force ? "-f" : ""
-        let parts = split(word[7:], "/")
+        let parts = split(a:word[7:], "/")
         let cmd = "!git push " . par . " " . parts[0] . " " . join(parts[1:], "/") . ":"
     else
         return
@@ -145,18 +194,18 @@ function! s:GitSVNDcommit(word, syng)
     call s:GitGraph()
 endfunction
 
-function! s:GitMappings()
-    command! -buffer -nargs=* -range GitRebase :call <SID>GitRebase(<line1>, <line2>, <f-args>)
-    command! -buffer -nargs=* -range GitDiff :call <SID>GitDiff(<line1>, <line2>, <f-args>)
-    command! -buffer -nargs=? GitDelete :call <SID>GitDelete(expand('<cWORD>'), <SID>GetSynName('.', '.'), <f-args>)
-    command! -buffer GitBranch :call <SID>GitBranch('.', input("Enter new branch name: "))
+function! s:GitGraphMappings()
+    command! -buffer -nargs=* -range GitRebase :call <SID>GitRebase(<SID>GetLineCommit(<line1>), <SID>GetLineCommit(<line2>), <f-args>)
+    command! -buffer -nargs=* -range GitDiff :call <SID>GitDiff(<SID>GetLineCommit(<line1>), <SID>GetLineCommit(<line2>), <f-args>)
+    command! -buffer -nargs=? GitDelete :call <SID>GitDelete(<SID>GetRefName(expand('<cWORD>')), <SID>GetSynName('.', '.'), <f-args>)
+    command! -buffer GitBranch :call <SID>GitBranch(<SID>GetLineCommit('.'), input("Enter new branch name: "))
 
-    command! -buffer -nargs=? GitPush :call <SID>GitPush(expand('<cWORD>'), <SID>GetSynName('.', '.'), <f-args>)
-    command! -buffer GitPull :call <SID>GitPull(expand('<cWORD>'), <SID>GetSynName('.', '.'))
-    command! -buffer GitCheckout :call <SID>GitCheckout(expand('<cWORD>'), <SID>GetSynName('.', '.'))
+    command! -buffer -nargs=? GitPush :call <SID>GitPush(<SID>GetRefName(expand('<cWORD>')), <SID>GetSynName('.', '.'), <f-args>)
+    command! -buffer GitPull :call <SID>GitPull(<SID>GetRefName(expand('<cWORD>')), <SID>GetSynName('.', '.'))
+    command! -buffer GitCheckout :call <SID>GitCheckout(<SID>GetRefName(expand('<cWORD>')), <SID>GetSynName('.', '.'))
 
-    command! -buffer GitSVNRebase :call <SID>GitSVNRebase(expand('<cWORD>'), <SID>GetSynName('.', '.'))
-    command! -buffer GitSVNDcommit :call <SID>GitSVNDcommit(expand('<cWORD>'), <SID>GetSynName('.', '.'))
+    command! -buffer GitSVNRebase :call <SID>GitSVNRebase(<SID>GetRefName(expand('<cWORD>')), <SID>GetSynName('.', '.'))
+    command! -buffer GitSVNDcommit :call <SID>GitSVNDcommit(<SID>GetRefName(expand('<cWORD>')), <SID>GetSynName('.', '.'))
 
     map <buffer> dw :GitDelete<cr>
     map <buffer> ,gp :GitPush<cr><cr>
@@ -167,13 +216,10 @@ function! s:GitMappings()
     vmap <buffer> ,gr :GitRebase<space>
     vmap <buffer> ,gri :GitRebase "-i"<cr>
     vmap <buffer> ,gd :GitDiff<cr><cr>
+    map <buffer> <CR> :GitDiff<cr><cr>
 
     map <buffer> ,su :GitSVNRebase<cr><cr>
     map <buffer> ,sp :GitSVNDcommit<cr><cr>
 endfunction
 
-command! -nargs=* -complete=custom,GitBranchCompleter GitGraph :call <SID>GitGraph(<f-args>)
-
-map ,gg :GitGraph "--all"<cr><cr>
-map ,gf :exec 'GitGraph "--all" 0 '.expand('%:p')<cr><cr>
-
+call s:GitGraphInit()
