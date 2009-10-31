@@ -173,11 +173,7 @@ let g:netrw_keepdir=0
 " }}}
 
 " Custom highlighting {{{
-if &term =~ 'builtin_gui'
-    colorscheme lucius
-else
-    colorscheme candycode
-endif
+colorscheme lucius
 " }}}
 
 " vim: set ft=vim :
