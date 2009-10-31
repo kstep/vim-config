@@ -55,7 +55,6 @@ function! s:GitGraphMarkHead()
     let commit = system('git rev-parse --short HEAD')[:-2]
     silent! syn clear gitgraphHeadRefItem
     exec 'syn match gitgraphHeadRefItem "\<'. commit . '\>"'
-    echo commit
 endfunction
 
 " a:1 - branch, a:2 - order, a:3 - file
