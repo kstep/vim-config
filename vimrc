@@ -12,8 +12,9 @@ set guifont=Terminus\ 12
 set helplang=ru
 set background=light
 
-set nohlsearch
+set hlsearch
 set ignorecase
+set smartcase
 
 set keymap=russian-jcukenwin
 set iminsert=0
