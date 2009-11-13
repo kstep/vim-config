@@ -1,7 +1,8 @@
-set ts=8
-set sws=4
-set sw=4
-set et
-set tags=./tags,../tags,../../tags,../../../tags,../../../../tags,../../../../../tags,../../../../../../tags
-set pa=.,..,../..,../../..,../../../..,../../../../..,../../../../../..
-set inex=substitute(v:fname,'\\.','/','g').'.py'
+setl ts=8
+setl sws=4
+setl sw=4
+setl et
+setl pa=.,..,../..,../../..,../../../..,../../../../..,../../../../../..
+setl inex=substitute(v:fname,'\\.','/','g').'.py'
+setl mp=python\ %:p
+setl efm=%C%p^,%A\ %#File\ \"%f\"\\,\ line\ %l,%ZSyntax\ error:\ %m,%C%m
