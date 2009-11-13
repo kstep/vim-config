@@ -18,6 +18,14 @@ function! GitGraphFolder(lnum)
     return bline ==# line && aline ==# line
 endfunction
 
+function! GitDiffGotoFile(fname)
+    let repopath = s:GitGetRepository()
+    let fname = a:fname
+    if fname =~# "^[ab]/" | let fname = fname[2:] | endif
+    if repopath != "" | let fname = repopath . "/" . fname | endif
+    return fname
+endfunction
+
 function! s:GitGraphBranchCompleter(arg, cline, cpos)
     let cmd = 'git branch | cut -c 3-'
     let lst = system(cmd)
@@ -90,7 +98,7 @@ function! s:GitGraph(...)
 
     goto 1
 
-    setl bt=nofile bh=delete ft=gitgraph fde=<SID>GitGraphFolder(v:lnum) fdm=expr nowrap noma nomod noswf cul
+    setl bt=nofile bh=delete ft=gitgraph fde=GitGraphFolder(v:lnum) isk=a-z,A-Z,48-57,.,_,-,/ fdm=expr nowrap noma nomod noswf cul
     call s:GitGraphMarkHead()
 endfunction
 
@@ -152,7 +160,7 @@ function! s:GitDiff(fcomm, tcomm, ...)
         let cmd = "0read !git diff " . join(a:000, " ") . " " . a:tcomm
         if a:fcomm != a:tcomm | let cmd = cmd . " " . a:fcomm | endif
         call s:Scratch("[Git Diff]", 20, cmd)
-        setl ft=diff
+        setl ft=diff inex=GitDiffGotoFile(v:fname)
     endif
 endfunction
 
@@ -160,7 +168,7 @@ function! s:GitShow(commit, ...)
     if a:commit != ""
         let cmd = "0read !git show " . join(a:000, " ") . " " . a:commit
         call s:Scratch("[Git Show]", 20, cmd)
-        setl ft=diff
+        setl ft=diff.gitlog inex=GitDiffGotoFile(v:fname)
     endif
 endfunction
 
