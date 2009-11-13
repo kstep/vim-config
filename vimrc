@@ -161,8 +161,7 @@ let g:NERDShutUp=1
 let g:CodeCompl_Complete_File="templates/default_snippets.template"
 let g:CodeCompl_Hotkey=";;"
 
-let g:vimwiki_home="~/.vim/wiki/"
-let g:vimwiki_syntax="trac"
+let g:vimwiki_list = [{'path': '~/.vim/wiki/', 'path_html': '~/.vim/wiki_html/', 'syntax': 'trac'}]
 
 let g:netrw_liststyle=1
 let g:netrw_list_hide="^\\."
