@@ -268,3 +268,5 @@ function! s:GitGraphMappings()
 endfunction
 
 call s:GitGraphInit()
+
+" vim: et ts=8 sts=4 sw=4
