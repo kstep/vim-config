@@ -65,8 +65,9 @@ endfunction
 
 function! s:GitGraphMarkHead()
     let commit = system('git rev-parse --short HEAD')[:-2]
+    let branch = system('git symbolic-ref -q HEAD')[11:-2]
     silent! syn clear gitgraphHeadRefItem
-    exec 'syn match gitgraphHeadRefItem "\<'. commit . '\>"'
+    exec 'syn keyword gitgraphHeadRefItem ' . commit . ' ' . branch . ' contained'
 endfunction
 
 " a:1 - branch, a:2 - order, a:3 - file
