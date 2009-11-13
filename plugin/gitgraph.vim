@@ -258,16 +258,20 @@ function! s:GitGraphMappings()
     command! -buffer GitSVNRebase :call <SID>GitSVNRebase(<SID>GetRefName(expand('<cWORD>')), <SID>GetSynName('.', '.'))
     command! -buffer GitSVNDcommit :call <SID>GitSVNDcommit(<SID>GetRefName(expand('<cWORD>')), <SID>GetSynName('.', '.'))
 
+    " (d)elete (w)ord
     map <buffer> dw :GitDelete<cr>
+
     map <buffer> ,gp :GitPush<cr><cr>
     map <buffer> ,gu :GitPull<cr><cr>
     map <buffer> ,gc :GitCheckout<cr><cr>
-    map <buffer> ,gb :GitBranch<cr>
+
+    " (a)dd (b)ranch
+    map <buffer> ab :GitBranch<cr>
 
     vmap <buffer> ,gr :GitRebase<space>
     vmap <buffer> ,gri :GitRebase "-i"<cr>
     map <buffer> ,gd :GitDiff<cr><cr>
-    map <buffer> ,gs :GitShow<cr><cr>
+    map <buffer> gf :GitShow<cr><cr>
 
     map <buffer> ,su :GitSVNRebase<cr><cr>
     map <buffer> ,sp :GitSVNDcommit<cr><cr>
