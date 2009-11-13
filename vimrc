@@ -104,9 +104,6 @@ inoremap <A-8> <Esc>8gti
 inoremap <A-9> <Esc>9gti
 inoremap <S-Left> <Esc>gTi
 inoremap <S-Right> <Esc>gti
-inoremap [Z <Tab>
-inoremap <S-Tab> <Tab>
-inoremap <Tab> <C-^>
 
 noremap ,x, :call MirrorExchange(", ")<cr>
 noremap ,x= :call MirrorExchange(" = ")<cr>
