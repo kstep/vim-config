@@ -1,5 +1,15 @@
 
-function! s:GitGraphFolder(lnum)
+function! s:GitGetRepository()
+    let reponame = system('git rev-parse --git-dir')[:-2]
+    if reponame ==# '.git'
+        let reponame = getcwd()
+    else
+        let reponame = fnamemodify(reponame, ':h')
+    endif
+    return reponame
+endfunction
+
+function! GitGraphFolder(lnum)
     let regex = '\([0-9][|] \)* [*] '
     let bline = matchstr(getline(a:lnum-1), regex)
     let aline = matchstr(getline(a:lnum+1), regex)
@@ -36,13 +46,7 @@ function! s:GitGraphInit()
 endfunction
 
 function! s:GitGraphNew(branch, afile)
-    let reponame = system('git rev-parse --git-dir')[:-2]
-    if reponame ==# '.git'
-        let reponame = fnamemodify(getcwd(), ':t')
-    else
-        let reponame = fnamemodify(reponame, ':h:t')
-    endif
-
+    let reponame = fnamemodify(s:GitGetRepository(), ':t')
     new
     exec 'file [Git\ Graph:' . reponame . ']'
     let b:gitgraph_file = a:afile
