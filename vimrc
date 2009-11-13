@@ -114,7 +114,7 @@ vnoremap s) <Esc>`>a)<Esc>`<i(<Esc>
 vnoremap s' <Esc>`>a'<Esc>`<i'<Esc>
 
 noremap <Leader>\ :TlistToggle<CR>
-noremap <F11> :Texplore<CR>
+noremap <F11> :tabe ~/.vim_mru_files<CR>
 noremap <F10> :set list!<CR>
 noremap <Leader>= :call SignMark("mark")<CR>
 noremap <Leader>- :call UnSignMark()<CR>
