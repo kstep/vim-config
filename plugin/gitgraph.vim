@@ -161,7 +161,7 @@ function! s:GitDiff(fcomm, tcomm, ...)
     if a:fcomm != "" && a:tcomm != ""
         let cmd = "0read !git diff " . join(a:000, " ") . " " . a:tcomm
         if a:fcomm != a:tcomm | let cmd = cmd . " " . a:fcomm | endif
-        call s:Scratch("[Git Diff]", 20, cmd)
+        call s:Scratch("[Git Diff]", 15, cmd)
         setl ft=diff inex=GitDiffGotoFile(v:fname)
     endif
 endfunction
@@ -169,7 +169,7 @@ endfunction
 function! s:GitShow(commit, ...)
     if a:commit != ""
         let cmd = "0read !git show " . join(a:000, " ") . " " . a:commit
-        call s:Scratch("[Git Show]", 20, cmd)
+        call s:Scratch("[Git Show]", 15, cmd)
         setl ft=diff.gitlog inex=GitDiffGotoFile(v:fname)
     endif
 endfunction
