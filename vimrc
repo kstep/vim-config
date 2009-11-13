@@ -150,6 +150,7 @@ let g:VCSCommandSVNExec="/usr/bin/svn"
 "let g:dbext_default_profile_mysql_buick="type=MYSQL:user=root:passwd=nownthen:dbname=zanby5_stepanov:host=buick:extra=-vvvt"
 let g:dbext_default_profile_pgsql="type=PGSQL:user=postgres:dbname=postgres"
 let g:dbext_default_profile_pgsql_spisoc="type=PGSQL:user=postgres:dbname=spisoc"
+let g:dbext_default_profile_mysql_icart_dev="type=MYSQL:user=root:dbname=icart_dev:passwd=vecrekhen"
 let g:dbext_default_DBI_max_rows=0
 
 let g:sql_type_default="mysql"
