@@ -12,7 +12,7 @@ set guifont=Terminus\ 12
 set helplang=ru
 set background=light
 
-set hlsearch
+set nohlsearch
 set ignorecase
 set smartcase
 
