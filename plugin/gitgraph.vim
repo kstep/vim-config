@@ -131,7 +131,8 @@ function! s:GitRebase(fcomm, tcomm, ...)
 endfunction
 
 function! s:Scratch(bufname, size, cmd)
-    let bufno = bufnr(a:bufname)
+    let bufpat = "^".escape(a:bufname, "[]*+")."$"
+    let bufno = bufnr(bufpat)
     if bufno == -1
         new
         exec a:size."wincmd _"
