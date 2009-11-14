@@ -26,6 +26,15 @@ function! GitDiffGotoFile(fname)
     return fname
 endfunction
 
+function! GitStatus()
+    let cmd = [
+           \ 'read !git diff --name-only',
+           \ 'norm Go',
+           \ 'read !git diff --cached --name-only'
+        \]
+    call s:Scratch('[Git Status]', 30, cmd, 1)
+endfunction
+
 function! s:GitGraphBranchCompleter(arg, cline, cpos)
     let cmd = 'git branch | cut -c 3-'
     let lst = system(cmd)
