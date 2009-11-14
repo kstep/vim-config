@@ -99,7 +99,7 @@ function! s:GitGraph(...)
 
     goto 1
 
-    setl bt=nofile bh=delete ft=gitgraph fde=GitGraphFolder(v:lnum) isk=a-z,A-Z,48-57,.,_,-,/ fdm=expr nowrap noma nomod noswf cul
+    setl bt=nofile bh=delete ft=gitgraph fde=GitGraphFolder(v:lnum) isk=:,a-z,A-Z,48-57,.,_,-,/ fdm=expr nowrap noma nomod noswf cul
     call s:GitGraphMarkHead()
 endfunction
 
