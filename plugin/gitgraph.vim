@@ -114,6 +114,13 @@ function! s:GitBranch(commit, branch)
     endif
 endfunction
 
+function! s:GitTag(commit, tag, ...)
+    if a:tag != ""
+        exec "!git tag " . join(a:000, " ") . " " . shellescape(a:tag) . " " . a:commit
+        call s:GitGraph()
+    endif
+endfunction
+
 function! s:GitMerge(tobranch, frombranch, ...)
     if a:tobranch != "" && a:frombranch != ""
         exec "!git checkout " . shellescape(a:tobranch) . " && git merge " . join(a:000, " ") . " " . shellescape(a:frombranch)
@@ -250,6 +257,9 @@ function! s:GitGraphMappings()
 
     command! -buffer -nargs=? GitDelete :call <SID>GitDelete(<SID>GetRefName(expand('<cWORD>')), <SID>GetSynName('.', '.'), <f-args>)
     command! -buffer GitBranch :call <SID>GitBranch(<SID>GetLineCommit('.'), input("Enter new branch name: "))
+    command! -buffer GitTag :call <SID>GitTag(<SID>GetLineCommit('.'), input("Enter new tag name: "))
+    command! -buffer GitSignedTag :call <SID>GitTag(<SID>GetLineCommit('.'), input("Enter new tag name: "), "-s")
+    command! -buffer GitAnnTag :call <SID>GitTag(<SID>GetLineCommit('.'), input("Enter new tag name: "), "-a")
 
     command! -buffer -nargs=? GitPush :call <SID>GitPush(<SID>GetRefName(expand('<cWORD>')), <SID>GetSynName('.', '.'), <f-args>)
     command! -buffer GitPull :call <SID>GitPull(<SID>GetRefName(expand('<cWORD>')), <SID>GetSynName('.', '.'))
@@ -265,8 +275,11 @@ function! s:GitGraphMappings()
     map <buffer> ,gu :GitPull<cr><cr>
     map <buffer> ,gc :GitCheckout<cr><cr>
 
-    " (a)dd (b)ranch
+    " (a)dd (b)ranch, (t)ag, (a)nnotated/(s)igned tag
     map <buffer> ab :GitBranch<cr>
+    map <buffer> at :GitTag<cr>
+    map <buffer> aa :GitAnnTag<cr>
+    map <buffer> as :GitSignedTag<cr>
 
     vmap <buffer> ,gr :GitRebase<space>
     vmap <buffer> ,gri :GitRebase "-i"<cr>
