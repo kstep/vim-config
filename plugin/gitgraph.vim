@@ -286,6 +286,7 @@ function! s:GitGraphMappings()
 
     " (d)elete (w)ord
     map <buffer> dw :GitDelete<cr>
+    map <buffer> dW :GitDelete 1<cr>
 
     map <buffer> ,gp :GitPush<cr><cr>
     map <buffer> ,gu :GitPull<cr><cr>
