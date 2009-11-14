@@ -189,10 +189,6 @@ function! s:GetSynName(l, c)
     return synIDattr(synID(line(a:l), col(a:c), 1), 'name')
 endfunction
 
-function! s:GetRefName(word)
-    return substitute(a:word, '[^:a-zA-Z0-9_/-]', '', 'g')
-endfunction
-
 " a:1 - force
 function! s:GitPush(word, syng, ...)
     if a:syng == 'gitgraphRemoteItem'
@@ -256,18 +252,19 @@ function! s:GitGraphMappings()
     command! -buffer -nargs=* -range GitDiff :call <SID>GitDiff(<SID>GetLineCommit(<line1>), <SID>GetLineCommit(<line2>), <f-args>)
     command! -buffer GitShow :call <SID>GitShow(<SID>GetLineCommit('.'))
 
-    command! -buffer -nargs=? GitDelete :call <SID>GitDelete(<SID>GetRefName(expand('<cWORD>')), <SID>GetSynName('.', '.'), <f-args>)
+    command! -buffer -nargs=? GitDelete :call <SID>GitDelete(expand('<cword>'), <SID>GetSynName('.', '.'), <f-args>)
     command! -buffer GitBranch :call <SID>GitBranch(<SID>GetLineCommit('.'), input("Enter new branch name: "))
     command! -buffer GitTag :call <SID>GitTag(<SID>GetLineCommit('.'), input("Enter new tag name: "))
     command! -buffer GitSignedTag :call <SID>GitTag(<SID>GetLineCommit('.'), input("Enter new tag name: "), "-s")
     command! -buffer GitAnnTag :call <SID>GitTag(<SID>GetLineCommit('.'), input("Enter new tag name: "), "-a")
 
-    command! -buffer -nargs=? GitPush :call <SID>GitPush(<SID>GetRefName(expand('<cWORD>')), <SID>GetSynName('.', '.'), <f-args>)
-    command! -buffer GitPull :call <SID>GitPull(<SID>GetRefName(expand('<cWORD>')), <SID>GetSynName('.', '.'))
-    command! -buffer GitCheckout :call <SID>GitCheckout(<SID>GetRefName(expand('<cWORD>')), <SID>GetSynName('.', '.'))
+    command! -buffer -nargs=? GitPush :call <SID>GitPush(expand('<cword>'), <SID>GetSynName('.', '.'), <f-args>)
+    command! -buffer GitPull :call <SID>GitPull(expand('<cword>'), <SID>GetSynName('.', '.'))
+    command! -buffer GitCheckout :call <SID>GitCheckout(expand('<cword>'), <SID>GetSynName('.', '.'))
 
-    command! -buffer GitSVNRebase :call <SID>GitSVNRebase(<SID>GetRefName(expand('<cWORD>')), <SID>GetSynName('.', '.'))
-    command! -buffer GitSVNDcommit :call <SID>GitSVNDcommit(<SID>GetRefName(expand('<cWORD>')), <SID>GetSynName('.', '.'))
+    command! -buffer GitSVNRebase :call <SID>GitSVNRebase(expand('<cword>'), <SID>GetSynName('.', '.'))
+    command! -buffer GitSVNDcommit :call <SID>GitSVNDcommit(expand('<cword>'), <SID>GetSynName('.', '.'))
+
 
     " (d)elete (w)ord
     map <buffer> dw :GitDelete<cr>
