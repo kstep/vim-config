@@ -129,10 +129,10 @@ function! s:GitMerge(tobranch, frombranch, ...)
 endfunction
 
 " a:000 - additional params
-function! s:GitRebase(fcomm, tcomm, ...)
-    if a:fcomm != "" && a:tcomm != ""
-        let branch = "rebase-branch-" . a:fcomm
-        exec "!git branch " . branch . " " . a:fcomm . " && git rebase " . join(a:000, " ") . " " . a:tcomm . " " . branch
+function! s:GitRebase(branch, upstream, onto, ...)
+    if a:branch != "" && a:upstream != ""
+        let onto = a:onto == "" ? a:upstream : a:onto
+        exec "!git rebase " . join(a:000, " ") . " --onto " . onto . " " . a:upstream . " " . a:branch
         call s:GitGraph()
     endif
 endfunction
@@ -251,7 +251,8 @@ function! s:GitSVNDcommit(word, syng)
 endfunction
 
 function! s:GitGraphMappings()
-    command! -buffer -nargs=* -range GitRebase :call <SID>GitRebase(<SID>GetLineCommit(<line1>), <SID>GetLineCommit(<line2>), <f-args>)
+    command! -buffer -nargs=* -range GitRebase :call <SID>GitRebase(<SID>GetLineCommit(<line1>), <SID>GetLineCommit(<line2>), "", <f-args>)
+    command! -buffer -nargs=* GitRebaseOnto :let rng = <SID>GetRegCommit(v:register) | call <SID>GitRebase(rng[0], rng[1], <SID>GetLineCommit('.'), <f-args>)
     command! -buffer -nargs=* -range GitDiff :call <SID>GitDiff(<SID>GetLineCommit(<line1>), <SID>GetLineCommit(<line2>), <f-args>)
     command! -buffer GitShow :call <SID>GitShow(<SID>GetLineCommit('.'))
 
