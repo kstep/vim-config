@@ -107,6 +107,10 @@ function! s:GetLineCommit(line)
     return matchstr(getline(a:line), '\<[a-f0-9]\{7,40}\>')
 endfunction
 
+function! s:GetRegCommit(regn)
+    return split(getreg(regn), "\n")
+endfunction
+
 function! s:GitBranch(commit, branch)
     if a:branch != ""
         exec "!git branch " . shellescape(a:branch) . " " . a:commit
@@ -283,6 +287,9 @@ function! s:GitGraphMappings()
     command! -buffer GitSVNRebase :call <SID>GitSVNRebase(expand('<cword>'), <SID>GetSynName('.', '.'))
     command! -buffer GitSVNDcommit :call <SID>GitSVNDcommit(expand('<cword>'), <SID>GetSynName('.', '.'))
 
+    map <buffer> Y :GitYankRange<cr>
+    vmap <buffer> Y :GitYankRange<cr>
+    map <buffer> P :GitRebaseOnto<cr>
 
     " (d)elete (w)ord
     map <buffer> dw :GitDelete<cr>
