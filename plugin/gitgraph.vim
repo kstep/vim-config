@@ -246,11 +246,29 @@ function! s:GitSVNDcommit(word, syng)
     call s:GitGraph()
 endfunction
 
+function! s:GitSearch()
+    let pat = '\<\([a-z]\+:\)\?[a-zA-Z0-9./_-]\+\>'
+    while 1
+        let found = searchpos(pat)
+        if found == [0,0] | break | endif
+        let synname = synIDattr(synID(found[0], found[1], 1), 'name')
+        if (synname ==# "gitgraphRefItem")
+            \ || (synname ==# "gitgraphHeadRefItem")
+            \ || (synname ==# "gitgraphTagItem")
+            \ || (synname ==# "gitgraphRemoteItem")
+            \ || (synname ==# "gitgraphStashItem")
+            break
+        endif
+    endwhile
+endfunction
+
 function! s:GitGraphMappings()
+    command! -buffer -range GitYankRange :call setreg(v:register, <SID>GetLineCommit(<line1>)."\n".<SID>GetLineCommit(<line2>), "l")
     command! -buffer -nargs=* -range GitRebase :call <SID>GitRebase(<SID>GetLineCommit(<line1>), <SID>GetLineCommit(<line2>), "", <f-args>)
     command! -buffer -nargs=* GitRebaseOnto :let rng = <SID>GetRegCommit(v:register) | call <SID>GitRebase(rng[0], rng[1], <SID>GetLineCommit('.'), <f-args>)
     command! -buffer -nargs=* -range GitDiff :call <SID>GitDiff(<SID>GetLineCommit(<line1>), <SID>GetLineCommit(<line2>), <f-args>)
     command! -buffer GitShow :call <SID>GitShow(<SID>GetLineCommit('.'))
+    command! -buffer GitSearch :call <SID>GitSearch()
 
     command! -buffer -nargs=? GitDelete :call <SID>GitDelete(expand('<cword>'), <SID>GetSynName('.', '.'), <f-args>)
     command! -buffer GitBranch :call <SID>GitBranch(<SID>GetLineCommit('.'), input("Enter new branch name: "))
@@ -286,6 +304,8 @@ function! s:GitGraphMappings()
 
     map <buffer> ,su :GitSVNRebase<cr><cr>
     map <buffer> ,sp :GitSVNDcommit<cr><cr>
+
+    map <buffer> <Tab> :GitSearch<cr>
 endfunction
 
 call s:GitGraphInit()
