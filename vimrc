@@ -71,8 +71,8 @@ function! UnSignMark()
 	exe "sign unplace " . line(".") . " file=" . expand("%:p")
 endfunction
 
-function! GetSynName()
-    echo synIDattr(synID(line("."), col("."), 1), "name")
+function! GetSynName(l, c)
+    echo synIDattr(synID(line(a:l), col(a:c), 1), "name")
 endfunction
 " }}}
 
