@@ -141,27 +141,41 @@ function! s:GitRebase(branch, upstream, onto, ...)
     endif
 endfunction
 
-function! s:Scratch(bufname, size, cmd)
+function! s:Scratch(bufname, size, cmd, vert)
     let bufpat = "^".escape(a:bufname, "[]*+")."$"
     let bufno = bufnr(bufpat)
+    if a:vert
+        let vert = 'v'
+        let wert = '|'
+    else
+        let vert = ''
+        let wert = '_'
+    endif
     if bufno == -1
-        new
-        exec a:size."wincmd _"
+        exec vert . "new"
+        exec a:size."wincmd " . wert
         setl noswf bt=nofile bh=hide
         exec "file " . escape(a:bufname, " ")
     else
         let winno = bufwinnr(bufno)
         if winno == -1
-            exec "split +buffer" . bufno
-            exec a:size."wincmd _"
+            exec vert . "split +buffer" . bufno
+            exec a:size."wincmd " . wert
         elseif winno != winnr()
             exec winno."wincmd w"
         endif
     endif
 
-    if a:cmd != ''
+    if !empty(a:cmd)
         setl ma
-        exec a:cmd
+        1,$delete
+        if type(a:cmd) == 3
+            for cmd in a:cmd
+                exec cmd
+            endfor
+        else
+            exec a:cmd
+        endif
         setl noma nomod
     endif
     goto 1
@@ -172,7 +186,7 @@ function! s:GitDiff(fcomm, tcomm, ...)
     if a:fcomm != "" && a:tcomm != ""
         let cmd = "0read !git diff " . join(a:000, " ") . " " . a:tcomm
         if a:fcomm != a:tcomm | let cmd = cmd . " " . a:fcomm | endif
-        call s:Scratch("[Git Diff]", 15, cmd)
+        call s:Scratch("[Git Diff]", 15, cmd, 0)
         setl ft=diff inex=GitDiffGotoFile(v:fname)
         map <buffer> <C-d> /^commit [0-9a-f]\+<CR>
         map <buffer> <C-u> ?^commit [0-9a-f]\+<CR>
@@ -182,7 +196,7 @@ endfunction
 function! s:GitShow(commit, ...)
     if a:commit != ""
         let cmd = "0read !git show " . join(a:000, " ") . " " . a:commit
-        call s:Scratch("[Git Show]", 15, cmd)
+        call s:Scratch("[Git Show]", 15, cmd, 0)
         setl ft=diff.gitlog inex=GitDiffGotoFile(v:fname)
         map <buffer> <C-d> /^commit [0-9a-f]\+<CR>
         map <buffer> <C-u> ?^commit [0-9a-f]\+<CR>
