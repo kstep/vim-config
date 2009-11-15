@@ -92,7 +92,7 @@ function! s:GitGraph(...)
     endif
 
     let cmd = "0read !git log --graph --decorate=full --date=" . g:gitgraph_date_format . " --format=format:" . s:gitgraph_graph_format . " --abbrev-commit --color --" . order . "-order " . branch . " -- " . afile
-    set ma
+    setl ma
     1,$delete
     exec cmd
 
