@@ -26,12 +26,17 @@ function! GitDiffGotoFile(fname)
 endfunction
 
 function! GitStatus()
-    let cmd = [
-           \ 'read !git diff --name-only',
-           \ 'norm Go',
-           \ 'read !git diff --cached --name-only'
-        \]
+    let cmd = '0read !git status'
     call s:Scratch('[Git Status]', 30, cmd, 1)
+    setl ma
+    g!/^#\( Changes\| Changed\| Untracked\|\t\|\s*$\)/delete
+    g/^#\( Changes\| Changed\| Untracked\)/.+1delete
+    %s/^#\tmodified:   /\t[*] /
+    %s/^#\tnew file:   /\t[+] /
+    %s/^#\tdeleted:    /\t[-] /
+    %s/^#\t/\t[ ] /
+    %s/^#\s*$//
+    setl ts=4 noma nomod ft=gitstatus fdm=syntax nowrap
 endfunction
 
 function! s:GitGraphBranchCompleter(arg, cline, cpos)
