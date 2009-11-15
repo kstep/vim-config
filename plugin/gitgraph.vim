@@ -323,7 +323,7 @@ function! s:GitGraphMappings()
 
     vmap <buffer> ,gr :GitRebase<space>
     vmap <buffer> ,gri :GitRebase "-i"<cr>
-    map <buffer> ,gd :GitDiff<cr><cr>
+    map <buffer> gd :GitDiff<cr><cr>
     map <buffer> gf :GitShow<cr><cr>
 
     map <buffer> ,su :GitSVNRebase<cr><cr>
