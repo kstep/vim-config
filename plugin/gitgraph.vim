@@ -271,20 +271,20 @@ function! s:GitSVNDcommit(word, syng)
     call s:GitGraph()
 endfunction
 
-function! s:GitSearch()
-    let pat = '\<\([a-z]\+:\)\?[a-zA-Z0-9./_-]\+\>'
+function! s:SynSearch(pattern, synnames)
     while 1
-        let found = searchpos(pat)
+        let found = searchpos(a:pattern)
         if found == [0,0] | break | endif
         let synname = synIDattr(synID(found[0], found[1], 1), 'name')
-        if (synname ==# "gitgraphRefItem")
-            \ || (synname ==# "gitgraphHeadRefItem")
-            \ || (synname ==# "gitgraphTagItem")
-            \ || (synname ==# "gitgraphRemoteItem")
-            \ || (synname ==# "gitgraphStashItem")
-            break
-        endif
+        if index(a:synnames, synname) > -1 | break | endif
     endwhile
+endfunction
+
+function! s:GitSearch()
+    call s:SynSearch('\<\([a-z]\+:\)\?[a-zA-Z0-9./_-]\+\>',
+            \ ["gitgraphRefItem", "gitgraphHeadRefItem",
+            \ "gitgraphTagItem", "gitgraphRemoteItem",
+            \ "gitgraphStashItem"])
 endfunction
 
 function! s:GitGraphMappings()
