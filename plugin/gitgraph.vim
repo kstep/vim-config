@@ -14,7 +14,6 @@ function! GitGraphFolder(lnum)
     let bline = matchstr(getline(a:lnum-1), regex)
     let aline = matchstr(getline(a:lnum+1), regex)
     let line = matchstr(getline(a:lnum), regex)
-    "echo "<".bline . "> - <" . line . "> - <" . aline .">"
     return bline ==# line && aline ==# line
 endfunction
 
