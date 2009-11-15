@@ -1,4 +1,6 @@
 
+    * GitGraphStatusView
+
     * TodoList
     * OptimizationTasks
 
