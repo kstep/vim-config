@@ -177,13 +177,7 @@ function! s:Scratch(bufname, size, cmd, vert)
     if !empty(a:cmd)
         setl ma
         1,$delete
-        if type(a:cmd) == 3
-            for cmd in a:cmd
-                exec cmd
-            endfor
-        else
-            exec a:cmd
-        endif
+        exec a:cmd
         setl noma nomod
     endif
     goto 1
