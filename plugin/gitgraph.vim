@@ -8,6 +8,11 @@ function! s:GetSynName(l, c)
     return synIDattr(synID(line(a:l), col(a:c), 1), 'name')
 endfunction
 
+" a:1 = depth, default to 0
+function! s:GetSynRegionName(l, c, ...)
+    return synIDattr(synstack(line(a:l), col(a:c))[a:0 > 0 ? a:1 : 0], 'name')
+endfunction
+
 function! s:SynSearch(pattern, synnames)
     while 1
         let found = searchpos(a:pattern)
@@ -209,6 +214,56 @@ endfunction
 " }}}
 
 " GitStatus view implementation {{{
+function! s:GitStatusNextFile()
+    call s:SynSearch('\[[ +*-]\]', ['gitModFile', 'gitNewFile', 'gitDelFile', 'gitUnFile'])
+endfunction
+
+function! s:GitStatusGetFile(l)
+    let synname = s:GetSynName(a:l, '.')
+    if synname ==# 'gitModFile' || synname ==# 'gitNewFile'
+        \ || synname ==# 'gitDelFile' || synname ==# 'gitUnFile'
+        return getline(a:l)[5:]
+    else
+        return ""
+    endif
+endfunction
+
+function! s:GitStatusRevertFile(fname, region)
+    if a:fname == '' | return | endif
+    if a:region ==# 'gitStaged'
+        call s:GitResetFiles(a:fname)
+    elseif a:region ==# 'gitUnstaged'
+        call s:GitCheckoutFiles(1, a:fname)
+    elseif a:region ==# 'gitUntracked'
+        if confirm('Remove untracked file "'.a:fname.'"?', '&Yes\n&No') == 1
+            exec '!rm -f ' . shellescape(fname, 1)
+        endif
+    else
+        return
+    endif
+    call s:GitStatus()
+endfunction
+
+function! s:GitStatusAddFile(fname, region)
+    if a:fname == '' | return | endif
+    if a:region ==# 'gitUnstage' || a:region ==# 'gitUntracked'
+        call s:GitAddFiles(fname)
+    else
+        return
+    endif
+    call s:GitStatus()
+endfunction
+
+function! s:GitStatusMappings()
+    command! -buffer GitNextFile :call <SID>GitStatusNextFile()
+    command! -buffer GitRevertFile :call <SID>GitStatusRevertFile(<SID>GitStatusGetFile('.'), <SID>GetSynRegionName('.', '.'))
+    command! -buffer GitAddFile :call <SID>GitStatusAddFile(<SID>GitStatusGetFile('.'), <SID>GetSynRegionName('.', '.'))
+
+    map <buffer> <Tab> :GitNextFile<cr>
+    map <buffer> dd :GitRevertFile<cr>
+    map <buffer> yy :GitAddFile<cr>
+endfunction
+
 function! s:GitStatus()
     let cmd = '0read !git status'
     call s:Scratch('[Git Status]', 30, cmd, 1)
