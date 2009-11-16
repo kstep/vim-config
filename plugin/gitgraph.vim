@@ -148,13 +148,14 @@ function! s:GitGraphMappings()
 endfunction
 
 function! s:GitGraphNew(branch, afile)
-    let reponame = fnamemodify(s:GitGetRepository(), ':t')
-    new
-    exec 'file [Git\ Graph:' . reponame . ']'
+    let repopath = s:GitGetRepository()
+    let reponame = fnamemodify(repopath, ':t')
+    call s:Scratch('[Git Graph:'.reponame.']', 20, '', 0)
     let b:gitgraph_file = a:afile
     let b:gitgraph_branch = a:branch
+    let b:gitgraph_repopath = repopath
+    exec 'lcd ' . repopath
     au ColorScheme <buffer> setl ft=gitgraph | call s:GitGraphMarkHead()
-    call s:GitGraphMappings()
 endfunction
 
 function! s:GitGraphMarkHead()
@@ -177,9 +178,10 @@ function! s:GitGraph(...)
     let order = exists('a:2') && a:2 ? 'date' : 'topo'
     let afile = exists('a:3') && a:3 != '' ? a:3 : ''
 
-    if bufname('%') =~# '^\[Git Graph'
+    if exists('b:gitgraph_repopath')
         if afile == '' | let afile = b:gitgraph_file | endif
         if branch == '' | let branch = b:gitgraph_branch | endif
+        exec 'lcd ' . b:gitgraph_repopath
     else
         call s:GitGraphNew(branch, afile)
     endif
