@@ -375,6 +375,28 @@ function! s:GitSVNDcommit(word, syng)
     exec "!git svn dcommit"
     call s:GitGraph()
 endfunction
+
+" a:1 = force, a:2 = patch
+function! s:GitAddFiles(fname, ...)
+    let files = type(a:fname) == type([]) ? s:ShellJoin(a:fname, " ") : shellescape(a:fname, 1)
+    let force = exists('a:1') && a:1 ? '--force' : ''
+    let patch = exists('a:2') && a:2 ? '--patch' : ''
+    exec '!git add ' . force . ' ' . patch . ' -- ' . shellescape(fname, 1)
+endfunction
+
+" a:1 = patch
+function! s:GitResetFiles(fname, ...)
+    let patch = exists('a:1') && a:1 ? '--patch' : ''
+    let files = type(a:fname) == type([]) ? s:ShellJoin(a:fname, " ") : shellescape(a:fname, 1)
+    exec '!git reset ' . patch . ' -- ' . files
+endfunction
+
+" a:1 = force
+function! s:GitCheckoutFiles(fname, ...)
+    let force = exists("a:1") && a:1 ? "-f" : ""
+    let files = type(a:fname) == type([]) ? s:ShellJoin(a:fname, " ") : shellescape(a:fname, 1)
+    exec "!git checkout " . force . " -- " . files
+endfunction
 " }}}
 
 call s:GitGraphInit()
