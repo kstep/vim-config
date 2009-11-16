@@ -268,14 +268,16 @@ function! s:GitStatus()
     let cmd = '0read !git status'
     call s:Scratch('[Git Status]', 30, cmd, 1)
     setl ma
-    g!/^#\( Changes\| Changed\| Untracked\|\t\|\s*$\)/delete
-    g/^#\( Changes\| Changed\| Untracked\)/.+1delete
-    %s/^#\tmodified:   /\t[*] /
-    %s/^#\tnew file:   /\t[+] /
-    %s/^#\tdeleted:    /\t[-] /
-    %s/^#\t/\t[ ] /
-    %s/^#\s*$//
-    setl ts=4 noma nomod ft=gitstatus fdm=syntax nowrap
+    silent! g!/^#\( Changes\| Changed\| Untracked\|\t\|\s*$\)/delete
+    silent! g/^#\( Changes\| Changed\| Untracked\)/.+1delete
+    silent! %s/^#\tmodified:   /\t[*] /e
+    silent! %s/^#\tnew file:   /\t[+] /e
+    silent! %s/^#\tdeleted:    /\t[-] /e
+    silent! %s/^#\t/\t[ ] /e
+    silent! %s/^#\s*$//e
+    setl ts=4 noma nomod ft=gitstatus fdm=syntax nowrap cul
+
+    call s:GitStatusMappings()
 endfunction
 " }}}
 
