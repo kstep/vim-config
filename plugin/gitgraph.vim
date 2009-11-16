@@ -1,5 +1,9 @@
 
 " Common utility functions {{{
+function! s:ShellJoin(alist, glue)
+    return join(map(alist, 'shellescape(v:val, 1)'), a:glue)
+endfunction
+
 function! s:GetSynName(l, c)
     return synIDattr(synID(line(a:l), col(a:c), 1), 'name')
 endfunction
@@ -104,8 +108,8 @@ function! s:GitGraphMappings()
     command! -buffer -nargs=? GitDelete :call <SID>GitDelete(expand('<cword>'), <SID>GetSynName('.', '.'), <f-args>)
     command! -buffer GitBranch :call <SID>GitBranch(<SID>GetLineCommit('.'), input("Enter new branch name: "))
     command! -buffer GitTag :call <SID>GitTag(<SID>GetLineCommit('.'), input("Enter new tag name: "))
-    command! -buffer GitSignedTag :call <SID>GitTag(<SID>GetLineCommit('.'), input("Enter new tag name: "), "-s")
-    command! -buffer GitAnnTag :call <SID>GitTag(<SID>GetLineCommit('.'), input("Enter new tag name: "), "-a")
+    command! -buffer GitSignedTag :call <SID>GitTag(<SID>GetLineCommit('.'), input("Enter new tag name: "), "s")
+    command! -buffer GitAnnTag :call <SID>GitTag(<SID>GetLineCommit('.'), input("Enter new tag name: "), "a")
 
     command! -buffer -nargs=? GitPush :call <SID>GitPush(expand('<cword>'), <SID>GetSynName('.', '.'), <f-args>)
     command! -buffer GitPull :call <SID>GitPull(expand('<cword>'), <SID>GetSynName('.', '.'))
@@ -133,7 +137,7 @@ function! s:GitGraphMappings()
     map <buffer> as :GitSignedTag<cr>
 
     vmap <buffer> ,gr :GitRebase<space>
-    vmap <buffer> ,gri :GitRebase "-i"<cr>
+    vmap <buffer> ,gri :GitRebase 1<cr>
     map <buffer> gd :GitDiff<cr><cr>
     map <buffer> gf :GitShow<cr><cr>
 
@@ -231,7 +235,7 @@ function! s:GitGraphInit()
         let g:gitgraph_subject_format = '%s'
     end
 
-    let s:gitgraph_graph_format = shellescape('%Creset%h%d ' . g:gitgraph_subject_format . ' [' . g:gitgraph_authorship_format . ']', '%')
+    let s:gitgraph_graph_format = shellescape('%Creset%h%d ' . g:gitgraph_subject_format . ' [' . g:gitgraph_authorship_format . ']', 1)
 
     command! -nargs=* -complete=custom,<SID>GitBranchCompleter GitGraph :call <SID>GitGraph(<f-args>)
     command! GitStatus :call <SID>GitStatus()
@@ -245,39 +249,56 @@ endfunction
 " Git commands interface {{{
 function! s:GitBranch(commit, branch)
     if a:branch != ""
-        exec "!git branch " . shellescape(a:branch) . " " . a:commit
+        exec "!git branch " . shellescape(a:branch, 1) . " " . a:commit
         call s:GitGraph()
     endif
 endfunction
 
+" a:1 - mode (none/'a'/'s'), a:1 - key id
 function! s:GitTag(commit, tag, ...)
     if a:tag != ""
-        exec "!git tag " . join(a:000, " ") . " " . shellescape(a:tag) . " " . a:commit
+        let mode = ''
+        if exists('a:1')
+            if a:1 ==# 'a'
+                let mode = '-a'
+            elseif a:1 ==# 's'
+                let mode = exists('a:2') && a:2 ? '-u '.a:2 : '-s'
+            endif
+        endif
+        exec "!git tag " . mode . " " . shellescape(a:tag, 1) . " " . a:commit
         call s:GitGraph()
     endif
 endfunction
 
+" a:1 - nocommit, a:2 - noff, a:3 - squash
 function! s:GitMerge(tobranch, frombranch, ...)
-    if a:tobranch != "" && a:frombranch != ""
-        exec "!git checkout " . shellescape(a:tobranch) . " && git merge " . join(a:000, " ") . " " . shellescape(a:frombranch)
+    if a:tobranch != '' && a:frombranch != ''
+        let nocommit = exists('a:1') && a:1 '--no-commit' : '--commit'
+        let nofastfwd = exists('a:2') && a:2 '--no-ff' : '--ff'
+        let squash = exists('a:3') && a:3 '--squash' : '--no-squash'
+        exec '!git checkout ' . shellescape(a:tobranch, 1) . ' && git merge ' . nocommit . ' ' . nofastfwd . ' ' . squash . ' ' . shellescape(a:frombranch, 1)
         call s:GitGraph()
     endif
 endfunction
 
-" a:000 - additional params
+" a:1 = interactive
 function! s:GitRebase(branch, upstream, onto, ...)
     if a:branch != "" && a:upstream != ""
         let onto = a:onto == "" ? a:upstream : a:onto
-        exec "!git rebase " . join(a:000, " ") . " --onto " . onto . " " . a:upstream . " " . a:branch
+        let iact = exists('a:1') && a:1 ? '--interactive' : ''
+        exec "!git rebase " . iact . " --onto " . onto . " " . a:upstream . " " . a:branch
         call s:GitGraph()
     endif
 endfunction
 
-" a:000 - additional params
+" a:1 = cached, a:2 = files
 function! s:GitDiff(fcomm, tcomm, ...)
     if a:fcomm != "" && a:tcomm != ""
-        let cmd = "0read !git diff " . join(a:000, " ") . " " . a:tcomm
+        let cached = exists('a:1') && a:1 ? '--cached' : ''
+        let paths = exists('a:2') && a:2 ? s:ShellJoin(a:2, ' ') : ''
+        let cmd = "0read !git diff " . cached . " " . a:tcomm
         if a:fcomm != a:tcomm | let cmd = cmd . " " . a:fcomm | endif
+        let cmd = cmd . ' -- ' . paths
         call s:Scratch("[Git Diff]", 15, cmd, 0)
         setl ft=diff inex=GitGraphGotoFile(v:fname)
         map <buffer> <C-d> /^diff --git<CR>
@@ -299,7 +320,7 @@ endfunction
 function! s:GitPush(word, syng, ...)
     if a:syng == 'gitgraphRemoteItem'
         let parts = split(a:word[7:], "/")
-        let force = exists("a:1") && a:1 ? " -f " : ""
+        let force = exists("a:1") && a:1 ? "-f" : ""
         exec "!git push " . force . " " . parts[0] . " " . join(parts[1:], "/")
         call s:GitGraph()
     endif
