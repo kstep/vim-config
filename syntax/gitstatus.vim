@@ -10,7 +10,7 @@ syn region gitDelFile start='^\t\[-\]' end='$' contained
 syn region gitUnFile  start='^\t\[ \]' end='$' contained
 
 hi link gitSectionHeader Title
-hi gitModFile guifg=#eeee00
-hi gitNewFile guifg=#00ee00
-hi gitDelFile guifg=#ee0000
-hi gitUnFile guifg=#00eeee
+hi link gitModFile Identifier
+hi link gitNewFile Type
+hi link gitDelFile Special
+hi link gitUnFile PreProc
