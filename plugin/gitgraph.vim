@@ -161,6 +161,7 @@ function! s:GitGraphNew(branch, afile)
     let b:gitgraph_repopath = repopath
     exec 'lcd ' . repopath
     au ColorScheme <buffer> setl ft=gitgraph | call s:GitGraphMarkHead()
+    call s:GitGraphMappings()
 endfunction
 
 function! s:GitGraphMarkHead()
