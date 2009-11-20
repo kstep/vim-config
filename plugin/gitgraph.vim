@@ -104,19 +104,19 @@ endfunction
 " GitGraph view implementation {{{
 function! s:GitGraphMappings()
     command! -buffer -range GitYankRange :call setreg(v:register, <SID>GetLineCommit(<line1>)."\n".<SID>GetLineCommit(<line2>), "l")
-    command! -buffer -nargs=* -range GitRebase :call <SID>GitRebase(<SID>GetLineCommit(<line1>), <SID>GetLineCommit(<line2>), "", <f-args>)
-    command! -buffer -nargs=* GitRebaseOnto :let rng = <SID>GetRegCommit(v:register) | call <SID>GitRebase(rng[0], rng[1], <SID>GetLineCommit('.'), <f-args>)
+    command! -buffer -bang -range GitRebase :call <SID>GitRebase(<SID>GetLineCommit(<line1>), <SID>GetLineCommit(<line2>), '', '<bang>'=='!')
+    command! -buffer -bang GitRebaseOnto :let rng = <SID>GetRegCommit(v:register) | call <SID>GitRebase(rng[0], rng[1], <SID>GetLineCommit('.'), '<bang>'=='!')
     command! -buffer -nargs=* -range GitDiff :call <SID>GitDiff(<SID>GetLineCommit(<line1>), <SID>GetLineCommit(<line2>), <f-args>)
     command! -buffer GitShow :call <SID>GitShow(<SID>GetLineCommit('.'))
     command! -buffer GitNextRef :call <SID>GitGraphNextRef()
 
-    command! -buffer -nargs=? GitDelete :call <SID>GitDelete(expand('<cword>'), <SID>GetSynName('.', '.'), <f-args>)
+    command! -buffer -bang GitDelete :call <SID>GitDelete(expand('<cword>'), <SID>GetSynName('.', '.'), '<bang>'=='!')
     command! -buffer GitBranch :call <SID>GitBranch(<SID>GetLineCommit('.'), input("Enter new branch name: "))
     command! -buffer GitTag :call <SID>GitTag(<SID>GetLineCommit('.'), input("Enter new tag name: "))
     command! -buffer GitSignedTag :call <SID>GitTag(<SID>GetLineCommit('.'), input("Enter new tag name: "), "s")
     command! -buffer GitAnnTag :call <SID>GitTag(<SID>GetLineCommit('.'), input("Enter new tag name: "), "a")
 
-    command! -buffer -nargs=? GitPush :call <SID>GitPush(expand('<cword>'), <SID>GetSynName('.', '.'), <f-args>)
+    command! -buffer -bang GitPush :call <SID>GitPush(expand('<cword>'), <SID>GetSynName('.', '.'), '<bang>'=='!')
     command! -buffer GitPull :call <SID>GitPull(expand('<cword>'), <SID>GetSynName('.', '.'))
     command! -buffer GitCheckout :call <SID>GitCheckout(expand('<cword>'), <SID>GetSynName('.', '.'))
 
@@ -129,7 +129,7 @@ function! s:GitGraphMappings()
 
     " (d)elete (w)ord
     map <buffer> dw :GitDelete<cr>
-    map <buffer> dW :GitDelete 1<cr>
+    map <buffer> dW :GitDelete!<cr>
 
     map <buffer> ,gp :GitPush<cr><cr>
     map <buffer> ,gu :GitPull<cr><cr>
@@ -141,8 +141,9 @@ function! s:GitGraphMappings()
     map <buffer> aa :GitAnnTag<cr>
     map <buffer> as :GitSignedTag<cr>
 
-    vmap <buffer> ,gr :GitRebase<space>
-    vmap <buffer> ,gri :GitRebase 1<cr>
+    " (g)o (r)ebase (interactive), (d)iff, (f)ile (aka commit)
+    vmap <buffer> gr :GitRebase<space>
+    vmap <buffer> gR :GitRebase!<cr>
     map <buffer> gd :GitDiff<cr><cr>
     map <buffer> gf :GitShow<cr><cr>
 
