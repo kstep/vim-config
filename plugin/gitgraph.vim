@@ -59,7 +59,7 @@ endfunction
 
 " Common git helper functions {{{
 function! s:GitGetRepository()
-    let reponame = system('git rev-parse --git-dir')[:-2]
+    let reponame = system(s:gitgraph_git_path . ' rev-parse --git-dir')[:-2]
     if reponame ==# '.git'
         let reponame = getcwd()
     else
@@ -77,8 +77,8 @@ function! s:GetRegCommit(regn)
 endfunction
 
 function! s:GitBranchCompleter(arg, cline, cpos)
-    let cmd = 'git branch | cut -c 3-'
-    let lst = system(cmd)
+    let cmd = s:gitgraph_git_path . ' branch'
+    let lst = join(map(split(system(cmd), "\n"), 'v:val[2:]'), "\n")
     return lst
 endfunction
 " }}}
@@ -165,8 +165,8 @@ function! s:GitGraphNew(branch, afile)
 endfunction
 
 function! s:GitGraphMarkHead()
-    let commit = system('git rev-parse --short HEAD')[:-2]
-    let branch = system('git symbolic-ref -q HEAD')[11:-2]
+    let commit = system(s:gitgraph_git_path . ' rev-parse --short HEAD')[:-2]
+    let branch = system(s:gitgraph_git_path . ' symbolic-ref -q HEAD')[11:-2]
     silent! syn clear gitgraphHeadRefItem
     exec 'syn keyword gitgraphHeadRefItem ' . commit . ' ' . branch . ' contained'
 endfunction
@@ -192,7 +192,7 @@ function! s:GitGraph(...)
         call s:GitGraphNew(branch, afile)
     endif
 
-    let cmd = "0read !git log --graph --decorate=full --date=" . g:gitgraph_date_format . " --format=format:" . s:gitgraph_graph_format . " --abbrev-commit --color --" . order . "-order " . branch . " -- " . afile
+    let cmd = "0read !" . s:gitgraph_git_path . " log --graph --decorate=full --date=" . g:gitgraph_date_format . " --format=format:" . s:gitgraph_graph_format . " --abbrev-commit --color --" . order . "-order " . branch . " -- " . afile
     setl ma
     1,$delete
     exec cmd
@@ -209,7 +209,7 @@ function! s:GitGraph(...)
     goto 1
 
     setl bt=nofile bh=delete ft=gitgraph fde=GitGraphFolder(v:lnum) isk=:,a-z,A-Z,48-57,.,_,-,/ fdm=expr nowrap noma nomod noswf cul
-    exec 'setl gp=git\ grep\ -n\ $*\ --\ ' . escape(b:gitgraph_repopath, ' ')
+    exec 'setl gp=' . s:gitgraph_git_path . '\ grep\ -n\ $*\ --\ ' . escape(b:gitgraph_repopath, ' ')
     call s:GitGraphMarkHead()
 endfunction
 " }}}
@@ -266,7 +266,7 @@ function! s:GitStatusMappings()
 endfunction
 
 function! s:GitStatus()
-    let cmd = '0read !git status'
+    let cmd = '0read !' . s:gitgraph_git_path .  ' status'
     call s:Scratch('[Git Status]', 30, cmd, 1)
     setl ma
     silent! g!/^#\( Changes\| Changed\| Untracked\|\t\|\s*$\)/delete
@@ -296,6 +296,11 @@ function! s:GitGraphInit()
         let g:gitgraph_subject_format = '%s'
     end
 
+    if !exists('g:gitgraph_git_path') || g:gitgraph_git_path == ''
+        let g:gitgraph_git_path = 'git'
+    endif
+
+    let s:gitgraph_git_path = g:gitgraph_git_path
     let s:gitgraph_graph_format = shellescape('%Creset%h%d ' . g:gitgraph_subject_format . ' [' . g:gitgraph_authorship_format . ']', 1)
 
     command! -nargs=* -complete=custom,<SID>GitBranchCompleter GitGraph :call <SID>GitGraph(<f-args>)
@@ -310,7 +315,7 @@ endfunction
 " Git commands interface {{{
 function! s:GitBranch(commit, branch)
     if a:branch != ""
-        exec "!git branch " . shellescape(a:branch, 1) . " " . a:commit
+        exec "!" . s:gitgraph_git_path . " branch " . shellescape(a:branch, 1) . " " . a:commit
         call s:GitGraph()
     endif
 endfunction
@@ -326,7 +331,7 @@ function! s:GitTag(commit, tag, ...)
                 let mode = exists('a:2') && a:2 ? '-u '.a:2 : '-s'
             endif
         endif
-        exec "!git tag " . mode . " " . shellescape(a:tag, 1) . " " . a:commit
+        exec "!" . s:gitgraph_git_path . " tag " . mode . " " . shellescape(a:tag, 1) . " " . a:commit
         call s:GitGraph()
     endif
 endfunction
@@ -337,7 +342,7 @@ function! s:GitMerge(tobranch, frombranch, ...)
         let nocommit = exists('a:1') && a:1 '--no-commit' : '--commit'
         let nofastfwd = exists('a:2') && a:2 '--no-ff' : '--ff'
         let squash = exists('a:3') && a:3 '--squash' : '--no-squash'
-        exec '!git checkout ' . shellescape(a:tobranch, 1) . ' && git merge ' . nocommit . ' ' . nofastfwd . ' ' . squash . ' ' . shellescape(a:frombranch, 1)
+        exec '!' . s:gitgraph_git_path . ' checkout ' . shellescape(a:tobranch, 1) . ' && ' . s:gitgraph_git_path . ' merge ' . nocommit . ' ' . nofastfwd . ' ' . squash . ' ' . shellescape(a:frombranch, 1)
         call s:GitGraph()
     endif
 endfunction
@@ -347,7 +352,7 @@ function! s:GitRebase(branch, upstream, onto, ...)
     if a:branch != "" && a:upstream != ""
         let onto = a:onto == "" ? a:upstream : a:onto
         let iact = exists('a:1') && a:1 ? '--interactive' : ''
-        exec "!git rebase " . iact . " --onto " . onto . " " . a:upstream . " " . a:branch
+        exec "!" . s:gitgraph_git_path . " rebase " . iact . " --onto " . onto . " " . a:upstream . " " . a:branch
         call s:GitGraph()
     endif
 endfunction
@@ -357,7 +362,7 @@ function! s:GitDiff(fcomm, tcomm, ...)
     if a:fcomm != "" && a:tcomm != ""
         let cached = exists('a:1') && a:1 ? '--cached' : ''
         let paths = exists('a:2') && a:2 ? s:ShellJoin(a:2, ' ') : ''
-        let cmd = "0read !git diff " . cached . " " . a:tcomm
+        let cmd = "0read !" . s:gitgraph_git_path . " diff " . cached . " " . a:tcomm
         if a:fcomm != a:tcomm | let cmd = cmd . " " . a:fcomm | endif
         let cmd = cmd . ' -- ' . paths
         call s:Scratch("[Git Diff]", 15, cmd, 0)
@@ -369,7 +374,7 @@ endfunction
 
 function! s:GitShow(commit, ...)
     if a:commit != ""
-        let cmd = "0read !git show " . join(a:000, " ") . " " . a:commit
+        let cmd = "0read !" . s:gitgraph_git_path . " show " . join(a:000, " ") . " " . a:commit
         call s:Scratch("[Git Show]", 15, cmd, 0)
         setl ft=diff.gitlog inex=GitGraphGotoFile(v:fname)
         map <buffer> <C-d> /^diff --git<CR>
@@ -382,14 +387,14 @@ function! s:GitPush(word, syng, ...)
     if a:syng == 'gitgraphRemoteItem'
         let parts = split(a:word[7:], "/")
         let force = exists("a:1") && a:1 ? "-f" : ""
-        exec "!git push " . force . " " . parts[0] . " " . join(parts[1:], "/")
+        exec "!" . s:gitgraph_git_path . " push " . force . " " . parts[0] . " " . join(parts[1:], "/")
         call s:GitGraph()
     endif
 endfunction
 
 function! s:GitCheckout(word, syng)
     if a:syng == 'gitgraphRefItem'
-        exec "!git checkout " . a:word
+        exec "!" . s:gitgraph_git_path . " checkout " . a:word
         call s:GitGraphMarkHead()
     endif
 endfunction
@@ -397,7 +402,7 @@ endfunction
 function! s:GitPull(word, syng)
     if a:syng == 'gitgraphRemoteItem'
         let parts = split(a:word[7:], "/")
-        exec "!git pull " . parts[0] . " " . join(parts[1:], "/")
+        exec "!" . s:gitgraph_git_path . " pull " . parts[0] . " " . join(parts[1:], "/")
         call s:GitGraph()
     endif
 endfunction
@@ -407,13 +412,13 @@ function! s:GitDelete(word, syng, ...)
     let force = exists("a:1") && a:1
     if a:syng == 'gitgraphRefItem'
         let par = force ? "-D" : "-d"
-        let cmd = "!git branch " . par . " " . a:word
+        let cmd = "!" . s:gitgraph_git_path . " branch " . par . " " . a:word
     elseif a:syng == 'gitgraphTagItem'
-        let cmd = "!git tag -d " . a:word[4:]
+        let cmd = "!" . s:gitgraph_git_path . " tag -d " . a:word[4:]
     elseif a:syng == 'gitgraphRemoteItem'
         let par = force ? "-f" : ""
         let parts = split(a:word[7:], "/")
-        let cmd = "!git push " . par . " " . parts[0] . " " . join(parts[1:], "/") . ":"
+        let cmd = "!" . s:gitgraph_git_path . " push " . par . " " . parts[0] . " " . join(parts[1:], "/") . ":"
     else
         return
     endif
@@ -424,13 +429,13 @@ endfunction
 
 function! s:GitSVNRebase(word, syng)
     call s:GitCheckout(a:word, a:syng)
-    exec "!git svn rebase"
+    exec "!" . s:gitgraph_git_path . " svn rebase"
     call s:GitGraph()
 endfunction
 
 function! s:GitSVNDcommit(word, syng)
     call s:GitCheckout(a:word, a:syng)
-    exec "!git svn dcommit"
+    exec "!" . s:gitgraph_git_path . " svn dcommit"
     call s:GitGraph()
 endfunction
 
@@ -439,21 +444,21 @@ function! s:GitAddFiles(fname, ...)
     let files = type(a:fname) == type([]) ? s:ShellJoin(a:fname, " ") : shellescape(a:fname, 1)
     let force = exists('a:1') && a:1 ? '--force' : ''
     let patch = exists('a:2') && a:2 ? '--patch' : ''
-    exec '!git add ' . force . ' ' . patch . ' -- ' . shellescape(fname, 1)
+    exec '!' . s:gitgraph_git_path . ' add ' . force . ' ' . patch . ' -- ' . shellescape(fname, 1)
 endfunction
 
 " a:1 = patch
 function! s:GitResetFiles(fname, ...)
     let patch = exists('a:1') && a:1 ? '--patch' : ''
     let files = type(a:fname) == type([]) ? s:ShellJoin(a:fname, " ") : shellescape(a:fname, 1)
-    exec '!git reset ' . patch . ' -- ' . files
+    exec '!' . s:gitgraph_git_path . ' reset ' . patch . ' -- ' . files
 endfunction
 
 " a:1 = force
 function! s:GitCheckoutFiles(fname, ...)
     let force = exists("a:1") && a:1 ? "-f" : ""
     let files = type(a:fname) == type([]) ? s:ShellJoin(a:fname, " ") : shellescape(a:fname, 1)
-    exec "!git checkout " . force . " -- " . files
+    exec "!" . s:gitgraph_git_path . " checkout " . force . " -- " . files
 endfunction
 " }}}
 
