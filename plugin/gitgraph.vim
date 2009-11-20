@@ -124,19 +124,21 @@ function! s:GitGraphMappings()
     command! -buffer GitSVNRebase :call <SID>GitSVNRebase(expand('<cword>'), <SID>GetSynName('.', '.'))
     command! -buffer GitSVNDcommit :call <SID>GitSVNDcommit(expand('<cword>'), <SID>GetSynName('.', '.'))
 
+    " (y)ank range into buffer and (p)ut it somewhere (aka rebase onto)
     map <buffer> Y :GitYankRange<cr>
     vmap <buffer> Y :GitYankRange<cr>
     map <buffer> P :GitRebaseOnto<cr>
 
-    " (d)elete (w)ord
+    " (d)elete (w)ord, commit (aka revert)
     map <buffer> dw :GitDelete<cr>
     map <buffer> dW :GitDelete!<cr>
     map <buffer> dd :GitRevert<cr>
     map <buffer> DD :GitRevert!<cr>
 
-    map <buffer> ,gp :GitPush<cr><cr>
-    map <buffer> ,gu :GitPull<cr><cr>
-    map <buffer> ,gc :GitCheckout<cr><cr>
+    " (g)o (b)ranch, (p)ush, p(u)ll
+    map <buffer> gp :GitPush<cr><cr>
+    map <buffer> gu :GitPull<cr><cr>
+    map <buffer> gb :GitCheckout<cr><cr>
 
     " (a)dd (b)ranch, (t)ag, (a)nnotated/(s)igned tag
     map <buffer> ab :GitBranch<cr>
@@ -150,8 +152,9 @@ function! s:GitGraphMappings()
     map <buffer> gd :GitDiff<cr><cr>
     map <buffer> gf :GitShow<cr><cr>
 
-    map <buffer> ,su :GitSVNRebase<cr><cr>
-    map <buffer> ,sp :GitSVNDcommit<cr><cr>
+    " like gu/gp, but for git-svn
+    map <buffer> gU :GitSVNRebase<cr><cr>
+    map <buffer> gP :GitSVNDcommit<cr><cr>
 
     map <buffer> <Tab> :GitNextRef<cr>
 endfunction
