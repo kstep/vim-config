@@ -111,6 +111,7 @@ function! s:GitGraphMappings()
     command! -buffer GitNextRef :call <SID>GitGraphNextRef()
 
     command! -buffer -bang GitDelete :call <SID>GitDelete(expand('<cword>'), <SID>GetSynName('.', '.'), '<bang>'=='!')
+    command! -buffer -bang GitRevert :call <SID>GitRevert(<SID>GetLineCommit('.'), '<bang>'=='!')
     command! -buffer GitBranch :call <SID>GitBranch(<SID>GetLineCommit('.'), input("Enter new branch name: "))
     command! -buffer GitTag :call <SID>GitTag(<SID>GetLineCommit('.'), input("Enter new tag name: "))
     command! -buffer GitSignedTag :call <SID>GitTag(<SID>GetLineCommit('.'), input("Enter new tag name: "), "s")
@@ -130,6 +131,8 @@ function! s:GitGraphMappings()
     " (d)elete (w)ord
     map <buffer> dw :GitDelete<cr>
     map <buffer> dW :GitDelete!<cr>
+    map <buffer> dd :GitRevert<cr>
+    map <buffer> DD :GitRevert!<cr>
 
     map <buffer> ,gp :GitPush<cr><cr>
     map <buffer> ,gu :GitPull<cr><cr>
@@ -460,6 +463,23 @@ function! s:GitCheckoutFiles(fname, ...)
     let force = exists("a:1") && a:1 ? "-f" : ""
     let files = type(a:fname) == type([]) ? s:ShellJoin(a:fname, " ") : shellescape(a:fname, 1)
     exec "!" . s:gitgraph_git_path . " checkout " . force . " -- " . files
+endfunction
+
+" a:1 = nocommit, a:2 = edit, a:3 = signoff
+function! s:GitRevert(commit, ...)
+    let nocommit = exists('a:1') && a:1 ? '--no-commit' : ''
+    let edit = exists('a:2') && a:2 ? '--edit' : '--no-edit'
+    let signoff = exists('a:3') && a:3 ? '--signoff' : ''
+    exec '!' . s:gitgraph_git_path . ' revert ' . nocommit . ' ' . edit . ' ' . signoff . ' ' . shellescape(commit, 1)
+endfunction
+
+" a:1 = nocommit, a:2 = edit, a:3 = signoff, a:4 = attribute
+function! s:GitCherryPick(commit, ...)
+    let nocommit = exists('a:1') && a:1 ? '--no-commit' : ''
+    let edit = exists('a:2') && a:2 ? '--edit' : ''
+    let signoff = exists('a:3') && a:3 ? '--signoff' : ''
+    let attrib = exists('a:4') && a:4 ? '-x' : '-r'
+    exec '!' . s:gitgraph_git_path . ' cherry-pick ' . nocommit . ' ' . edit . ' ' . signoff . ' ' . attrib . ' ' . shellescape(commit, 1)
 endfunction
 " }}}
 
