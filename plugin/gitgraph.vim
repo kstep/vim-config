@@ -374,8 +374,8 @@ function! s:GitDiff(fcomm, tcomm, ...)
         let cmd = cmd . ' -- ' . paths
         call s:Scratch("[Git Diff]", 15, cmd, 0)
         setl ft=diff inex=GitGraphGotoFile(v:fname)
-        map <buffer> <C-d> /^diff --git<CR>
-        map <buffer> <C-u> ?^diff --git<CR>
+        map <buffer> <C-f> /^diff --git<CR>
+        map <buffer> <C-b> ?^diff --git<CR>
     endif
 endfunction
 
@@ -384,8 +384,8 @@ function! s:GitShow(commit, ...)
         let cmd = "0read !" . s:gitgraph_git_path . " show " . join(a:000, " ") . " " . a:commit
         call s:Scratch("[Git Show]", 15, cmd, 0)
         setl ft=diff.gitlog inex=GitGraphGotoFile(v:fname)
-        map <buffer> <C-d> /^diff --git<CR>
-        map <buffer> <C-u> ?^diff --git<CR>
+        map <buffer> <C-f> /^diff --git<CR>
+        map <buffer> <C-b> ?^diff --git<CR>
     endif
 endfunction
 
