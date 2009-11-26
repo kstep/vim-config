@@ -262,8 +262,8 @@ endfunction
 
 function! s:GitStatusAddFile(fname, region)
     if a:fname == '' | return | endif
-    if a:region ==# 'gitUnstage' || a:region ==# 'gitUntracked'
-        call s:GitAddFiles(fname)
+    if a:region ==# 'gitUnstaged' || a:region ==# 'gitUntracked'
+        call s:GitAddFiles(a:fname)
     else
         return
     endif
@@ -459,7 +459,7 @@ function! s:GitAddFiles(fname, ...)
     let files = type(a:fname) == type([]) ? s:ShellJoin(a:fname, " ") : shellescape(a:fname, 1)
     let force = exists('a:1') && a:1 ? '--force' : ''
     let patch = exists('a:2') && a:2 ? '--patch' : ''
-    exec '!' . s:gitgraph_git_path . ' add ' . force . ' ' . patch . ' -- ' . shellescape(fname, 1)
+    exec '!' . s:gitgraph_git_path . ' add ' . force . ' ' . patch . ' -- ' . files
 endfunction
 
 " a:1 = patch
