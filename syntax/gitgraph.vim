@@ -46,7 +46,7 @@ hi link gitgraphKeywords Keyword
 " placeholder
 "syn keyword gitgraphHeadRefItem xxxxxxx
 hi link gitgraphHeadRefItem PreCondit
-hi PreCondit gui=underline,bold cterm=underline,bold
+hi gitgraphHeadRefItem gui=underline,bold cterm=underline,bold
 "hi gitgraphHeadRefItem gui=bold,inverse
 
 hi link gitgraphAuthorship Comment
