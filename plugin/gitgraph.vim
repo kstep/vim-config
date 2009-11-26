@@ -4,13 +4,21 @@ function! s:ShellJoin(alist, glue)
     return join(map(alist, 'shellescape(v:val, 1)'), a:glue)
 endfunction
 
+function! s:Line(l)
+    return type(a:l) == type("") ? line(a:l) : a:l
+endfunction
+
+function! s:Col(c)
+    return type(a:c) == type("") ? col(a:c) : a:c
+endfunction
+
 function! s:GetSynName(l, c)
-    return synIDattr(synID(line(a:l), col(a:c), 1), 'name')
+    return synIDattr(synID(s:Line(a:l), s:Col(a:c), 1), 'name')
 endfunction
 
 " a:1 = depth, default to 0
 function! s:GetSynRegionName(l, c, ...)
-    return synIDattr(synstack(line(a:l), col(a:c))[a:0 > 0 ? a:1 : 0], 'name')
+    return synIDattr(synstack(s:Line(a:l), s:Col(a:c))[a:0 > 0 ? a:1 : 0], 'name')
 endfunction
 
 function! s:SynSearch(pattern, synnames)
