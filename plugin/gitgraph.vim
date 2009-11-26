@@ -290,6 +290,7 @@ function! s:GitStatus()
     silent! %s/^#\tmodified:   /\t[*] /e
     silent! %s/^#\tnew file:   /\t[+] /e
     silent! %s/^#\tdeleted:    /\t[-] /e
+    silent! %s/^#\trenamed:    /\t[=] /e
     silent! %s/^#\t/\t[ ] /e
     silent! %s/^#\s*$//e
     setl ts=4 noma nomod ft=gitstatus fdm=syntax nowrap cul
