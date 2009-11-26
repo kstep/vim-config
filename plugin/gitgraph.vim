@@ -281,7 +281,8 @@ function! s:GitStatusMappings()
 endfunction
 
 function! s:GitStatus()
-    let cmd = '0read !' . s:gitgraph_git_path .  ' status'
+    let repopath = s:GitGetRepository()
+    let cmd = 'lcd ' . repopath . ' | 0read !' . s:gitgraph_git_path .  ' status'
     call s:Scratch('[Git Status]', 30, cmd, 1)
     setl ma
     silent! g!/^#\( Changes\| Changed\| Untracked\|\t\|\s*$\)/delete
