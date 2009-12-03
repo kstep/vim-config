@@ -1,7 +1,7 @@
 
 " Common utility functions {{{
 function! s:ShellJoin(alist, glue)
-    return join(map(alist, 'shellescape(v:val, 1)'), a:glue)
+    return join(map(a:alist, 'shellescape(v:val, 1)'), a:glue)
 endfunction
 
 function! s:Line(l)
@@ -245,7 +245,7 @@ function! s:GitStatusGetFile(l)
 endfunction
 
 function! s:GitStatusRevertFile(fname, region)
-    if a:fname == '' | return | endif
+    if empty(a:fname) | return | endif
     if a:region ==# 'gitStaged'
         call s:GitResetFiles(a:fname)
     elseif a:region ==# 'gitUnstaged'
@@ -261,7 +261,7 @@ function! s:GitStatusRevertFile(fname, region)
 endfunction
 
 function! s:GitStatusAddFile(fname, region)
-    if a:fname == '' | return | endif
+    if empty(a:fname) | return | endif
     if a:region ==# 'gitUnstaged' || a:region ==# 'gitUntracked'
         call s:GitAddFiles(a:fname)
     else
