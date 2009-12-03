@@ -20,7 +20,7 @@ set keymap=russian-jcukenwin
 set iminsert=0
 set imsearch=0
 set incsearch
-set grepprg=find\ %:p:h\ -xdev\ -name\ '*.%:e'\ -exec\ grep\ -n\ $*\ \{}\ +
+set grepprg=find\ %:p:h\ -xdev\ -name\ '*.%:e'\ -exec\ grep\ -Hn\ $*\ \{}\ +
 
 set tabstop=8
 set shiftwidth=4
