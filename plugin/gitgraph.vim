@@ -114,6 +114,7 @@ function! s:GitGraphMappings()
     command! -buffer -range GitYankRange :call setreg(v:register, <SID>GetLineCommit(<line1>)."\n".<SID>GetLineCommit(<line2>), "l")
     command! -buffer -bang -range GitRebase :call <SID>GitRebase(<SID>GetLineCommit(<line1>), <SID>GetLineCommit(<line2>), '', '<bang>'=='!')
     command! -buffer -bang GitRebaseOnto :let rng = <SID>GetRegCommit(v:register) | call <SID>GitRebase(rng[0], rng[1], <SID>GetLineCommit('.'), '<bang>'=='!')
+    command! -buffer -bang GitRebaseCurrent :call <SID>GitRebase('', <SID>GetLineCommit('.'), '', '<bang>'=='!')
     command! -buffer -nargs=* -range GitDiff :call <SID>GitDiff(<SID>GetLineCommit(<line1>), <SID>GetLineCommit(<line2>), <f-args>)
     command! -buffer GitShow :call <SID>GitShow(<SID>GetLineCommit('.'))
     command! -buffer GitNextRef :call <SID>GitGraphNextRef()
@@ -136,6 +137,7 @@ function! s:GitGraphMappings()
     map <buffer> Y :GitYankRange<cr>
     vmap <buffer> Y :GitYankRange<cr>
     map <buffer> P :GitRebaseOnto<cr>
+    map <buffer> p :GitRebaseCurrent<cr>
 
     " (d)elete (w)ord, commit (aka revert)
     map <buffer> dw :GitDelete<cr>
