@@ -11,6 +11,8 @@ runtime macros/matchit.vim
 set guifont=Terminus\ 12
 set helplang=ru
 set background=light
+set t_IS=]0; t_IE=
+set icon iconstring=Vim
 
 set nohlsearch
 set ignorecase
