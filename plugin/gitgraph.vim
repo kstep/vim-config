@@ -234,14 +234,17 @@ function! s:GitStatusNextFile()
     call s:SynSearch('\[[ =+*-]\]', ['gitModFile', 'gitNewFile', 'gitDelFile', 'gitUnFile'])
 endfunction
 
-function! s:GitStatusGetFile(l)
-    let synname = s:GetSynName(a:l, '.')
-    if synname ==# 'gitModFile' || synname ==# 'gitNewFile'
-        \ || synname ==# 'gitDelFile' || synname ==# 'gitUnFile'
-        return getline(a:l)[5:]
-    else
-        return ""
-    endif
+function! s:GitStatusGetFiles(l1, l2)
+    let filelist = []
+    for lineno in range(a:l1, a:l2)
+        let synname = s:GetSynName(lineno, 5)
+        if synname ==# 'gitModFile' || synname ==# 'gitNewFile'
+            \ || synname ==# 'gitDelFile' || synname ==# 'gitUnFile'
+            \ || synname ==# 'gitRenFile'
+            call add(filelist, getline(lineno)[5:])
+        endif
+    endfor
+    return filelist
 endfunction
 
 function! s:GitStatusRevertFile(fname, region)
@@ -272,8 +275,8 @@ endfunction
 
 function! s:GitStatusMappings()
     command! -buffer GitNextFile :call <SID>GitStatusNextFile()
-    command! -buffer GitRevertFile :call <SID>GitStatusRevertFile(<SID>GitStatusGetFile('.'), <SID>GetSynRegionName('.', '.'))
-    command! -buffer GitAddFile :call <SID>GitStatusAddFile(<SID>GitStatusGetFile('.'), <SID>GetSynRegionName('.', '.'))
+    command! -buffer -range GitRevertFile :call <SID>GitStatusRevertFile(<SID>GitStatusGetFiles(<line1>, <line2>), <SID>GetSynRegionName(<line1>, '.'))
+    command! -buffer -range GitAddFile :call <SID>GitStatusAddFile(<SID>GitStatusGetFiles(<line1>, <line2>), <SID>GetSynRegionName(<line1>, '.'))
 
     map <buffer> <Tab> :GitNextFile<cr>
     map <buffer> dd :GitRevertFile<cr>
