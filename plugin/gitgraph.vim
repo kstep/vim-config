@@ -231,7 +231,7 @@ endfunction
 
 " GitStatus view implementation {{{
 function! s:GitStatusNextFile()
-    call s:SynSearch('\[[ +*-]\]', ['gitModFile', 'gitNewFile', 'gitDelFile', 'gitUnFile'])
+    call s:SynSearch('\[[ =+*-]\]', ['gitModFile', 'gitNewFile', 'gitDelFile', 'gitUnFile'])
 endfunction
 
 function! s:GitStatusGetFile(l)
