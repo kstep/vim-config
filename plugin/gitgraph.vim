@@ -256,15 +256,7 @@ function! s:GitStatusRevertFile(fname, region)
     elseif a:region ==# 'gitUnstaged'
         call s:GitCheckoutFiles(a:fname, 1)
     elseif a:region ==# 'gitUntracked'
-        if type(a:fname) == type([])
-            if confirm('Remove untracked file'.(len(a:fname) > 1 ? 's' : ' '.a:fname[0]).'?', "&Yes\n&No") == 1
-                exec '!rm -f ' . s:ShellJoin(a:fname, ' ')
-            endif
-        else
-            if confirm('Remove untracked file "'.a:fname.'"?', "&Yes\n&No") == 1
-                exec '!rm -f ' . shellescape(a:fname, 1)
-            endif
-        endif
+        call s:GitRemoveFiles(a:fname)
     else
         return
     endif
@@ -480,6 +472,21 @@ function! s:GitResetFiles(fname, ...)
     let patch = exists('a:1') && a:1 ? '--patch' : ''
     let files = type(a:fname) == type([]) ? s:ShellJoin(a:fname, " ") : shellescape(a:fname, 1)
     exec '!' . s:gitgraph_git_path . ' reset ' . patch . ' -- ' . files
+endfunction
+
+" a:1 = force
+function! s:GitRemoveFiles(fname, ...)
+    let force = exists("a:1") && a:1 ? "-f" : ""
+    let cmd = "!rm " . force . " "
+    if type(a:fname) == type([])
+        if confirm('Remove untracked file'.(len(a:fname) > 1 ? 's' : ' '.a:fname[0]).'?', "&Yes\n&No") == 1
+            exec cmd . s:ShellJoin(a:fname, ' ')
+        endif
+    else
+        if confirm('Remove untracked file "'.a:fname.'"?', "&Yes\n&No") == 1
+            exec cmd . shellescape(a:fname, 1)
+        endif
+    endif
 endfunction
 
 " a:1 = force
