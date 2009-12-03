@@ -366,7 +366,7 @@ endfunction
 
 " a:1 = interactive
 function! s:GitRebase(branch, upstream, onto, ...)
-    if a:branch != "" && a:upstream != ""
+    if a:upstream != ""
         let onto = a:onto == "" ? a:upstream : a:onto
         let iact = exists('a:1') && a:1 ? '--interactive' : ''
         exec "!" . s:gitgraph_git_path . " rebase " . iact . " --onto " . onto . " " . a:upstream . " " . a:branch
