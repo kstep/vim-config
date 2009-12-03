@@ -34,3 +34,71 @@
 
 теплообменник Альфа Лаваль Alfa Laval пластинчатый теплообменник расчет теплообменника водоподогреватель ГВС теплообменное энергосберегающее котельное оборудование отопление теплообмен ЦТП ИТП паро-водяной водо-водяной
 
+Формат ссылки на список пакетов в репе:
+[Первая колонка]------------------------------------------[Вторая колонка]-----[Третья и далее]--------------------------------------------
+[базовый урл репа: http://dl.google.com/linux/deb/] dists/[версия оси: stable]/[имя репа: main]/[архитектура репа: binary-i386]/Packages.gz
+
+=====
+
+дано: id профиля
+нужно подсчитать *количество* профилей, связанных с такими же тегами, что и данный профиль.
+То есть нет нужды опрашивать таблицу профилей, достаточно опросить таблицу-связку profiles_vs_tags.
+
+{{{
+#!sql
+select count(pt2.tag_id) from profiles_vs_tags as pt1 join profiles_vs_tags as pt2 on pt1.tag_id = pt2.tag_id where pt1.object_id = :id: and pt2.object_id <> :id: order by count(pt2.tag_id) desc limit 10
+}}}
+
+теперь отсюда надо исключить те теги, которые уже есть в таблице communities_vs_tags:
+
+{{{
+#!sql
+select distinct ct.tag_id from communities_vs_tags as ct
+}}}
+
+{{{
+#!sql
+select count(pt2.tag_id) from profiles_vs_tags as pt1 join profiles_vs_tags as pt2 on pt1.tag_id = pt2.tag_id where pt1.object_id = :id: and pt2.object_id <> :id: and pt2.tag_id not in (select distinct ct.tag_id from communities_vs_tags as ct) group by pt2.tag_id order by count(pt2.tag_id) desc limit 10
+}}}
+
+теперь нам нужны собственно имена тегов, а не только количество:
+
+{{{
+#!sql
+explain select t.name, count(pt2.tag_id) from profiles_vs_tags as pt1 join profiles_vs_tags as pt2 on pt1.tag_id = pt2.tag_id join soc_ts_tags as t on t.id = pt2.tag_id where pt1.object_id = 1 and pt2.object_id <> 1 and pt2.tag_id not in (select distinct ct.tag_id from communities_vs_tags as ct) group by t.name, pt2.tag_id order by count(pt2.tag_id) desc limit 10
+}}}
+
+вариант отторжения тегов сообществ:
+
+{{{
+#!sql
+explain select t.name, count(pt2.tag_id) from profiles_vs_tags as pt1 join profiles_vs_tags as pt2 on pt1.tag_id = pt2.tag_id left join communities_vs_tags as ct on ct.tag_id = pt2.tag_id join soc_ts_tags as t on t.id = pt2.tag_id where pt1.object_id = 1 and pt2.object_id <> 1 and ct.tag_id is null group by t.name, pt2.tag_id order by count(pt2.tag_id) desc limit 10
+}}}
+
+Судя по explain'у, второй вариант раза в 1.4-1.5 быстрее первого (стоимость 142 против 200 без индексной оптимизации). Судя по быстрым тестам их результаты совпадают и соответствуют ожиданиям.
+
+Вывод: использовать второй запрос (с 3 join'ами и проверкой ct.tag_id is not null, а не с 2 join'ами и одним подзапросом).
+
+Ещё вариант в двумя подзапросами и одним join'ом:
+
+{{{
+#!sql
+explain select t.name, count(pt2.tag_id) from profiles_vs_tags as pt2 join soc_ts_tags as t on t.id = pt2.tag_id where pt2.object_id <> 1 and pt2.tag_id in (select distinct pt1.tag_id from profiles_vs_tags as pt1 where pt1.object_id = 1) and pt2.tag_id not in (select distinct ct.tag_id from communities_vs_tags as ct) group by t.name, pt2.tag_id order by count(pt2.tag_id) desc limit 10
+}}}
+
+Стоимость почти как у первого (примерно 199).
+
+Итого: подзапросы зло. Использовать второй вариант:
+
+{{{
+#!sql
+select t.name, count(pt2.tag_id) from profiles_vs_tags as pt1 join profiles_vs_tags as pt2 on pt1.tag_id = pt2.tag_id left join communities_vs_tags as ct on ct.tag_id = pt2.tag_id join soc_ts_tags as t on t.id = pt2.tag_id where pt1.object_id = :id and pt2.object_id <> :id and ct.tag_id is null group by t.name, pt2.tag_id order by count(pt2.tag_id) desc limit 10
+}}}
+
+{{{
+#!sql
+SELECT count(profiles_vs_tags_1.tag_id) AS count_1, soc_ts_tags.name 
+FROM profiles_vs_tags JOIN profiles_vs_tags AS profiles_vs_tags_1 ON profiles_vs_tags_1.tag_id = profiles_vs_tags.tag_id LEFT OUTER JOIN communities_vs_tags ON communities_vs_tags.tag_id = profiles_vs_tags_1.tag_id JOIN soc_ts_tags ON soc_ts_tags.id = profiles_vs_tags_1.tag_id 
+WHERE profiles_vs_tags.object_id = :object_id_1 AND profiles_vs_tags_1.object_id != :object_id_2 AND communities_vs_tags.tag_id IS NULL GROUP BY soc_ts_tags.name, profiles_vs_tags_1.tag_id ORDER BY count(profiles_vs_tags_1.tag_id) DESC 
+ LIMIT 5
+}}}
