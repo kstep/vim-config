@@ -254,8 +254,14 @@ function! s:GitStatusRevertFile(fname, region)
     elseif a:region ==# 'gitUnstaged'
         call s:GitCheckoutFiles(a:fname, 1)
     elseif a:region ==# 'gitUntracked'
-        if confirm('Remove untracked file "'.a:fname.'"?', '&Yes\n&No') == 1
-            exec '!rm -f ' . shellescape(fname, 1)
+        if type(a:fname) == type([])
+            if confirm('Remove untracked file'.(len(a:fname) > 1 ? 's' : ' '.a:fname[0]).'?', "&Yes\n&No") == 1
+                exec '!rm -f ' . s:ShellJoin(a:fname, ' ')
+            endif
+        else
+            if confirm('Remove untracked file "'.a:fname.'"?', "&Yes\n&No") == 1
+                exec '!rm -f ' . shellescape(a:fname, 1)
+            endif
         endif
     else
         return
