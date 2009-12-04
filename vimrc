@@ -79,6 +79,7 @@ endfunction
 " }}}
 
 " Mappings & abbrevs {{{
+map <C-w><C-]> <C-w><C-]><C-w>T
 noremap va ggVG
 noremap by "+y
 noremap bp "+p
