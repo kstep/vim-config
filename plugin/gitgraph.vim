@@ -236,14 +236,22 @@ function! s:GitStatusNextFile()
     call s:SynSearch('\[[ =+*-]\]', ['gitModFile', 'gitNewFile', 'gitDelFile', 'gitUnFile'])
 endfunction
 
+function! s:GitStatusGetFile(lineno)
+    let synname = s:GetSynName(a:lineno, 5)
+    if synname ==# 'gitModFile' || synname ==# 'gitNewFile'
+        \ || synname ==# 'gitDelFile' || synname ==# 'gitUnFile'
+        \ || synname ==# 'gitRenFile'
+        return getline(a:lineno)[5:]
+    endif
+    return ''
+endfunction
+
 function! s:GitStatusGetFiles(l1, l2)
     let filelist = []
     for lineno in range(a:l1, a:l2)
-        let synname = s:GetSynName(lineno, 5)
-        if synname ==# 'gitModFile' || synname ==# 'gitNewFile'
-            \ || synname ==# 'gitDelFile' || synname ==# 'gitUnFile'
-            \ || synname ==# 'gitRenFile'
-            call add(filelist, getline(lineno)[5:])
+        let fname = s:GitStatusGetFile(lineno)
+        if !empty(fname)
+            call add(filelist, fname)
         endif
     endfor
     return filelist
