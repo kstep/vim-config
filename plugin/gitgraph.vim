@@ -388,12 +388,13 @@ function! s:GitRebase(branch, upstream, onto, ...)
     endif
 endfunction
 
-" a:1 = cached, a:2 = files
+" a:1 = cached, a:2 = files, a:3 = context lines
 function! s:GitDiff(fcomm, tcomm, ...)
     if a:fcomm != "" && a:tcomm != ""
         let cached = exists('a:1') && a:1 ? '--cached' : ''
         let paths = exists('a:2') && !empty(a:2) ? s:ShellJoin(a:2, ' ') : ''
-        let cmd = "0read !" . s:gitgraph_git_path . " diff " . cached . " " . a:tcomm
+        let ctxl = exists('a:3') ? '-U'.a:3 : ''
+        let cmd = "0read !" . s:gitgraph_git_path . " diff " . cached . " " . ctxl . " " . a:tcomm
         if a:fcomm != a:tcomm | let cmd = cmd . " " . a:fcomm | endif
         let cmd = cmd . ' -- ' . paths
         call s:Scratch("[Git Diff]", 15, cmd, 0)
