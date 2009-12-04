@@ -381,7 +381,7 @@ endfunction
 function! s:GitDiff(fcomm, tcomm, ...)
     if a:fcomm != "" && a:tcomm != ""
         let cached = exists('a:1') && a:1 ? '--cached' : ''
-        let paths = exists('a:2') && a:2 ? s:ShellJoin(a:2, ' ') : ''
+        let paths = exists('a:2') && !empty(a:2) ? s:ShellJoin(a:2, ' ') : ''
         let cmd = "0read !" . s:gitgraph_git_path . " diff " . cached . " " . a:tcomm
         if a:fcomm != a:tcomm | let cmd = cmd . " " . a:fcomm | endif
         let cmd = cmd . ' -- ' . paths
