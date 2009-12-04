@@ -285,10 +285,13 @@ function! s:GitStatusMappings()
     command! -buffer GitNextFile :call <SID>GitStatusNextFile()
     command! -buffer -range GitRevertFile :call <SID>GitStatusRevertFile(<SID>GitStatusGetFiles(<line1>, <line2>), <SID>GetSynRegionName(<line1>, '.'))
     command! -buffer -range GitAddFile :call <SID>GitStatusAddFile(<SID>GitStatusGetFiles(<line1>, <line2>), <SID>GetSynRegionName(<line1>, '.'))
+    command! -buffer -range GitDiff :call <SID>GitDiff('HEAD', 'HEAD', <SID>GetSynRegionName('.', '.') ==# 'gitStaged', <SID>GitStatusGetFiles(<line1>, <line2>))
 
     map <buffer> <Tab> :GitNextFile<cr>
     map <buffer> dd :GitRevertFile<cr>
     map <buffer> yy :GitAddFile<cr>
+    map <buffer> gd :GitDiff<cr><C-w>T
+    map <buffer> gf <C-w>gf<C-w>T
 endfunction
 
 function! s:GitStatus()
