@@ -21,9 +21,9 @@ function! s:GetSynRegionName(l, c, ...)
     return synIDattr(synstack(s:Line(a:l), s:Col(a:c))[a:0 > 0 ? a:1 : 0], 'name')
 endfunction
 
-function! s:SynSearch(pattern, synnames)
+function! s:SynSearch(pattern, synnames, back)
     while 1
-        let found = searchpos(a:pattern)
+        let found = searchpos(a:pattern, a:back ? 'bW' : 'W')
         if found == [0,0] | break | endif
         let synname = synIDattr(synID(found[0], found[1], 1), 'name')
         if index(a:synnames, synname) > -1 | break | endif
@@ -117,7 +117,7 @@ function! s:GitGraphMappings()
     command! -buffer -bang GitRebaseCurrent :call <SID>GitRebase('', <SID>GetLineCommit('.'), '', '<bang>'=='!')
     command! -buffer -nargs=* -range GitDiff :call <SID>GitDiff(<SID>GetLineCommit(<line1>), <SID>GetLineCommit(<line2>), <f-args>)
     command! -buffer GitShow :call <SID>GitShow(<SID>GetLineCommit('.'))
-    command! -buffer GitNextRef :call <SID>GitGraphNextRef()
+    command! -buffer -bang GitNextRef :call <SID>GitGraphNextRef('<bang>'=='!')
 
     command! -buffer -bang GitDelete :call <SID>GitDelete(expand('<cword>'), <SID>GetSynName('.', '.'), '<bang>'=='!')
     command! -buffer -bang GitRevert :call <SID>GitRevert(<SID>GetLineCommit('.'), '<bang>'=='!')
@@ -167,6 +167,7 @@ function! s:GitGraphMappings()
     map <buffer> gP :GitSVNDcommit<cr><cr>
 
     map <buffer> <Tab> :GitNextRef<cr>
+    map <buffer> <S-Tab> :GitNextRef!<cr>
 endfunction
 
 function! s:GitGraphNew(branch, afile)
@@ -188,11 +189,11 @@ function! s:GitGraphMarkHead()
     exec 'syn keyword gitgraphHeadRefItem ' . commit . ' ' . branch . ' contained'
 endfunction
 
-function! s:GitGraphNextRef()
+function! s:GitGraphNextRef(back)
     call s:SynSearch('\<\([a-z]\+:\)\?[a-zA-Z0-9./_-]\+\>',
             \ ["gitgraphRefItem", "gitgraphHeadRefItem",
             \ "gitgraphTagItem", "gitgraphRemoteItem",
-            \ "gitgraphStashItem"])
+            \ "gitgraphStashItem"], a:back)
 endfunction
 
 " a:1 - branch, a:2 - order, a:3 - file
@@ -232,8 +233,8 @@ endfunction
 " }}}
 
 " GitStatus view implementation {{{
-function! s:GitStatusNextFile()
-    call s:SynSearch('\[[ =+*-]\]', ['gitModFile', 'gitNewFile', 'gitDelFile', 'gitUnFile'])
+function! s:GitStatusNextFile(back)
+    call s:SynSearch('\[[ =+*-]\]', ['gitModFile', 'gitNewFile', 'gitDelFile', 'gitUnFile'], a:back)
 endfunction
 
 function! s:GitStatusGetFile(lineno)
@@ -282,12 +283,13 @@ function! s:GitStatusAddFile(fname, region)
 endfunction
 
 function! s:GitStatusMappings()
-    command! -buffer GitNextFile :call <SID>GitStatusNextFile()
+    command! -buffer -bang GitNextFile :call <SID>GitStatusNextFile('<bang>'==1)
     command! -buffer -range GitRevertFile :call <SID>GitStatusRevertFile(<SID>GitStatusGetFiles(<line1>, <line2>), <SID>GetSynRegionName(<line1>, '.'))
     command! -buffer -range GitAddFile :call <SID>GitStatusAddFile(<SID>GitStatusGetFiles(<line1>, <line2>), <SID>GetSynRegionName(<line1>, '.'))
     command! -buffer -range GitDiff :call <SID>GitDiff('HEAD', 'HEAD', <SID>GetSynRegionName('.', '.') ==# 'gitStaged', <SID>GitStatusGetFiles(<line1>, <line2>))
 
     map <buffer> <Tab> :GitNextFile<cr>
+    map <buffer> <S-Tab> :GitNextFile!<cr>
     map <buffer> dd :GitRevertFile<cr>
     map <buffer> yy :GitAddFile<cr>
     map <buffer> gd :GitDiff<cr><C-w>T
