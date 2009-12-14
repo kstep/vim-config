@@ -133,11 +133,11 @@ function! s:GitGraphMappings()
     command! -buffer GitSVNRebase :call <SID>GitSVNRebase(expand('<cword>'), <SID>GetSynName('.', '.'))
     command! -buffer GitSVNDcommit :call <SID>GitSVNDcommit(expand('<cword>'), <SID>GetSynName('.', '.'))
 
-    " (y)ank range into buffer and (p)ut it somewhere (aka rebase onto)
+    " (y)ank range into buffer and (r)ebase onto another branch
     map <buffer> Y :GitYankRange<cr>
     vmap <buffer> Y :GitYankRange<cr>
-    map <buffer> P :GitRebaseOnto<cr>
-    map <buffer> p :GitRebaseCurrent<cr>
+    map <buffer> R :GitRebaseOnto<cr>
+    map <buffer> r :GitRebaseCurrent<cr>
 
     " (d)elete (w)ord, commit (aka revert)
     map <buffer> dw :GitDelete<cr>
