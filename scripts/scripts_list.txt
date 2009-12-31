@@ -5,7 +5,6 @@ ScriptID SourceID Filename
 1218 10318 NERD_commenter
 492 9825 SQLUtilities
 1066 7618 cecutil
-2427 9601 code_complete
 356 11341 dbext
 441 10578 localvimrc
 489 9573 manpageview
