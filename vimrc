@@ -80,7 +80,7 @@ endfunction
 
 " Mappings & abbrevs {{{
 map <C-w><C-]> <C-w><C-]><C-w>T
-noremap va ggVG
+noremap vA ggVG
 noremap by "+y
 noremap bp "+p
 
@@ -117,6 +117,7 @@ vnoremap s) <Esc>`>a)<Esc>`<i(<Esc>
 vnoremap s' <Esc>`>a'<Esc>`<i'<Esc>
 
 noremap <Leader>\ :TlistToggle<CR>
+noremap <Leader>' :30Vexplore<CR>
 noremap <F11> :tabe ~/.vim_mru_files<CR>
 noremap <F10> :set list!<CR>
 noremap <Leader>= :call SignMark("mark")<CR>
