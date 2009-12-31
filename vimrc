@@ -160,7 +160,11 @@ let g:sqlutil_align_comma=1
 let g:MRU_Max_Entries=50
 let g:Tlist_Show_One_File=1
 let g:DrChipTopLvlMenu="Plugin."
+
 let g:NERDShutUp=1
+let g:NERDTreeHijackNetrw=0
+let g:NERDTreeChDirMode=2
+
 let g:CodeCompl_Complete_File="templates/default_snippets.template"
 let g:CodeCompl_Hotkey=";;"
 
