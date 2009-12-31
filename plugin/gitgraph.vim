@@ -247,6 +247,18 @@ function! s:GitStatusGetFile(lineno)
     return ''
 endfunction
 
+function! s:GitStatusGetFilesDict(l1, l2)
+    let filelist = { 'gitModFile': [], 'gitNewFile': [], 'gitDelFile': [], 'gitUnFile': [], 'gitRenFile': [] }
+    for lineno in range(a:l1, a:l2)
+        let fname = s:GitStatusGetFile(lineno)
+        let synname = s:GetSynName(lineno, 5)
+        if !empty(fname)
+            call add(filelist[synname], fname)
+        endif
+    endfor
+    return filelist
+endfunction
+
 function! s:GitStatusGetFiles(l1, l2)
     let filelist = []
     for lineno in range(a:l1, a:l2)
@@ -275,7 +287,14 @@ endfunction
 function! s:GitStatusAddFile(fname, region)
     if empty(a:fname) | return | endif
     if a:region ==# 'gitUnstaged' || a:region ==# 'gitUntracked'
-        call s:GitAddFiles(a:fname)
+        if type(a:fname) == type({})
+            call s:GitAddFiles(a:fname['gitUnFile'])
+            call s:GitAddFiles(a:fname['gitModFile'])
+            call s:GitAddFiles(a:fname['gitRenFile'])
+            call s:GitPurgeFiles(a:fname['gitDelFile'])
+        else
+            call s:GitAddFiles(a:fname)
+        endif
     else
         return
     endif
@@ -285,7 +304,7 @@ endfunction
 function! s:GitStatusMappings()
     command! -buffer -bang GitNextFile :call <SID>GitStatusNextFile('<bang>'==1)
     command! -buffer -range GitRevertFile :call <SID>GitStatusRevertFile(<SID>GitStatusGetFiles(<line1>, <line2>), <SID>GetSynRegionName(<line1>, '.'))
-    command! -buffer -range GitAddFile :call <SID>GitStatusAddFile(<SID>GitStatusGetFiles(<line1>, <line2>), <SID>GetSynRegionName(<line1>, '.'))
+    command! -buffer -range GitAddFile :call <SID>GitStatusAddFile(<SID>GitStatusGetFilesDict(<line1>, <line2>), <SID>GetSynRegionName(<line1>, '.'))
     command! -buffer -range GitDiff :call <SID>GitDiff('HEAD', 'HEAD', <SID>GetSynRegionName('.', '.') ==# 'gitStaged', <SID>GitStatusGetFiles(<line1>, <line2>))
 
     map <buffer> <Tab> :GitNextFile<cr>
@@ -479,6 +498,15 @@ function! s:GitAddFiles(fname, ...)
     let force = exists('a:1') && a:1 ? '--force' : ''
     let patch = exists('a:2') && a:2 ? '--patch' : ''
     exec '!' . s:gitgraph_git_path . ' add ' . force . ' ' . patch . ' -- ' . files
+endfunction
+
+" a:1 = force, a:2 = index
+function! s:GitPurgeFiles(fname, ...)
+    if empty(a:fname) | return | endif
+    let files = type(a:fname) == type([]) ? s:ShellJoin(a:fname, " ") : shellescape(a:fname, 1)
+    let force = exists('a:1') && a:1 ? '--force' : ''
+    let index = exists('a:2') && a:2 ? '--cached' : ''
+    exec '!' . s:gitgraph_git_path . ' rm -r ' . force . ' ' . index . ' -- ' . files
 endfunction
 
 " a:1 = patch
