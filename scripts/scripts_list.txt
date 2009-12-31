@@ -14,3 +14,4 @@ ScriptID SourceID Filename
 695 4159 po
 2390 10336 CSApprox
 2591 10609 AutoCloseTag
+2540 0 snipMate
