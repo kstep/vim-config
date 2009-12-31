@@ -10,7 +10,6 @@ runtime macros/matchit.vim
 " Options {{{
 set guifont=Terminus\ 12
 set helplang=ru
-set background=light
 set t_IS=]0; t_IE=
 set icon iconstring=Vim
 
@@ -177,7 +176,15 @@ let g:localvimrc_ask=0
 " }}}
 
 " Custom highlighting {{{
-colorscheme lucius
+colorscheme elflord
+set background=light
+if &term == "screen"
+    "let &t_SI = "[4h"
+    "let &t_EI = "[4l"
+elseif &term == "rxvt-256color"
+    let &t_SI = "]12;orange"
+    let &t_EI = "]12;green"
+endif
 " }}}
 
 " vim: set ft=vim :
