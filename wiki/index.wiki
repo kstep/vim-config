@@ -1,4 +1,6 @@
 
+    * СмыслМонад
+
     * GitGraphStatusView
 
     * TodoList
