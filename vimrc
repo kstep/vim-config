@@ -178,8 +178,8 @@ let g:localvimrc_ask=0
 " }}}
 
 " Custom highlighting {{{
-colorscheme elflord
-set background=light
+colorscheme earendel
+set background=dark
 if &term == "screen"
     "let &t_SI = "[4h"
     "let &t_EI = "[4l"
