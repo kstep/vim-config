@@ -8,7 +8,7 @@ runtime macros/matchit.vim
 " }}}
 
 " Options {{{
-set guifont=Terminus\ 12
+set guifont=DejaVu\ Sans\ Mono\ 10
 set helplang=ru
 set t_IS=]0; t_IE=
 set icon iconstring=Vim
