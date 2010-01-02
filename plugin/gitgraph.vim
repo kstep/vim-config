@@ -197,7 +197,7 @@ function! s:GitGraphNextRef(back)
 endfunction
 
 " a:1 - branch, a:2 - order, a:3 - file
-function! s:GitGraph(...)
+function! s:GitGraphView(...)
     let branch = exists('a:1') && a:1 != '' ? a:1 : ''
     let order = exists('a:2') && a:2 ? 'date' : 'topo'
     let afile = exists('a:3') && a:3 != '' ? a:3 : ''
@@ -281,7 +281,7 @@ function! s:GitStatusRevertFile(fname, region)
     else
         return
     endif
-    call s:GitStatus()
+    call s:GitStatusView()
 endfunction
 
 function! s:GitStatusAddFile(fname, region)
@@ -298,7 +298,7 @@ function! s:GitStatusAddFile(fname, region)
     else
         return
     endif
-    call s:GitStatus()
+    call s:GitStatusView()
 endfunction
 
 function! s:GitStatusMappings()
@@ -315,7 +315,7 @@ function! s:GitStatusMappings()
     map <buffer> gf <C-w>gf<C-w>T
 endfunction
 
-function! s:GitStatus()
+function! s:GitStatusView()
     let repopath = s:GitGetRepository()
     let cmd = 'lcd ' . repopath . ' | 0read !' . s:gitgraph_git_path .  ' status'
     call s:Scratch('[Git Status]', 30, cmd, 1)
@@ -355,8 +355,8 @@ function! s:GitGraphInit()
     let s:gitgraph_git_path = g:gitgraph_git_path
     let s:gitgraph_graph_format = shellescape('%Creset%h%d ' . g:gitgraph_subject_format . ' [' . g:gitgraph_authorship_format . ']', 1)
 
-    command! -nargs=* -complete=custom,<SID>GitBranchCompleter GitGraph :call <SID>GitGraph(<f-args>)
-    command! GitStatus :call <SID>GitStatus()
+    command! -nargs=* -complete=custom,<SID>GitBranchCompleter GitGraph :call <SID>GitGraphView(<f-args>)
+    command! GitStatus :call <SID>GitStatusView()
 
     map ,gg :GitGraph "--all"<cr><cr>
     map ,gs :GitStatus<cr><cr>
@@ -368,7 +368,7 @@ endfunction
 function! s:GitBranch(commit, branch)
     if a:branch != ""
         exec "!" . s:gitgraph_git_path . " branch " . shellescape(a:branch, 1) . " " . a:commit
-        call s:GitGraph()
+        call s:GitGraphView()
     endif
 endfunction
 
@@ -384,7 +384,7 @@ function! s:GitTag(commit, tag, ...)
             endif
         endif
         exec "!" . s:gitgraph_git_path . " tag " . mode . " " . shellescape(a:tag, 1) . " " . a:commit
-        call s:GitGraph()
+        call s:GitGraphView()
     endif
 endfunction
 
@@ -395,7 +395,7 @@ function! s:GitMerge(tobranch, frombranch, ...)
         let nofastfwd = exists('a:2') && a:2 '--no-ff' : '--ff'
         let squash = exists('a:3') && a:3 '--squash' : '--no-squash'
         exec '!' . s:gitgraph_git_path . ' checkout ' . shellescape(a:tobranch, 1) . ' && ' . s:gitgraph_git_path . ' merge ' . nocommit . ' ' . nofastfwd . ' ' . squash . ' ' . shellescape(a:frombranch, 1)
-        call s:GitGraph()
+        call s:GitGraphView()
     endif
 endfunction
 
@@ -441,7 +441,7 @@ function! s:GitPush(word, syng, ...)
         let parts = split(a:word[7:], "/")
         let force = exists("a:1") && a:1 ? "-f" : ""
         exec "!" . s:gitgraph_git_path . " push " . force . " " . parts[0] . " " . join(parts[1:], "/")
-        call s:GitGraph()
+        call s:GitGraphView()
     endif
 endfunction
 
@@ -456,7 +456,7 @@ function! s:GitPull(word, syng)
     if a:syng == 'gitgraphRemoteItem'
         let parts = split(a:word[7:], "/")
         exec "!" . s:gitgraph_git_path . " pull " . parts[0] . " " . join(parts[1:], "/")
-        call s:GitGraph()
+        call s:GitGraphView()
     endif
 endfunction
 
@@ -476,20 +476,19 @@ function! s:GitDelete(word, syng, ...)
         return
     endif
     exec cmd
-    "echo cmd
-    call s:GitGraph()
+    call s:GitGraphView()
 endfunction
 
 function! s:GitSVNRebase(word, syng)
     call s:GitCheckout(a:word, a:syng)
     exec "!" . s:gitgraph_git_path . " svn rebase"
-    call s:GitGraph()
+    call s:GitGraphView()
 endfunction
 
 function! s:GitSVNDcommit(word, syng)
     call s:GitCheckout(a:word, a:syng)
     exec "!" . s:gitgraph_git_path . " svn dcommit"
-    call s:GitGraph()
+    call s:GitGraphView()
 endfunction
 
 " a:1 = force, a:2 = patch
