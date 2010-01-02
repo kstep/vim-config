@@ -328,6 +328,9 @@ function! s:GitStatusView()
     silent! %s/^#\trenamed:    /\t[=] /e
     silent! %s/^#\t/\t[ ] /e
     silent! %s/^#\s*$//e
+    if has("perl") || has("perl/dyn")
+        g/^\t\[.\] \".*\"$/perldo s/\\([0-7]{1,3})|(")/if($2){""}else{$o=oct($1);if(($o&0xc0)!=0x80){for($m=0x80,$i=-1;($m&$o)!=0;$m>>=1){$i++};$a=$o&($m-1);}else{$a=($a<<6)|($o&63);$i--;};$i>0?"":chr($a)}/ge
+    end
     setl ts=4 noma nomod ft=gitstatus fdm=syntax nowrap cul
 
     call s:GitStatusMappings()
