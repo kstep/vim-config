@@ -30,6 +30,7 @@ set smarttab
 set expandtab
 set autoindent
 set smartindent
+set listchars=tab:»\ ,eol:¶,trail:·,precedes:…,extends:…
 
 set foldmethod=marker
 set foldlevelstart=1
