@@ -1,0 +1,52 @@
+
+Винты:
+1.5T    140$
+1T      110$
+Итого: 110 140
+
+Процессоры:
+AMD Sempron 3200+   32$
+Intel Celeron 420   40$
+Итого: 32 30
+
+Материнки:
+Под АМД на AM2
+Gigabyte GA-M61PME-S2P  50$
+ASUS M2N68-M            60$
+
+Под Интел на LGA775
+ASUS P5KPL-AM/PS        50$
+Gigabyte GA-G31M-ES2C   60$
+
+Итого: 50 60
+
+Память:
+DDR2 2Гб    45-53$
+Итого: 45 53
+*того: 90 106
+
+Питание:
+Gembird CCC-PSU8 600Вт  49$
+Gembird CCC-PSU8X 650Вт 52$
+
+Корпус:
+Delux DLC-SH*           50$
+Итого: 50 50
+
+Кулер на винт:
+Scythe ITA KAZE         18$
+Итого: 18 18
+
+Кулер на процессор:
+Titan TTC-NK35TZ/PW(BX) 25$
+Cooler Master Hyper TX2 30$
+Итого: 25 30
+
+Сумма: 330 381 355.5
+
+Бесперебойники:
+Vivaldi EA200 LCD 1200VA    105$
+Mustek !PowerMust 1000 USB   120$
+Итого: 105 120
+
+Сумма: 435 501 468
