@@ -365,9 +365,17 @@ endfunction
 " }}}
 
 " Git commands interface {{{
+function! s:GitRun(...)
+    exec "silent !" . s:gitgraph_git_path . " " . join(a:000, " ")
+endfunction
+
+function! s:GitRead(...)
+    exec "0read !" . s:gitgraph_git_path . " " . join(a:000, " ")
+endfunction
+
 function! s:GitBranch(commit, branch)
     if a:branch != ""
-        exec "!" . s:gitgraph_git_path . " branch " . shellescape(a:branch, 1) . " " . a:commit
+        call s:GitRun('branch', shellescape(a:branch, 1), a:commit)
         call s:GitGraphView()
     endif
 endfunction
@@ -383,7 +391,7 @@ function! s:GitTag(commit, tag, ...)
                 let mode = exists('a:2') && a:2 ? '-u '.a:2 : '-s'
             endif
         endif
-        exec "!" . s:gitgraph_git_path . " tag " . mode . " " . shellescape(a:tag, 1) . " " . a:commit
+        call s:GitRun('tag', mode, shellescape(a:tag, 1), a:commit)
         call s:GitGraphView()
     endif
 endfunction
@@ -394,7 +402,8 @@ function! s:GitMerge(tobranch, frombranch, ...)
         let nocommit = exists('a:1') && a:1 '--no-commit' : '--commit'
         let nofastfwd = exists('a:2') && a:2 '--no-ff' : '--ff'
         let squash = exists('a:3') && a:3 '--squash' : '--no-squash'
-        exec '!' . s:gitgraph_git_path . ' checkout ' . shellescape(a:tobranch, 1) . ' && ' . s:gitgraph_git_path . ' merge ' . nocommit . ' ' . nofastfwd . ' ' . squash . ' ' . shellescape(a:frombranch, 1)
+        call s:GitRun('checkout', shellescape(a:tobranch, 1))
+        call s:GitRun('merge', nocommit, nofastfwd, squash, shellescape(a:frombranch, 1))
         call s:GitGraphView()
     endif
 endfunction
@@ -404,14 +413,14 @@ function! s:GitRebase(branch, upstream, onto, ...)
     if a:upstream != ""
         let onto = a:onto == "" ? a:upstream : a:onto
         let iact = exists('a:1') && a:1 ? '--interactive' : ''
-        exec "!" . s:gitgraph_git_path . " rebase " . iact . " --onto " . onto . " " . a:upstream . " " . a:branch
-        call s:GitGraph()
+        call s:GitRun('rebase', iact, '--onto', onto, a:upstream, a:branch)
+        call s:GitGraphView()
     endif
 endfunction
 
 " a:1 = cached, a:2 = files, a:3 = context lines
 function! s:GitDiff(fcomm, tcomm, ...)
-    if a:fcomm != "" && a:tcomm != ""
+    if a:fcomm != '' && a:tcomm != ''
         let cached = exists('a:1') && a:1 ? '--cached' : ''
         let paths = exists('a:2') && !empty(a:2) ? s:ShellJoin(a:2, ' ') : ''
         let ctxl = exists('a:3') ? '-U'.a:3 : ''
@@ -440,14 +449,14 @@ function! s:GitPush(word, syng, ...)
     if a:syng == 'gitgraphRemoteItem'
         let parts = split(a:word[7:], "/")
         let force = exists("a:1") && a:1 ? "-f" : ""
-        exec "!" . s:gitgraph_git_path . " push " . force . " " . parts[0] . " " . join(parts[1:], "/")
+        call s:GitRun('push', force, parts[0], join(parts[1:], '/'))
         call s:GitGraphView()
     endif
 endfunction
 
 function! s:GitCheckout(word, syng)
     if a:syng == 'gitgraphRefItem'
-        exec "!" . s:gitgraph_git_path . " checkout " . a:word
+        call s:GitRun('checkout', a:word)
         call s:GitGraphMarkHead()
     endif
 endfunction
@@ -455,39 +464,39 @@ endfunction
 function! s:GitPull(word, syng)
     if a:syng == 'gitgraphRemoteItem'
         let parts = split(a:word[7:], "/")
-        exec "!" . s:gitgraph_git_path . " pull " . parts[0] . " " . join(parts[1:], "/")
+        call s:GitRun('pull', parts[0], join(parts[1:], '/'))
         call s:GitGraphView()
     endif
 endfunction
 
 " a:1 - force
 function! s:GitDelete(word, syng, ...)
-    let force = exists("a:1") && a:1
+    let force = exists('a:1') && a:1
     if a:syng == 'gitgraphRefItem'
-        let par = force ? "-D" : "-d"
-        let cmd = "!" . s:gitgraph_git_path . " branch " . par . " " . a:word
+        let par = force ? '-D' : '-d'
+        let cmd = 'branch ' . par . ' ' . a:word
     elseif a:syng == 'gitgraphTagItem'
-        let cmd = "!" . s:gitgraph_git_path . " tag -d " . a:word[4:]
+        let cmd = 'tag -d ' . a:word[4:]
     elseif a:syng == 'gitgraphRemoteItem'
-        let par = force ? "-f" : ""
+        let par = force ? '-f' : ''
         let parts = split(a:word[7:], "/")
-        let cmd = "!" . s:gitgraph_git_path . " push " . par . " " . parts[0] . " " . join(parts[1:], "/") . ":"
+        let cmd = 'push ' . par . ' ' . parts[0] . ' ' . join(parts[1:], '/') . ':'
     else
         return
     endif
-    exec cmd
+    call s:GitRun(cmd)
     call s:GitGraphView()
 endfunction
 
 function! s:GitSVNRebase(word, syng)
     call s:GitCheckout(a:word, a:syng)
-    exec "!" . s:gitgraph_git_path . " svn rebase"
+    call s:GitRun('svn rebase')
     call s:GitGraphView()
 endfunction
 
 function! s:GitSVNDcommit(word, syng)
     call s:GitCheckout(a:word, a:syng)
-    exec "!" . s:gitgraph_git_path . " svn dcommit"
+    call s:GitRun('svn dcommit')
     call s:GitGraphView()
 endfunction
 
@@ -497,7 +506,7 @@ function! s:GitAddFiles(fname, ...)
     let files = type(a:fname) == type([]) ? s:ShellJoin(a:fname, " ") : shellescape(a:fname, 1)
     let force = exists('a:1') && a:1 ? '--force' : ''
     let patch = exists('a:2') && a:2 ? '--patch' : ''
-    exec '!' . s:gitgraph_git_path . ' add ' . force . ' ' . patch . ' -- ' . files
+    call s:GitRun('add', force, patch, '--', files)
 endfunction
 
 " a:1 = force, a:2 = index
@@ -506,7 +515,7 @@ function! s:GitPurgeFiles(fname, ...)
     let files = type(a:fname) == type([]) ? s:ShellJoin(a:fname, " ") : shellescape(a:fname, 1)
     let force = exists('a:1') && a:1 ? '--force' : ''
     let index = exists('a:2') && a:2 ? '--cached' : ''
-    exec '!' . s:gitgraph_git_path . ' rm -r ' . force . ' ' . index . ' -- ' . files
+    call s:GitRun('rm -r', force, index, '--', files)
 endfunction
 
 " a:1 = patch
@@ -514,7 +523,7 @@ function! s:GitResetFiles(fname, ...)
     if empty(a:fname) | return | endif
     let patch = exists('a:1') && a:1 ? '--patch' : ''
     let files = type(a:fname) == type([]) ? s:ShellJoin(a:fname, " ") : shellescape(a:fname, 1)
-    exec '!' . s:gitgraph_git_path . ' reset ' . patch . ' -- ' . files
+    call s:GitRun('reset', patch, '--', files)
 endfunction
 
 " a:1 = force
@@ -523,7 +532,7 @@ function! s:GitRemoveFiles(fname, ...)
     let force = exists("a:1") && a:1 ? "-f" : ""
     let cmd = "!rm " . force . " "
     if type(a:fname) == type([])
-        if confirm('Remove untracked file'.(len(a:fname) > 1 ? 's' : ' '.a:fname[0]).'?', "&Yes\n&No") == 1
+        if confirm('Remove untracked file'.(len(a:fname) > 1 ? 's' : ' "'.a:fname[0]).'"?', "&Yes\n&No") == 1
             exec cmd . s:ShellJoin(a:fname, ' ')
         endif
     else
@@ -536,9 +545,9 @@ endfunction
 " a:1 = force
 function! s:GitCheckoutFiles(fname, ...)
     if empty(a:fname) | return | endif
-    let force = exists("a:1") && a:1 ? "-f" : ""
-    let files = type(a:fname) == type([]) ? s:ShellJoin(a:fname, " ") : shellescape(a:fname, 1)
-    exec "!" . s:gitgraph_git_path . " checkout " . force . " -- " . files
+    let force = exists('a:1') && a:1 ? '-f' : ''
+    let files = type(a:fname) == type([]) ? s:ShellJoin(a:fname, ' ') : shellescape(a:fname, 1)
+    call s:GitRun('checkout', force, '--', files)
 endfunction
 
 " a:1 = nocommit, a:2 = edit, a:3 = signoff
@@ -546,7 +555,7 @@ function! s:GitRevert(commit, ...)
     let nocommit = exists('a:1') && a:1 ? '--no-commit' : ''
     let edit = exists('a:2') && a:2 ? '--edit' : '--no-edit'
     let signoff = exists('a:3') && a:3 ? '--signoff' : ''
-    exec '!' . s:gitgraph_git_path . ' revert ' . nocommit . ' ' . edit . ' ' . signoff . ' ' . shellescape(commit, 1)
+    call s:GitRun('revert', nocommit, edit, signoff, shellescape(commit, 1))
 endfunction
 
 " a:1 = nocommit, a:2 = edit, a:3 = signoff, a:4 = attribute
@@ -555,7 +564,7 @@ function! s:GitCherryPick(commit, ...)
     let edit = exists('a:2') && a:2 ? '--edit' : ''
     let signoff = exists('a:3') && a:3 ? '--signoff' : ''
     let attrib = exists('a:4') && a:4 ? '-x' : '-r'
-    exec '!' . s:gitgraph_git_path . ' cherry-pick ' . nocommit . ' ' . edit . ' ' . signoff . ' ' . attrib . ' ' . shellescape(commit, 1)
+    call s:GitRun('cherry-pick', nocommit, edit, signoff, attrib, shellescape(commit, 1))
 endfunction
 " }}}
 
