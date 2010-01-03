@@ -167,6 +167,8 @@ function! s:GitGraphMappings()
     command! -buffer GitSVNRebase :call <SID>GitSVNRebase(expand('<cword>'), <SID>GetSynName('.', '.'))
     command! -buffer GitSVNDcommit :call <SID>GitSVNDcommit(expand('<cword>'), <SID>GetSynName('.', '.'))
 
+    command! -buffer -bang -count GitCommit :call <SID>GitCommitView(<SID>GetLineCommit('.'),'<bang>'=='!','c',<count>)
+
     " (y)ank range into buffer and (r)ebase onto another branch
     map <buffer> Y :GitYankRange<cr>
     vmap <buffer> Y :GitYankRange<cr>
@@ -184,11 +186,13 @@ function! s:GitGraphMappings()
     map <buffer> gu :GitPull<cr><cr>
     map <buffer> gb :GitCheckout<cr><cr>
 
-    " (a)dd (b)ranch, (t)ag, (a)nnotated/(s)igned tag
+    " (a)dd (b)ranch, (t)ag, (a)nnotated/(s)igned tag, (c)ommit, a(m)end
     map <buffer> ab :GitBranch<cr>
     map <buffer> at :GitTag<cr>
     map <buffer> aa :GitAnnTag<cr>
     map <buffer> as :GitSignedTag<cr>
+    map <buffer> ac :GitCommit<cr>
+    map <buffer> am :GitCommit!<cr>
 
     " (g)o (r)ebase (interactive), (d)iff, (f)ile (aka commit)
     vmap <buffer> gr :GitRebase<space>
@@ -371,6 +375,46 @@ function! s:GitStatusView()
 endfunction
 " }}}
 
+" GitCommit view implementation {{{
+function! s:GitCommitView(msg, amend, src, signoff)
+    call s:Scratch('[Git Commit]', 'c', '1') | set ma
+
+    if a:src == 'c'
+        let message = substitute(s:GitSys('cat-file', 'commit', a:msg), '^.\{-}\n\n', '', '')
+    elseif a:src == 'f'
+        let message = readfile(a:msg)
+    elseif a:amend && empty(a:msg)
+        let message = substitute(s:GitSys('cat-file', 'commit', 'HEAD'), '^.\{-}\n\n', '', '')
+    else
+        let message = a:msg
+    endif
+
+    silent 0put =message
+    silent put ='## -------------------------------------------------------------------------------------'
+    silent put ='## Enter commit message here. Write it (:w) to commit or close the buffer (:q) to cancel.'
+    silent put ='## Lines starting with ## are removed from commit message.' | 1
+
+    setl ft=gitcommit bt=acwrite bh=wipe nomod
+    let b:gitgraph_commit_amend = a:amend
+    let b:gitgraph_commit_signoff = a:signoff
+    au BufWriteCmd <buffer> call s:GitCommitBuffer()
+endfunction
+
+function! s:GitCommitBuffer()
+    let bufno = bufnr('%')
+    let message = filter(getbufline('%', 1, '$'), 'strpart(v:val, 0, 2) != "##"')
+    let msgfile = tempname()
+    call writefile(message, msgfile)
+    try
+        call s:GitCommit(msgfile, b:gitgraph_commit_amend, 0, b:gitgraph_commit_signoff, 'f') | set nomod
+        if bufno >= 0 | exec 'bwipeout! '.bufno | endif
+    finally
+        call delete(msgfile)
+    endtry
+    call s:GitStatusView()
+endfunction
+" }}}
+
 " Initializator {{{
 function! s:GitGraphInit()
 
@@ -415,10 +459,12 @@ function! s:GitGraphInit()
 
     command! -nargs=* -complete=custom,<SID>GitBranchCompleter GitGraph :call <SID>GitGraphView(<f-args>)
     command! GitStatus :call <SID>GitStatusView()
+    command! -bang -count -nargs=? GitCommit :call <SID>GitCommitView(<q-args>,<q-bang>=='!','',<count>)
     command! GitLayout :call <SID>GitLayout()
 
     map ,gg :GitGraph "--all"<cr>
     map ,gs :GitStatus<cr>
+    map ,gc :GitCommit<cr>
     map ,gf :exec 'GitGraph "--all" 0 '.expand('%:p')<cr>
     map ,ga :GitLayout<cr>
 endfunction
@@ -633,6 +679,7 @@ function! s:GitRevert(commit, ...)
     let edit = exists('a:2') && a:2 ? '--edit' : '--no-edit'
     let signoff = exists('a:3') && a:3 ? '--signoff' : ''
     call s:GitRun('revert', nocommit, edit, signoff, shellescape(commit, 1))
+    call s:GitGraphView()
 endfunction
 
 " a:1 = nocommit, a:2 = edit, a:3 = signoff, a:4 = attribute
@@ -642,6 +689,30 @@ function! s:GitCherryPick(commit, ...)
     let signoff = exists('a:3') && a:3 ? '--signoff' : ''
     let attrib = exists('a:4') && a:4 ? '-x' : '-r'
     call s:GitRun('cherry-pick', nocommit, edit, signoff, attrib, shellescape(commit, 1))
+    call s:GitGraphView()
+endfunction
+
+" a:1 = amend, a:2 = edit, a:3 = signoff, a:4 = message source: string/(f)ile/(c)ommit
+function! s:GitCommit(msg, ...)
+    let amend = exists('a:1') && a:1 ? '--amend' : ''
+    let edit = exists('a:2') && a:2 ? '--edit' : ''
+    let signoff = exists('a:3') && a:3 ? '--signoff' : ''
+    let msgparam = exists('a:4') ? (a:4 == 'c' ? '-C' : (a:4 == 'f' ? '-F' : '-m')) : '-m'
+    call s:GitRun('commit', amend, edit, signoff, msgparam, shellescape(a:msg, 1))
+    call s:GitGraphView()
+endfunction
+
+" the same as GitCommit
+function! s:GitCommitFiles(fname, msg, include, ...)
+    if empty(a:fname) | return | endif
+    let include = a:include ? '-i' : '-o'
+    let files = type(a:fname) == type([]) ? s:ShellJoin(a:fname, ' ') : shellescape(a:fname, 1)
+    let amend = exists('a:1') && a:1 ? '--amend' : ''
+    let edit = exists('a:2') && a:2 ? '--edit' : ''
+    let signoff = exists('a:3') && a:3 ? '--signoff' : ''
+    let msgparam = exists('a:4') ? (a:4 == 'c' ? '-C' : (a:4 == 'f' ? '-F' : '-m')) : '-m'
+    call s:GitRun('commit', amend, edit, signoff, msgparam, shellescape(a:msg, 1), include, '--', files)
+    call s:GitGraphView()
 endfunction
 " }}}
 
