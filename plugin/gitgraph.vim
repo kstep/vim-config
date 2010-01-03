@@ -67,7 +67,7 @@ function! s:Scratch(bufname, size, ...)
     " no buffer is created yet
     if bufno == -1
         exec gravity . ' new'
-        exec size.'wincmd ' . vertical
+        if size > 1 | exec size.'wincmd ' . vertical | endif
         setl noswf nonu nospell bt=nofile bh=hide
         exec 'file ' . escape(a:bufname, ' ')
 
@@ -78,7 +78,7 @@ function! s:Scratch(bufname, size, ...)
         " the buffer is not opened in any window, open it up
         if winno == -1
             exec gravity . ' split +buffer' . bufno
-            exec size.'wincmd ' . vertical
+            if size > 1 | exec size.'wincmd ' . vertical | endif
 
         " the buffer is opened in some window, so switch to it if necessary
         elseif winno != winnr()
