@@ -30,38 +30,62 @@ function! s:SynSearch(pattern, synnames, back)
     endwhile
 endfunction
 
-function! s:Scratch(bufname, size, cmd, vert)
-    let bufpat = "^".escape(a:bufname, "[]*+")."$"
+" bufname = buffer name to open
+" sizes = if int its a width (height if below 0), if < 0 split vertically,
+" a:1 = cmd = command to run to fill the new window,
+" a:2 = gravity = one of commands la(leftabove)/rb(rightbelow)/tl(topleft)/br(botright).
+let s:gitgraph_gravities = { 'la': 'leftabove', 'rb': 'rightbelow', 'tl': 'topleft', 'br': 'bottomright' }
+function! s:Scratch(bufname, size, ...)
+
+    " parse args at first
+    let gravity = get(s:gitgraph_gravities, exists('a:2') ? a:2 : 'rb', 'rb')
+    let vertical = '_'
+    let size = a:size
+
+    " negative size opens vertical window
+    if size < 0
+        let vertical = '|'
+        let gravity = 'vertical ' . gravity
+        let size = -size
+    end
+
+    " now we must try to find buffer with the name
+    let bufpat = '^\V'.a:bufname.'\$'
     let bufno = bufnr(bufpat)
-    if a:vert
-        let vert = 'v'
-        let wert = '|'
-    else
-        let vert = ''
-        let wert = '_'
-    endif
+
+    " no buffer is created yet
     if bufno == -1
-        exec vert . "new"
-        exec a:size."wincmd " . wert
-        setl noswf bt=nofile bh=hide
-        exec "file " . escape(a:bufname, " ")
+        exec gravity . ' new'
+        exec size.'wincmd ' . vertical
+        setl noswf nonu nospell bt=nofile bh=hide
+        exec 'file ' . escape(a:bufname, ' ')
+
+    " yup, we have a buffer, switch to it
     else
         let winno = bufwinnr(bufno)
+
+        " the buffer is not opened in any window, open it up
         if winno == -1
-            exec vert . "split +buffer" . bufno
-            exec a:size."wincmd " . wert
+            exec gravity . ' split +buffer' . bufno
+            exec size.'wincmd ' . vertical
+
+        " the buffer is opened in some window, so switch to it if necessary
         elseif winno != winnr()
             exec winno."wincmd w"
         endif
     endif
 
-    if !empty(a:cmd)
+    " if we are provided with filling command, run it now
+    if exists('a:1') && !empty(a:1)
         setl ma
         1,$delete
-        exec a:cmd
-        setl noma nomod
+        exec a:1
     endif
+
+    " the buffer is not modifiable
+    setl noma nomod
     goto 1
+    return bufnr('.')
 endfunction
 " }}}
 
@@ -173,7 +197,7 @@ endfunction
 function! s:GitGraphNew(branch, afile)
     let repopath = s:GitGetRepository()
     let reponame = fnamemodify(repopath, ':t')
-    call s:Scratch('[Git Graph:'.reponame.']', 20, '', 0)
+    call s:Scratch('[Git Graph:'.reponame.']', 20)
     let b:gitgraph_file = a:afile
     let b:gitgraph_branch = a:branch
     let b:gitgraph_repopath = repopath
@@ -318,7 +342,7 @@ endfunction
 function! s:GitStatusView()
     let repopath = s:GitGetRepository()
     let cmd = 'lcd ' . repopath . ' | 0read !' . s:gitgraph_git_path .  ' status'
-    call s:Scratch('[Git Status]', 30, cmd, 1)
+    call s:Scratch('[Git Status]', -30, cmd)
     setl ma
     silent! g!/^#\( Changes\| Changed\| Untracked\|\t\|\s*$\)/delete
     silent! g/^#\( Changes\| Changed\| Untracked\)/.+1delete
@@ -430,7 +454,7 @@ function! s:GitDiff(fcomm, tcomm, ...)
         let cmd = "0read !" . s:gitgraph_git_path . " diff " . cached . " " . ctxl . " " . a:tcomm
         if a:fcomm != a:tcomm | let cmd = cmd . " " . a:fcomm | endif
         let cmd = cmd . ' -- ' . paths
-        call s:Scratch("[Git Diff]", 15, cmd, 0)
+        call s:Scratch("[Git Diff]", 15, cmd)
         setl ft=diff inex=GitGraphGotoFile(v:fname)
         map <buffer> <C-f> /^diff --git<CR>
         map <buffer> <C-b> ?^diff --git<CR>
@@ -440,7 +464,7 @@ endfunction
 function! s:GitShow(commit, ...)
     if a:commit != ""
         let cmd = "0read !" . s:gitgraph_git_path . " show " . join(a:000, " ") . " " . a:commit
-        call s:Scratch("[Git Show]", 15, cmd, 0)
+        call s:Scratch('[Git Show]', 15, cmd)
         setl ft=diff.gitlog inex=GitGraphGotoFile(v:fname)
         map <buffer> <C-f> /^diff --git<CR>
         map <buffer> <C-b> ?^diff --git<CR>
