@@ -126,8 +126,8 @@ endfunction
 function! GitGraphGotoFile(fname)
     let repopath = s:GitGetRepository()
     let fname = a:fname
-    if fname =~# "^[ab]/" | let fname = fname[2:] | endif
-    if repopath != "" | let fname = repopath . "/" . fname | endif
+    if fname =~# '^[ab]/' | let fname = fname[2:] | endif
+    if !empty(repopath) | let fname = repopath . '/' . fname | endif
     return fname
 endfunction
 " }}}
@@ -221,13 +221,13 @@ endfunction
 
 " a:1 - branch, a:2 - order, a:3 - file
 function! s:GitGraphView(...)
-    let branch = exists('a:1') && a:1 != '' ? a:1 : ''
+    let branch = exists('a:1') && !empty(a:1) ? a:1 : ''
     let order = exists('a:2') && a:2 ? 'date' : 'topo'
-    let afile = exists('a:3') && a:3 != '' ? a:3 : ''
+    let afile = exists('a:3') && !empty(a:3) ? a:3 : ''
 
     if exists('b:gitgraph_repopath')
-        if afile == '' | let afile = b:gitgraph_file | endif
-        if branch == '' | let branch = b:gitgraph_branch | endif
+        if empty(afile) | let afile = b:gitgraph_file | endif
+        if empty(branch) | let branch = b:gitgraph_branch | endif
         exec 'lcd ' . b:gitgraph_repopath
     else
         call s:GitGraphNew(branch, afile)
@@ -362,19 +362,19 @@ endfunction
 
 " Initializator {{{
 function! s:GitGraphInit()
-    if !exists('g:gitgraph_date_format') || g:gitgraph_date_format == ''
-        let g:gitgraph_date_format = "short"
+    if !exists('g:gitgraph_date_format') || empty(g:gitgraph_date_format)
+        let g:gitgraph_date_format = 'short'
     end
 
-    if !exists('g:gitgraph_authorship_format') || g:gitgraph_authorship_format == ''
+    if !exists('g:gitgraph_authorship_format') || empty(g:gitgraph_authorship_format)
         let g:gitgraph_authorship_format = '%aN, %ad'
     end
 
-    if !exists('g:gitgraph_subject_format') || g:gitgraph_subject_format == ''
+    if !exists('g:gitgraph_subject_format') || empty(g:gitgraph_subject_format)
         let g:gitgraph_subject_format = '%s'
     end
 
-    if !exists('g:gitgraph_git_path') || g:gitgraph_git_path == ''
+    if !exists('g:gitgraph_git_path') || empty(g:gitgraph_git_path)
         let g:gitgraph_git_path = 'git'
     endif
 
@@ -384,9 +384,9 @@ function! s:GitGraphInit()
     command! -nargs=* -complete=custom,<SID>GitBranchCompleter GitGraph :call <SID>GitGraphView(<f-args>)
     command! GitStatus :call <SID>GitStatusView()
 
-    map ,gg :GitGraph "--all"<cr><cr>
-    map ,gs :GitStatus<cr><cr>
-    map ,gf :exec 'GitGraph "--all" 0 '.expand('%:p')<cr><cr>
+    map ,gg :GitGraph "--all"<cr>
+    map ,gs :GitStatus<cr>
+    map ,gf :exec 'GitGraph "--all" 0 '.expand('%:p')<cr>
 endfunction
 " }}}
 
@@ -406,7 +406,7 @@ function! s:GitSys(...)
 endfunction
 
 function! s:GitBranch(commit, branch)
-    if a:branch != ""
+    if !empty(a:branch)
         call s:GitRun('branch', shellescape(a:branch, 1), a:commit)
         call s:GitGraphView()
     endif
@@ -414,13 +414,13 @@ endfunction
 
 " a:1 - mode (none/'a'/'s'), a:1 - key id
 function! s:GitTag(commit, tag, ...)
-    if a:tag != ""
+    if !empty(a:tag)
         let mode = ''
         if exists('a:1')
             if a:1 ==# 'a'
                 let mode = '-a'
             elseif a:1 ==# 's'
-                let mode = exists('a:2') && a:2 ? '-u '.a:2 : '-s'
+                let mode = exists('a:2') && !empty(a:2) ? '-u '.a:2 : '-s'
             endif
         endif
         call s:GitRun('tag', mode, shellescape(a:tag, 1), a:commit)
@@ -430,7 +430,7 @@ endfunction
 
 " a:1 - nocommit, a:2 - noff, a:3 - squash
 function! s:GitMerge(tobranch, frombranch, ...)
-    if a:tobranch != '' && a:frombranch != ''
+    if !empty(a:tobranch) && !empty(a:frombranch)
         let nocommit = exists('a:1') && a:1 '--no-commit' : '--commit'
         let nofastfwd = exists('a:2') && a:2 '--no-ff' : '--ff'
         let squash = exists('a:3') && a:3 '--squash' : '--no-squash'
@@ -442,8 +442,8 @@ endfunction
 
 " a:1 = interactive
 function! s:GitRebase(branch, upstream, onto, ...)
-    if a:upstream != ""
-        let onto = a:onto == "" ? a:upstream : a:onto
+    if !empty(a:upstream)
+        let onto = empty(a:onto) ? a:upstream : a:onto
         let iact = exists('a:1') && a:1 ? '--interactive' : ''
         call s:GitRun('rebase', iact, '--onto', onto, a:upstream, a:branch)
         call s:GitGraphView()
@@ -452,7 +452,7 @@ endfunction
 
 " a:1 = cached, a:2 = files, a:3 = context lines
 function! s:GitDiff(fcomm, tcomm, ...)
-    if a:fcomm != '' && a:tcomm != ''
+    if !empty(a:fcomm) && !empty(a:tcomm)
         let cached = exists('a:1') && a:1 ? '--cached' : ''
         let paths = exists('a:2') && !empty(a:2) ? s:ShellJoin(a:2, ' ') : ''
         let ctxl = exists('a:3') ? '-U'.a:3 : ''
@@ -465,7 +465,7 @@ function! s:GitDiff(fcomm, tcomm, ...)
 endfunction
 
 function! s:GitShow(commit, ...)
-    if a:commit != ""
+    if !empty(a:commit)
         let cmd = s:GitRead('show', join(a:000, ' '), a:commit)
         call s:Scratch('[Git Show]', 15, cmd)
         setl ft=diff.gitlog inex=GitGraphGotoFile(v:fname)
