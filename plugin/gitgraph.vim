@@ -91,7 +91,7 @@ endfunction
 
 " Common git helper functions {{{
 function! s:GitGetRepository()
-    let reponame = system(s:gitgraph_git_path . ' rev-parse --git-dir')[:-2]
+    let reponame = s:GitSys('rev-parse --git-dir')[:-2]
     if reponame ==# '.git'
         let reponame = getcwd()
     else
@@ -109,8 +109,7 @@ function! s:GetRegCommit(regn)
 endfunction
 
 function! s:GitBranchCompleter(arg, cline, cpos)
-    let cmd = s:gitgraph_git_path . ' branch'
-    let lst = join(map(split(system(cmd), "\n"), 'v:val[2:]'), "\n")
+    let lst = join(map(split(s:GitSys('branch'), "\n"), 'v:val[2:]'), "\n")
     return lst
 endfunction
 " }}}
@@ -207,8 +206,8 @@ function! s:GitGraphNew(branch, afile)
 endfunction
 
 function! s:GitGraphMarkHead()
-    let commit = system(s:gitgraph_git_path . ' rev-parse --short HEAD')[:-2]
-    let branch = system(s:gitgraph_git_path . ' symbolic-ref -q HEAD')[11:-2]
+    let commit = s:GitSys('rev-parse --short HEAD')[:-2]
+    let branch = s:GitSys('symbolic-ref -q HEAD')[11:-2]
     silent! syn clear gitgraphHeadRefItem
     exec 'syn keyword gitgraphHeadRefItem ' . commit . ' ' . branch . ' contained'
 endfunction
@@ -234,7 +233,7 @@ function! s:GitGraphView(...)
         call s:GitGraphNew(branch, afile)
     endif
 
-    let cmd = "0read !" . s:gitgraph_git_path . " log --graph --decorate=full --date=" . g:gitgraph_date_format . " --format=format:" . s:gitgraph_graph_format . " --abbrev-commit --color --" . order . "-order " . branch . " -- " . afile
+    let cmd = s:GitRead('log', '--graph', '--decorate=full', '--date='.g:gitgraph_date_format, '--format=format:'.s:gitgraph_graph_format, '--abbrev-commit', '--color', '--'.order.'-order', branch, '--', afile)
     setl ma
     1,$delete
     exec cmd
@@ -341,7 +340,7 @@ endfunction
 
 function! s:GitStatusView()
     let repopath = s:GitGetRepository()
-    let cmd = 'lcd ' . repopath . ' | 0read !' . s:gitgraph_git_path .  ' status'
+    let cmd = 'lcd ' . repopath . ' | ' . s:GitRead('status')
     call s:Scratch('[Git Status]', -30, cmd)
     setl ma
     silent! g!/^#\( Changes\| Changed\| Untracked\|\t\|\s*$\)/delete
@@ -392,12 +391,18 @@ endfunction
 " }}}
 
 " Git commands interface {{{
-function! s:GitRun(...)
-    exec "silent !" . s:gitgraph_git_path . " " . join(a:000, " ")
+function! s:GitCmd(args)
+    return s:gitgraph_git_path . ' ' . join(a:args, ' ')
 endfunction
 
+function! s:GitRun(...)
+    exec 'silent !' . s:GitCmd(a:000)
+endfunction
 function! s:GitRead(...)
-    exec "0read !" . s:gitgraph_git_path . " " . join(a:000, " ")
+    return '0read !' . s:GitCmd(a:000)
+endfunction
+function! s:GitSys(...)
+    return system(s:GitCmd(a:000))
 endfunction
 
 function! s:GitBranch(commit, branch)
@@ -451,9 +456,7 @@ function! s:GitDiff(fcomm, tcomm, ...)
         let cached = exists('a:1') && a:1 ? '--cached' : ''
         let paths = exists('a:2') && !empty(a:2) ? s:ShellJoin(a:2, ' ') : ''
         let ctxl = exists('a:3') ? '-U'.a:3 : ''
-        let cmd = "0read !" . s:gitgraph_git_path . " diff " . cached . " " . ctxl . " " . a:tcomm
-        if a:fcomm != a:tcomm | let cmd = cmd . " " . a:fcomm | endif
-        let cmd = cmd . ' -- ' . paths
+        let cmd = s:GitRead('diff', cached, ctxl, a:tcomm, a:fcomm != a:tcomm ? a:fcomm : '', '--', paths)
         call s:Scratch("[Git Diff]", 15, cmd)
         setl ft=diff inex=GitGraphGotoFile(v:fname)
         map <buffer> <C-f> /^diff --git<CR>
@@ -463,7 +466,7 @@ endfunction
 
 function! s:GitShow(commit, ...)
     if a:commit != ""
-        let cmd = "0read !" . s:gitgraph_git_path . " show " . join(a:000, " ") . " " . a:commit
+        let cmd = s:GitRead('show', join(a:000, ' '), a:commit)
         call s:Scratch('[Git Show]', 15, cmd)
         setl ft=diff.gitlog inex=GitGraphGotoFile(v:fname)
         map <buffer> <C-f> /^diff --git<CR>
