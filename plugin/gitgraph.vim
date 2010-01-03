@@ -30,17 +30,28 @@ function! s:SynSearch(pattern, synnames, back)
     endwhile
 endfunction
 
+function! s:ExtractLayout(obj)
+    return get(g:gitgraph_layout, a:obj, [30,'rb'])
+endfunction
+
 " bufname = buffer name to open
 " sizes = if int its a width (height if below 0), if < 0 split vertically,
+" if string its a layout element to use.
 " a:1 = cmd = command to run to fill the new window,
-" a:2 = gravity = one of commands la(leftabove)/rb(rightbelow)/tl(topleft)/br(botright).
-let s:gitgraph_gravities = { 'la': 'leftabove', 'rb': 'rightbelow', 'tl': 'topleft', 'br': 'bottomright' }
+" a:2 = gravity = one of commands la(leftabove)/rb(rightbelow)/tl(topleft)/br(botright)/t(tab).
+let s:gitgraph_gravities = { 't': 'tab', 'la': 'leftabove', 'rb': 'rightbelow', 'tl': 'topleft', 'br': 'botright' }
 function! s:Scratch(bufname, size, ...)
 
     " parse args at first
-    let gravity = get(s:gitgraph_gravities, exists('a:2') ? a:2 : 'rb', 'rb')
+    if type(a:size) == type('')
+        let [size, gravity] = s:ExtractLayout(a:size)
+    else
+        let size = a:size
+        let gravity = exists('a:2') ? a:2 : 'rb'
+    endif
+
+    let gravity = get(s:gitgraph_gravities, gravity, 'rb')
     let vertical = '_'
-    let size = a:size
 
     " negative size opens vertical window
     if size < 0
@@ -196,7 +207,7 @@ endfunction
 function! s:GitGraphNew(branch, afile)
     let repopath = s:GitGetRepository()
     let reponame = fnamemodify(repopath, ':t')
-    call s:Scratch('[Git Graph:'.reponame.']', 20)
+    call s:Scratch('[Git Graph:'.reponame.']', 'g')
     let b:gitgraph_file = a:afile
     let b:gitgraph_branch = a:branch
     let b:gitgraph_repopath = repopath
@@ -334,14 +345,14 @@ function! s:GitStatusMappings()
     map <buffer> <S-Tab> :GitNextFile!<cr>
     map <buffer> dd :GitRevertFile<cr>
     map <buffer> yy :GitAddFile<cr>
-    map <buffer> gd :GitDiff<cr><C-w>T
-    map <buffer> gf <C-w>gf<C-w>T
+    map <buffer> gd :GitDiff<cr>
+    map <buffer> gf <C-w>gf
 endfunction
 
 function! s:GitStatusView()
     let repopath = s:GitGetRepository()
     let cmd = 'lcd ' . repopath . ' | ' . s:GitRead('status')
-    call s:Scratch('[Git Status]', -30, cmd)
+    call s:Scratch('[Git Status]', 's', cmd)
     setl ma
     silent! g!/^#\( Changes\| Changed\| Untracked\|\t\|\s*$\)/delete
     silent! g/^#\( Changes\| Changed\| Untracked\)/.+1delete
@@ -362,20 +373,41 @@ endfunction
 
 " Initializator {{{
 function! s:GitGraphInit()
-    if !exists('g:gitgraph_date_format') || empty(g:gitgraph_date_format)
-        let g:gitgraph_date_format = 'short'
-    end
 
-    if !exists('g:gitgraph_authorship_format') || empty(g:gitgraph_authorship_format)
-        let g:gitgraph_authorship_format = '%aN, %ad'
-    end
-
+    " commits subject format to show in graph, defaults to simple commit subject
     if !exists('g:gitgraph_subject_format') || empty(g:gitgraph_subject_format)
         let g:gitgraph_subject_format = '%s'
     end
 
+    " authorship mark, placed after commit subject in tree, defaults to author
+    " name & timestamp
+    if !exists('g:gitgraph_authorship_format') || empty(g:gitgraph_authorship_format)
+        let g:gitgraph_authorship_format = '%aN, %ad'
+    end
+
+    " date format to show in authorship mark in graph, defaults to "short"
+    " format, like "3 days ago"
+    if !exists('g:gitgraph_date_format') || empty(g:gitgraph_date_format)
+        let g:gitgraph_date_format = 'short'
+    end
+
+    " git path, if not set git sohuld be in your PATH
     if !exists('g:gitgraph_git_path') || empty(g:gitgraph_git_path)
         let g:gitgraph_git_path = 'git'
+    endif
+
+    " gitgraph layout configuration, defines how to place different views namely:
+    " g = (g)raph view,
+    " s = (s)tatus view,
+    " t = s(t)ash view (todo),
+    " d = (d)iff view,
+    " c = (c)ommit view (todo),
+    " f = new (f)ile opened from any view (currently diff or status),
+    " l = (l)ayout: open these objects in order when activating plugin.
+    " format: [gstdcf]:<size>:<gravity>,...,l:[gstdcf]+
+    " for size & gravity discription see s:Scratch().
+    if !exists('g:gitgraph_layout') || empty(g:gitgraph_layout)
+        let g:gitgraph_layout = { 'g':[20,'la'], 's':[-30,'tl'], 'd':[20,'rb'], 'f':[20,'rb'], 'l':['g','s'] }
     endif
 
     let s:gitgraph_git_path = g:gitgraph_git_path
@@ -383,10 +415,25 @@ function! s:GitGraphInit()
 
     command! -nargs=* -complete=custom,<SID>GitBranchCompleter GitGraph :call <SID>GitGraphView(<f-args>)
     command! GitStatus :call <SID>GitStatusView()
+    command! GitLayout :call <SID>GitLayout()
 
     map ,gg :GitGraph "--all"<cr>
     map ,gs :GitStatus<cr>
     map ,gf :exec 'GitGraph "--all" 0 '.expand('%:p')<cr>
+    map ,ga :GitLayout<cr>
+endfunction
+" }}}
+
+" Layout {{{
+function! s:GitLayout()
+    let layout = get(g:gitgraph_layout, 'l', ['g','s'])
+    for obj in layout
+        if obj == 'g'
+            call s:GitGraphView()
+        elseif obj == 's'
+            call s:GitStatusView()
+        endif
+    endfor
 endfunction
 " }}}
 
@@ -457,7 +504,7 @@ function! s:GitDiff(fcomm, tcomm, ...)
         let paths = exists('a:2') && !empty(a:2) ? s:ShellJoin(a:2, ' ') : ''
         let ctxl = exists('a:3') ? '-U'.a:3 : ''
         let cmd = s:GitRead('diff', cached, ctxl, a:tcomm, a:fcomm != a:tcomm ? a:fcomm : '', '--', paths)
-        call s:Scratch("[Git Diff]", 15, cmd)
+        call s:Scratch('[Git Diff]', 'd', cmd)
         setl ft=diff inex=GitGraphGotoFile(v:fname)
         map <buffer> <C-f> /^diff --git<CR>
         map <buffer> <C-b> ?^diff --git<CR>
@@ -467,7 +514,7 @@ endfunction
 function! s:GitShow(commit, ...)
     if !empty(a:commit)
         let cmd = s:GitRead('show', join(a:000, ' '), a:commit)
-        call s:Scratch('[Git Show]', 15, cmd)
+        call s:Scratch('[Git Show]', 'f', cmd)
         setl ft=diff.gitlog inex=GitGraphGotoFile(v:fname)
         map <buffer> <C-f> /^diff --git<CR>
         map <buffer> <C-b> ?^diff --git<CR>
@@ -477,8 +524,8 @@ endfunction
 " a:1 - force
 function! s:GitPush(word, syng, ...)
     if a:syng == 'gitgraphRemoteItem'
-        let parts = split(a:word[7:], "/")
-        let force = exists("a:1") && a:1 ? "-f" : ""
+        let parts = split(a:word[7:], '/')
+        let force = exists('a:1') && a:1 ? '-f' : ''
         call s:GitRun('push', force, parts[0], join(parts[1:], '/'))
         call s:GitGraphView()
     endif
@@ -493,7 +540,7 @@ endfunction
 
 function! s:GitPull(word, syng)
     if a:syng == 'gitgraphRemoteItem'
-        let parts = split(a:word[7:], "/")
+        let parts = split(a:word[7:], '/')
         call s:GitRun('pull', parts[0], join(parts[1:], '/'))
         call s:GitGraphView()
     endif
