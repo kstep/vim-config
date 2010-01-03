@@ -146,28 +146,28 @@ endfunction
 " GitGraph view implementation {{{
 function! s:GitGraphMappings()
     command! -buffer -range GitYankRange :call setreg(v:register, <SID>GetLineCommit(<line1>)."\n".<SID>GetLineCommit(<line2>), "l")
-    command! -buffer -bang -range GitRebase :call <SID>GitRebase(<SID>GetLineCommit(<line1>), <SID>GetLineCommit(<line2>), '', '<bang>'=='!')
-    command! -buffer -bang GitRebaseOnto :let rng = <SID>GetRegCommit(v:register) | call <SID>GitRebase(rng[0], rng[1], <SID>GetLineCommit('.'), '<bang>'=='!')
-    command! -buffer -bang GitRebaseCurrent :call <SID>GitRebase('', <SID>GetLineCommit('.'), '', '<bang>'=='!')
+    command! -buffer -bang -range GitRebase :call <SID>GitRebase(<SID>GetLineCommit(<line1>), <SID>GetLineCommit(<line2>), '', <q-bang>=='!')
+    command! -buffer -bang GitRebaseOnto :let rng = <SID>GetRegCommit(v:register) | call <SID>GitRebase(rng[0], rng[1], <SID>GetLineCommit('.'), <q-bang>=='!')
+    command! -buffer -bang GitRebaseCurrent :call <SID>GitRebase('', <SID>GetLineCommit('.'), '', <q-bang>=='!')
     command! -buffer -nargs=* -range GitDiff :call <SID>GitDiff(<SID>GetLineCommit(<line1>), <SID>GetLineCommit(<line2>), <f-args>)
     command! -buffer GitShow :call <SID>GitShow(<SID>GetLineCommit('.'))
-    command! -buffer -bang GitNextRef :call <SID>GitGraphNextRef('<bang>'=='!')
+    command! -buffer -bang GitNextRef :call <SID>GitGraphNextRef(<q-bang>=='!')
 
-    command! -buffer -bang GitDelete :call <SID>GitDelete(expand('<cword>'), <SID>GetSynName('.', '.'), '<bang>'=='!')
-    command! -buffer -bang GitRevert :call <SID>GitRevert(<SID>GetLineCommit('.'), '<bang>'=='!')
+    command! -buffer -bang GitDelete :call <SID>GitDelete(expand('<cword>'), <SID>GetSynName('.', '.'), <q-bang>=='!')
+    command! -buffer -bang GitRevert :call <SID>GitRevert(<SID>GetLineCommit('.'), <q-bang>=='!')
     command! -buffer GitBranch :call <SID>GitBranch(<SID>GetLineCommit('.'), input("Enter new branch name: "))
     command! -buffer GitTag :call <SID>GitTag(<SID>GetLineCommit('.'), input("Enter new tag name: "))
     command! -buffer GitSignedTag :call <SID>GitTag(<SID>GetLineCommit('.'), input("Enter new tag name: "), "s")
     command! -buffer GitAnnTag :call <SID>GitTag(<SID>GetLineCommit('.'), input("Enter new tag name: "), "a")
 
-    command! -buffer -bang GitPush :call <SID>GitPush(expand('<cword>'), <SID>GetSynName('.', '.'), '<bang>'=='!')
+    command! -buffer -bang GitPush :call <SID>GitPush(expand('<cword>'), <SID>GetSynName('.', '.'), <q-bang>=='!')
     command! -buffer GitPull :call <SID>GitPull(expand('<cword>'), <SID>GetSynName('.', '.'))
     command! -buffer GitCheckout :call <SID>GitCheckout(expand('<cword>'), <SID>GetSynName('.', '.'))
 
     command! -buffer GitSVNRebase :call <SID>GitSVNRebase(expand('<cword>'), <SID>GetSynName('.', '.'))
     command! -buffer GitSVNDcommit :call <SID>GitSVNDcommit(expand('<cword>'), <SID>GetSynName('.', '.'))
 
-    command! -buffer -bang -count GitCommit :call <SID>GitCommitView(<SID>GetLineCommit('.'),'<bang>'=='!','c',<count>)
+    command! -buffer -bang -count GitCommit :call <SID>GitCommitView(<SID>GetLineCommit('.'),<q-bang>=='!','c',<count>)
 
     " (y)ank range into buffer and (r)ebase onto another branch
     map <buffer> Y :GitYankRange<cr>
@@ -340,7 +340,7 @@ function! s:GitStatusAddFile(fname, region)
 endfunction
 
 function! s:GitStatusMappings()
-    command! -buffer -bang GitNextFile :call <SID>GitStatusNextFile('<bang>'==1)
+    command! -buffer -bang GitNextFile :call <SID>GitStatusNextFile(<q-bang>==1)
     command! -buffer -range GitRevertFile :call <SID>GitStatusRevertFile(<SID>GitStatusGetFiles(<line1>, <line2>), <SID>GetSynRegionName(<line1>, '.'))
     command! -buffer -range GitAddFile :call <SID>GitStatusAddFile(<SID>GitStatusGetFilesDict(<line1>, <line2>), <SID>GetSynRegionName(<line1>, '.'))
     command! -buffer -range GitDiff :call <SID>GitDiff('HEAD', 'HEAD', <SID>GetSynRegionName('.', '.') ==# 'gitStaged', <SID>GitStatusGetFiles(<line1>, <line2>))
