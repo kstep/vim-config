@@ -367,7 +367,7 @@ function! s:GitStatusView()
     silent! %s/^#\t/\t[ ] /e
     silent! %s/^#\s*$//e
     if has('perl') || has('perl/dyn')
-        g/^\t\[.\] \".*\"$/perldo s/\\([0-7]{1,3})|(")/if($2){""}else{$c=oct($1);if(($c&0xc0)==0x80){$a=($a<<6)|($c&63);$i--}else{for($m=0x80,$i=-1;($m&$c)!=0;$m>>=1){$i++};$a=$c&($m-1)};$i>0?"":chr($a)}/ge
+        silent! g/^\t\[.\] \".*\"$/perldo s/\\([0-7]{1,3})|(")/if($2){""}else{$c=oct($1);if(($c&0xc0)==0x80){$a=($a<<6)|($c&63);$i--}else{for($m=0x80,$i=-1;($m&$c)!=0;$m>>=1){$i++};$a=$c&($m-1)};$i>0?"":chr($a)}/ge
     end
     setl ts=4 noma nomod ft=gitstatus fdm=syntax nowrap cul
 
@@ -492,7 +492,7 @@ function! s:GitRun(...)
     exec 'silent !' . s:GitCmd(a:000)
 endfunction
 function! s:GitRead(...)
-    return '0read !' . s:GitCmd(a:000)
+    return 'silent 0read !' . s:GitCmd(a:000)
 endfunction
 function! s:GitSys(...)
     return system(s:GitCmd(a:000))
