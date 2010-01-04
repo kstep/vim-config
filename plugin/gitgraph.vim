@@ -482,7 +482,7 @@ function! s:GitGraphInit()
     map ,gd :GitDiff<cr>
     map ,gf :exec 'GitGraph "--all" 0 '.expand('%:p')<cr>
 
-    map ,ga :GitLayout<cr>
+    map ,go :GitLayout<cr>
 endfunction
 " }}}
 
