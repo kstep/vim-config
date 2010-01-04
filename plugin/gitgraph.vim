@@ -182,9 +182,9 @@ function! s:GitGraphMappings()
     map <buffer> DD :GitRevert!<cr>
 
     " (g)o (b)ranch, (p)ush, p(u)ll
-    map <buffer> gp :GitPush<cr><cr>
-    map <buffer> gu :GitPull<cr><cr>
-    map <buffer> gb :GitCheckout<cr><cr>
+    map <buffer> gp :GitPush<cr>
+    map <buffer> gu :GitPull<cr>
+    map <buffer> gb :GitCheckout<cr>
 
     " (a)dd (b)ranch, (t)ag, (a)nnotated/(s)igned tag, (c)ommit, a(m)end
     map <buffer> ab :GitBranch<cr>
@@ -197,12 +197,12 @@ function! s:GitGraphMappings()
     " (g)o (r)ebase (interactive), (d)iff, (f)ile (aka commit)
     vmap <buffer> gr :GitRebase<space>
     vmap <buffer> gR :GitRebase!<cr>
-    map <buffer> gd :GitDiff<cr><cr>
-    map <buffer> gf :GitShow<cr><cr>
+    map <buffer> gd :GitDiff<cr>
+    map <buffer> gf :GitShow<cr>
 
     " like gu/gp, but for git-svn
-    map <buffer> gU :GitSVNRebase<cr><cr>
-    map <buffer> gP :GitSVNDcommit<cr><cr>
+    map <buffer> gU :GitSVNRebase<cr>
+    map <buffer> gP :GitSVNDcommit<cr>
 
     map <buffer> <Tab> :GitNextRef<cr>
     map <buffer> <S-Tab> :GitNextRef!<cr>
