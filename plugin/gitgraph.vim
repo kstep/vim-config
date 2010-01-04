@@ -5,11 +5,11 @@ function! s:ShellJoin(alist, glue)
 endfunction
 
 function! s:Line(l)
-    return type(a:l) == type("") ? line(a:l) : a:l
+    return type(a:l) == type('') ? line(a:l) : a:l
 endfunction
 
 function! s:Col(c)
-    return type(a:c) == type("") ? col(a:c) : a:c
+    return type(a:c) == type('') ? col(a:c) : a:c
 endfunction
 
 function! s:GetSynName(l, c)
@@ -632,13 +632,12 @@ function! s:GitSVNDcommit(word, syng)
     call s:GitGraphView()
 endfunction
 
-" a:1 = force, a:2 = patch
+" a:1 = force
 function! s:GitAddFiles(fname, ...)
     if empty(a:fname) | return | endif
     let files = type(a:fname) == type([]) ? s:ShellJoin(a:fname, " ") : shellescape(a:fname, 1)
     let force = exists('a:1') && a:1 ? '--force' : ''
-    let patch = exists('a:2') && a:2 ? '--patch' : ''
-    call s:GitRun('add', force, patch, '--', files)
+    call s:GitRun('add', force, '--', files)
 endfunction
 
 " a:1 = force, a:2 = index
@@ -650,19 +649,17 @@ function! s:GitPurgeFiles(fname, ...)
     call s:GitRun('rm -r', force, index, '--', files)
 endfunction
 
-" a:1 = patch
-function! s:GitResetFiles(fname, ...)
+function! s:GitResetFiles(fname)
     if empty(a:fname) | return | endif
-    let patch = exists('a:1') && a:1 ? '--patch' : ''
     let files = type(a:fname) == type([]) ? s:ShellJoin(a:fname, " ") : shellescape(a:fname, 1)
-    call s:GitRun('reset', patch, '--', files)
+    call s:GitRun('reset', '--', files)
 endfunction
 
 " a:1 = force
 function! s:GitRemoveFiles(fname, ...)
     if empty(a:fname) | return | endif
-    let force = exists("a:1") && a:1 ? "-f" : ""
-    let cmd = "!rm " . force . " "
+    let force = exists('a:1') && a:1 ? '-f' : ''
+    let cmd = '!rm ' . force . ' '
     if type(a:fname) == type([])
         if confirm('Remove untracked file'.(len(a:fname) > 1 ? 's' : ' "'.a:fname[0]).'"?', "&Yes\n&No") == 1
             exec cmd . s:ShellJoin(a:fname, ' ')
