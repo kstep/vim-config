@@ -1,7 +1,7 @@
 
 " Common utility functions {{{
 function! s:ShellJoin(alist, glue)
-    return join(map(a:alist, 'shellescape(v:val, 1)'), a:glue)
+    return type(a:alist) == type([]) ? join(map(a:alist, 'shellescape(v:val, 1)'), a:glue) : shellescape(a:alist, 1)
 endfunction
 
 function! s:Line(l)
@@ -635,7 +635,7 @@ endfunction
 " a:1 = force
 function! s:GitAddFiles(fname, ...)
     if empty(a:fname) | return | endif
-    let files = type(a:fname) == type([]) ? s:ShellJoin(a:fname, " ") : shellescape(a:fname, 1)
+    let files = s:ShellJoin(a:fname, ' ')
     let force = exists('a:1') && a:1 ? '--force' : ''
     call s:GitRun('add', force, '--', files)
 endfunction
@@ -643,7 +643,7 @@ endfunction
 " a:1 = force, a:2 = index
 function! s:GitPurgeFiles(fname, ...)
     if empty(a:fname) | return | endif
-    let files = type(a:fname) == type([]) ? s:ShellJoin(a:fname, " ") : shellescape(a:fname, 1)
+    let files = s:ShellJoin(a:fname, ' ')
     let force = exists('a:1') && a:1 ? '--force' : ''
     let index = exists('a:2') && a:2 ? '--cached' : ''
     call s:GitRun('rm -r', force, index, '--', files)
@@ -651,7 +651,7 @@ endfunction
 
 function! s:GitResetFiles(fname)
     if empty(a:fname) | return | endif
-    let files = type(a:fname) == type([]) ? s:ShellJoin(a:fname, " ") : shellescape(a:fname, 1)
+    let files = s:ShellJoin(a:fname, ' ')
     call s:GitRun('reset', '--', files)
 endfunction
 
@@ -681,7 +681,7 @@ endfunction
 function! s:GitCheckoutFiles(fname, ...)
     if empty(a:fname) | return | endif
     let force = exists('a:1') && a:1 ? '-f' : ''
-    let files = type(a:fname) == type([]) ? s:ShellJoin(a:fname, ' ') : shellescape(a:fname, 1)
+    let files = s:ShellJoin(a:fname, ' ')
     call s:GitRun('checkout', force, '--', files)
 endfunction
 
@@ -718,7 +718,7 @@ endfunction
 function! s:GitCommitFiles(fname, msg, include, ...)
     if empty(a:fname) | return | endif
     let include = a:include ? '-i' : '-o'
-    let files = type(a:fname) == type([]) ? s:ShellJoin(a:fname, ' ') : shellescape(a:fname, 1)
+    let files = s:ShellJoin(a:fname, ' ')
     let amend = exists('a:1') && a:1 ? '--amend' : ''
     let edit = exists('a:2') && a:2 ? '--edit' : ''
     let signoff = exists('a:3') && a:3 ? '--signoff' : ''
