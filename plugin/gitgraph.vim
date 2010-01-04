@@ -655,6 +655,12 @@ function! s:GitResetFiles(fname)
     call s:GitRun('reset', '--', files)
 endfunction
 
+" a:1 = mode: mixed/(s)oft/(h)ard/(m)erge
+function! s:GitReset(commit, ...)
+    let mode = exists('a:1') ? (a:1 == 's' ? '--soft' : (a:1 == 'h' ? '--hard' : (a:1 == 'm' ? '--merge' : '--mixed'))) : '--mixed'
+    call s:GitRun('reset', mode, commit)
+endfunction
+
 " a:1 = force
 function! s:GitRemoveFiles(fname, ...)
     if empty(a:fname) | return | endif
@@ -720,6 +726,15 @@ function! s:GitCommitFiles(fname, msg, include, ...)
     call s:GitRun('commit', amend, edit, signoff, msgparam, shellescape(a:msg, 1), include, '--', files)
     call s:GitGraphView()
 endfunction
+
+" a:1 = cached
+" TODO: check options
+function! s:GitApply(patch, ...)
+    let cached = exists('a:1') && a:1 ? '--cached' : ''
+    call s:GitRun('apply', cached, '--', patch)
+    call s:GitStatusView()
+endfunction
+
 " }}}
 
 call s:GitGraphInit()
