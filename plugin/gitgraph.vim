@@ -571,6 +571,7 @@ function! s:GitDiff(fcomm, tcomm, ...)
         map <buffer> <C-f> /^diff --git<CR>
         map <buffer> <C-b> ?^diff --git<CR>
         map <buffer> dd :call <SID>GitDiffDelete()<CR>
+        map <buffer> gf :call <SID>GitDiffGotoFile()<CR>
         augroup GitDiffView
             au!
             au BufWriteCmd <buffer> call s:GitDiffApply()
@@ -588,6 +589,31 @@ function! s:GitDiffApply()
     finally
         call delete(patchfile)
     endtry
+endfunction
+
+function! s:GitDiffGotoFile()
+    " get header position
+    let hdrpos = search('^+++ ', 'nbW')
+    if hdrpos < 1 | return "0" | endif
+    let chdrpos = search('^@@ ', 'nbW')
+    if chdrpos < 1 | return "1" | endif
+
+    " now get chunk position in original file
+    let chunkpos = matchstr(getline(chdrpos), '[0-9]\+', 3)
+    if empty(chunkpos) | return chdrpos | endif
+
+    " now get diff lines present in current file from header to current pos
+    let offlines = filter(getbufline('%', chdrpos+1, line('.')), 'v:val =~ "^[ +]"')
+
+    " and original file name from header
+    let origfile = strpart(getline(hdrpos), 5)
+    let repopath = s:GitGetRepository()
+
+    " now we have: original file name, first line of chunk in it and
+    " lines from chunk's start to our destination pos, so junk
+    " open the file and goto to position we seek!
+    exec 'edit! '. repopath . origfile
+    exec len(offlines)+chunkpos
 endfunction
 
 function! s:GitDiffDelete()
@@ -611,6 +637,7 @@ function! s:GitShow(commit, ...)
         setl ft=diff.gitlog inex=GitGraphGotoFile(v:fname)
         map <buffer> <C-f> /^diff --git<CR>
         map <buffer> <C-b> ?^diff --git<CR>
+        map <buffer> gf :call <SID>GitDiffGotoFile()<CR>
     endif
 endfunction
 
