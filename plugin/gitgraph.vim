@@ -149,7 +149,7 @@ function! s:GitGraphMappings()
     command! -buffer -bang -range GitRebase :call <SID>GitRebase(<SID>GetLineCommit(<line1>), <SID>GetLineCommit(<line2>), '', <q-bang>=='!')
     command! -buffer -bang GitRebaseOnto :let rng = <SID>GetRegCommit(v:register) | call <SID>GitRebase(rng[0], rng[1], <SID>GetLineCommit('.'), <q-bang>=='!')
     command! -buffer -bang GitRebaseCurrent :call <SID>GitRebase('', <SID>GetLineCommit('.'), '', <q-bang>=='!')
-    command! -buffer -nargs=* -range GitDiff :call <SID>GitDiff(<SID>GetLineCommit(<line1>), <SID>GetLineCommit(<line2>), <f-args>)
+    command! -buffer -bang -nargs=* -range GitDiff :call <SID>GitDiff(<SID>GetLineCommit(<line1>), <SID>GetLineCommit(<line2>), <q-bang>=='!', <f-args>)
     command! -buffer GitShow :call <SID>GitShow(<SID>GetLineCommit('.'))
     command! -buffer -bang GitNextRef :call <SID>GitGraphNextRef(<q-bang>=='!')
 
@@ -406,7 +406,10 @@ function! s:GitCommitView(msg, amend, src, signoff)
     setl ft=gitcommit bt=acwrite bh=wipe nomod
     let b:gitgraph_commit_amend = a:amend
     let b:gitgraph_commit_signoff = a:signoff
-    au BufWriteCmd <buffer> call s:GitCommitBuffer()
+    augroup GitCommitView
+        au!
+        au BufWriteCmd <buffer> call s:GitCommitBuffer()
+    augroup end
 endfunction
 
 function! s:GitCommitBuffer()
@@ -469,12 +472,16 @@ function! s:GitGraphInit()
     command! -nargs=* -complete=custom,<SID>GitBranchCompleter GitGraph :call <SID>GitGraphView(<f-args>)
     command! GitStatus :call <SID>GitStatusView()
     command! -bang -count -nargs=? GitCommit :call <SID>GitCommitView(<q-args>,<q-bang>=='!','',<count>)
+    command! -bang -count=3 GitDiff :call <SID>GitDiff('HEAD','HEAD',<q-bang>=='!',expand('%:p'),<q-count>)
+
     command! GitLayout :call <SID>GitLayout()
 
     map ,gg :GitGraph "--all"<cr>
     map ,gs :GitStatus<cr>
     map ,gc :GitCommit<cr>
+    map ,gd :GitDiff<cr>
     map ,gf :exec 'GitGraph "--all" 0 '.expand('%:p')<cr>
+
     map ,ga :GitLayout<cr>
 endfunction
 " }}}
@@ -560,9 +567,40 @@ function! s:GitDiff(fcomm, tcomm, ...)
         let ctxl = exists('a:3') ? '-U'.a:3 : ''
         let cmd = s:GitRead('diff', cached, ctxl, a:tcomm, a:fcomm != a:tcomm ? a:fcomm : '', '--', paths)
         call s:Scratch('[Git Diff]', 'd', cmd)
-        setl ft=diff inex=GitGraphGotoFile(v:fname)
+        setl ft=diff inex=GitGraphGotoFile(v:fname) bt=acwrite bh=wipe
         map <buffer> <C-f> /^diff --git<CR>
         map <buffer> <C-b> ?^diff --git<CR>
+        map <buffer> dd :call <SID>GitDiffDelete()<CR>
+        augroup GitDiffView
+            au!
+            au BufWriteCmd <buffer> call s:GitDiffApply()
+        augroup end
+    endif
+endfunction
+
+function! s:GitDiffApply()
+    let hunks = getbufline('%', 1, '$')
+    let patchfile = tempname()
+    try
+        call writefile(hunks, patchfile)
+        call s:GitApply(patchfile, 1)
+        setl nomod
+    finally
+        call delete(patchfile)
+    endtry
+endfunction
+
+function! s:GitDiffDelete()
+    let line = getline('.')
+    let hunk = strpart(line, 0, 2)
+    if hunk == '@@' " remove whole hunk
+        set ma | .,/^@@/-1delete | set noma
+    elseif hunk == '++' || hunk == '--' " remove whole file
+        set ma | ?^---?,/^---/-1delete | set noma
+    elseif strpart(hunk, 0, 1) == '+' " remove added line
+        set ma | delete | set noma
+    elseif strpart(hunk, 0, 1) == '-' " remove removed line (make it context)
+        set ma | call setline('.', ' '.strpart(line, 1)) | set noma
     endif
 endfunction
 
@@ -731,7 +769,7 @@ endfunction
 " TODO: check options
 function! s:GitApply(patch, ...)
     let cached = exists('a:1') && a:1 ? '--cached' : ''
-    call s:GitRun('apply', cached, '--', patch)
+    call s:GitRun('apply', cached, '--', a:patch)
     call s:GitStatusView()
 endfunction
 
