@@ -699,18 +699,15 @@ function! s:GitReset(commit, ...)
     call s:GitRun('reset', mode, commit)
 endfunction
 
-" a:1 = force
-function! s:GitRemoveFiles(fname, ...)
+function! s:GitRemoveFiles(fname)
     if empty(a:fname) | return | endif
-    let force = exists('a:1') && a:1 ? '-f' : ''
-    let cmd = '!rm ' . force . ' '
     if type(a:fname) == type([])
-        if confirm('Remove untracked file'.(len(a:fname) > 1 ? 's' : ' "'.a:fname[0]).'"?', "&Yes\n&No") == 1
-            exec cmd . s:ShellJoin(a:fname, ' ')
+        if confirm('Remove untracked file'.(len(a:fname) > 1 ? 's' : ' "'.a:fname[0].'"').'?', "&Yes\n&No") == 1
+            call map(a:fname, 'delete(v:val)')
         endif
     else
         if confirm('Remove untracked file "'.a:fname.'"?', "&Yes\n&No") == 1
-            exec cmd . shellescape(a:fname, 1)
+            call delete(a:fname)
         endif
     endif
 endfunction
