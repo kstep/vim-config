@@ -392,7 +392,16 @@ function! s:GitCommitView(msg, amend, src, signoff)
     silent 0put =message
     silent put ='## -------------------------------------------------------------------------------------'
     silent put ='## Enter commit message here. Write it (:w) to commit or close the buffer (:q) to cancel.'
-    silent put ='## Lines starting with ## are removed from commit message.' | 1
+    silent put ='## Lines starting with ## are removed from commit message.'
+
+    let submessage = ''
+    if a:amend | let submessage = submessage . '¹This is an amend commit. ' | endif
+    if a:signoff | let submessage = submessage . '²This commit will be signed off with your signature. ' | endif
+    if !empty(submessage)
+        silent put ='## '.submessage
+    endif
+
+    1
 
     setl ft=gitcommit bt=acwrite bh=wipe nomod
     let b:gitgraph_commit_amend = a:amend
