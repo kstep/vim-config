@@ -505,7 +505,7 @@ function! s:GitGraphInit()
     " format: [gstdcf]:<size>:<gravity>,...,l:[gstdcf]+
     " for size & gravity discription see s:Scratch().
     if !exists('g:gitgraph_layout') || empty(g:gitgraph_layout)
-        let g:gitgraph_layout = { 'g':[20,'la'], 's':[-30,'tl'], 't':[10,'rb'], 'd':[0,'br'], 'f':[20,'rb'], 'l':['g','s','t'] }
+        let g:gitgraph_layout = { 'g':[20,'la'], 's':[-30,'tl'], 't':[10,'rb'], 'd':[0,'br'], 'f':[0,'rb'], 'l':['g','s','t'] }
     endif
 
     let s:gitgraph_git_path = g:gitgraph_git_path
