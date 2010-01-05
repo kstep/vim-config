@@ -369,7 +369,7 @@ endfunction
 function! s:GitStatusView()
     let repopath = s:GitGetRepository()
     let cmd = 'lcd ' . repopath . ' | ' . s:GitRead('status')
-    call s:Scratch('[Git Status]', 's', cmd)
+    call s:Scratch('[Git Status:'.fnamemodify(repopath, ':t').']', 's', cmd)
     setl ma
     silent! g!/^#\( Changes\| Changed\| Untracked\|\t\|\s*$\)/delete
     silent! g/^#\( Changes\| Changed\| Untracked\)/.+1delete
