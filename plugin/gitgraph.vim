@@ -101,13 +101,20 @@ endfunction
 " }}}
 
 " Common git helper functions {{{
+let s:gitgraph_reponame_cache = {}
 function! s:GitGetRepository()
+    let curdir = getcwd()
+    if has_key(s:gitgraph_reponame_cache, curdir)
+        return s:gitgraph_reponame_cache[curdir]
+    endif
+
     let reponame = s:GitSys('rev-parse --git-dir')[:-2]
     if reponame ==# '.git'
-        let reponame = getcwd()
+        let reponame = curdir
     else
         let reponame = fnamemodify(reponame, ':h')
     endif
+    let s:gitgraph_reponame_cache[curdir] = reponame
     return reponame
 endfunction
 
