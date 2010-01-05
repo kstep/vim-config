@@ -123,6 +123,19 @@ function! s:GitBranchCompleter(arg, cline, cpos)
     let lst = join(map(split(s:GitSys('branch'), "\n"), 'v:val[2:]'), "\n")
     return lst
 endfunction
+
+function! s:GitDiffBuffer(bufname, cmd)
+    call s:Scratch(a:bufname, 'd', a:cmd)
+    setl ft=diff inex=GitGraphGotoFile(v:fname) bt=acwrite bh=wipe
+    map <buffer> <C-f> /^diff --git<CR>
+    map <buffer> <C-b> ?^diff --git<CR>
+    map <buffer> dd :call <SID>GitDiffDelete()<CR>
+    map <buffer> gf :call <SID>GitDiffGotoFile()<CR>
+    augroup GitDiffView
+        au!
+        au BufWriteCmd <buffer> call s:GitDiffApply()
+    augroup end
+endfunction
 " }}}
 
 " Exported functions {{{
@@ -370,6 +383,7 @@ function! s:GitStatusView()
         silent! g/^\t\[.\] \".*\"$/perldo s/\\([0-7]{1,3})|(")/if($2){""}else{$c=oct($1);if(($c&0xc0)==0x80){$a=($a<<6)|($c&63);$i--}else{for($m=0x80,$i=-1;($m&$c)!=0;$m>>=1){$i++};$a=$c&($m-1)};$i>0?"":chr($a)}/ge
     end
     setl ts=4 noma nomod ft=gitstatus fdm=syntax nowrap cul
+    goto 1
 
     call s:GitStatusMappings()
 endfunction
@@ -427,6 +441,27 @@ function! s:GitCommitBuffer()
 endfunction
 " }}}
 
+" GitStash view implementation {{{
+function! s:GitStashView()
+    let cmd = s:GitRead('stash list')
+    call s:Scratch('[Git Stash]', 't', cmd)
+    set ma
+    silent! %s/^stash@{[0-9]\+}: //e
+    silent! g/^\s*$/d
+    set noma nomod cul nowrap
+    goto 1
+
+    command! -buffer -bang GitStashApply :call <SID>GitStashApply(line('.')-1, <q-bang>=='!')
+    command! -buffer GitStashRemove :call <SID>GitStashRemove(line('.')-1)
+    command! -buffer -count=3 GitStashDiff :call <SID>GitStashDiff(line('.')-1, <count>)
+
+    map <buffer> dd :GitStashRemove<CR>
+    map <buffer> yy :GitStashApply<CR>
+    map <buffer> xx :GitStashApply!<CR>
+    map <buffer> gd :GitStashDiff<CR>
+endfunction
+" }}}
+
 " Initializator {{{
 function! s:GitGraphInit()
 
@@ -463,7 +498,7 @@ function! s:GitGraphInit()
     " format: [gstdcf]:<size>:<gravity>,...,l:[gstdcf]+
     " for size & gravity discription see s:Scratch().
     if !exists('g:gitgraph_layout') || empty(g:gitgraph_layout)
-        let g:gitgraph_layout = { 'g':[20,'la'], 's':[-30,'tl'], 'd':[999,'t'], 'f':[20,'rb'], 'l':['g','s'] }
+        let g:gitgraph_layout = { 'g':[20,'la'], 's':[-30,'tl'], 't':[10,'rb'], 'd':[0,'br'], 'f':[20,'rb'], 'l':['g','s','t'] }
     endif
 
     let s:gitgraph_git_path = g:gitgraph_git_path
@@ -473,6 +508,8 @@ function! s:GitGraphInit()
     command! GitStatus :call <SID>GitStatusView()
     command! -bang -count -nargs=? GitCommit :call <SID>GitCommitView(<q-args>,<q-bang>=='!','',<count>)
     command! -bang -count=3 GitDiff :call <SID>GitDiff('HEAD','HEAD',<q-bang>=='!',expand('%:p'),<q-count>)
+    command! GitStash :call <SID>GitStashView()
+    command! GitStashSave :call <SID>GitStashSave(input('Stash message: '))
 
     command! GitLayout :call <SID>GitLayout()
 
@@ -480,6 +517,8 @@ function! s:GitGraphInit()
     map ,gs :GitStatus<cr>
     map ,gc :GitCommit<cr>
     map ,gd :GitDiff<cr>
+    map ,gt :GitStash<cr>
+    map ,ga :GitStashSave<cr>
     map ,gf :exec 'GitGraph "--all" 0 '.expand('%:p')<cr>
 
     map ,go :GitLayout<cr>
@@ -494,6 +533,8 @@ function! s:GitLayout()
             call s:GitGraphView()
         elseif obj == 's'
             call s:GitStatusView()
+        elseif obj == 't'
+            call s:GitStashView()
         endif
     endfor
 endfunction
@@ -566,16 +607,7 @@ function! s:GitDiff(fcomm, tcomm, ...)
         let paths = exists('a:2') && !empty(a:2) ? s:ShellJoin(a:2, ' ') : ''
         let ctxl = exists('a:3') ? '-U'.a:3 : ''
         let cmd = s:GitRead('diff', cached, ctxl, a:tcomm, a:fcomm != a:tcomm ? a:fcomm : '', '--', paths)
-        call s:Scratch('[Git Diff]', 'd', cmd)
-        setl ft=diff inex=GitGraphGotoFile(v:fname) bt=acwrite bh=wipe
-        map <buffer> <C-f> /^diff --git<CR>
-        map <buffer> <C-b> ?^diff --git<CR>
-        map <buffer> dd :call <SID>GitDiffDelete()<CR>
-        map <buffer> gf :call <SID>GitDiffGotoFile()<CR>
-        augroup GitDiffView
-            au!
-            au BufWriteCmd <buffer> call s:GitDiffApply()
-        augroup end
+        call s:GitDiffBuffer('[Git Diff]', cmd)
     endif
 endfunction
 
@@ -797,6 +829,42 @@ function! s:GitApply(patch, ...)
     call s:GitStatusView()
 endfunction
 
+" a:1 = remove stash after apply, a:2 = apply index
+function! s:GitStashApply(stashno, ...)
+    let cmd = exists('a:1') && a:1 ? 'pop' : 'apply'
+    let index = exists('a:2') && a:2 ? '--index' : ''
+    let stashname = type(a:stashno) == type([]) ? map(a:stashno, '"stash@{".v:val."}"') : 'stash@{'.a:stashno.'}'
+    call s:GitRun('stash', cmd, index, s:ShellJoin(stashname, ' '))
+endfunction
+
+" if stashno < 0, then drop all
+function! s:GitStashRemove(stashno)
+    if a:stashno < 0
+        call s:GitRun('stash clear')
+    else
+        let stashname = type(a:stashno) == type([]) ? map(a:stashno, '"stash@{".v:val."}"') : 'stash@{'.a:stashno.'}'
+        call s:GitRun('stash drop', s:ShellJoin(stashname, ' '))
+    endif
+endfunction
+
+" a:1 = keep index
+function! s:GitStashSave(msg, ...)
+    let keepindex = exists('a:1') && a:1 ? '--keep-index' : '--no-keep-index'
+    call s:GitRun('stash save', keepindex, shellescape(a:msg, 1))
+endfunction
+
+function! s:GitStashBranch(stashno, branch)
+    let stashname = 'stash@{'.a:stashno.'}'
+    call s:GitRun('stash branch', shellescape(a:branch, 1), shellescape(stashname, 1))
+endfunction
+
+" a:1 = context lines 
+function! s:GitStashDiff(stashno, ...)
+    let stashname = 'stash@{'.a:stashno.'}'
+    let ctxl = exists('a:1') ? '-U'.a:1 : ''
+    let cmd = s:GitRead('stash show -p', ctxl, shellescape(stashname, 1))
+    call s:GitDiffBuffer('[Git Stash Diff]', cmd)
+endfunction
 " }}}
 
 call s:GitGraphInit()
