@@ -5,4 +5,4 @@ setl et
 setl pa=.,..,../..,../../..,../../../..,../../../../..,../../../../../..
 setl inex=substitute(v:fname,'\\.','/','g').'.py'
 setl mp=python\ %:p
-setl efm=%C%p^,%A\ %#File\ "%f"\,\ line\ %l%.%#,%Z%[%^\ ]%\@=%m,%+C\ %s
+setl efm=%C%p^,%A\ %#File\ \"%f\"\\,\ line\ %l%.%#,%Z%[%^\ ]%\\@=%m,%+C\ %s
