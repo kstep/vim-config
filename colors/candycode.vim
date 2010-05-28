@@ -19,7 +19,7 @@ hi Normal       guifg=#ffffff       guibg=#050505       gui=NONE
 hi Folded       guifg=#c2bfa5       guibg=#050505       gui=underline
             \   ctermfg=lightgray   ctermbg=black       cterm=underline
 
-hi LineNr       guifg=#928c75       guibg=NONE          gui=NONE
+hi LineNr       guifg=#928c75       guibg=#121212       gui=NONE
             \   ctermfg=darkgray    ctermbg=NONE        cterm=NONE
 
 hi Directory    guifg=#00bbdd       guibg=NONE          gui=NONE
@@ -158,7 +158,7 @@ hi Underlined   guifg=#80a0ff       guibg=NONE          gui=underline
             \   ctermfg=NONE        ctermbg=NONE        cterm=underline
             \   term=underline 
 
-hi Ignore       guifg=#888888       guibg=NONE          gui=NONE
+hi Ignore       guifg=#000000       guibg=NONE          gui=NONE
             \   ctermfg=darkgray    ctermbg=NONE        cterm=NONE
 
 hi Error        guifg=#ffffff       guibg=#ff0000       gui=NONE
