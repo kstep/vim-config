@@ -52,3 +52,11 @@ snippet namespace
 	<%namespace file="${1:name}" />
 snippet page
 	<%page args="${1:}" />
+snippet script
+	<script type="text/javascript">
+		${1}
+	</script>${2}
+snippet scriptsrc
+	<script src="${1}.js" type="text/javascript"></script>${2}
+snippet url
+	${url(controller='${1}', action='${2}'${3})}
