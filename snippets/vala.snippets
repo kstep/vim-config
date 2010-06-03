@@ -1,0 +1,28 @@
+snippet cl
+	public class ${1:ClassName} : ${2:Gtk.BaseClass}
+	{
+		public $1(${3:arguments})
+		{
+			${4:/* Constructor */}
+		}
+	}
+snippet func
+	${1:public} ${2:void} ${3:func_name}(${4:arguments})
+	{
+		$2 result;
+		${5:/* function body */}
+		return result;
+	}
+snippet if
+	if (${1:condition}) {
+		${2:/* if body */}
+	}
+snippet ife
+	if (${1:condition}) {
+		${2:/* if body */}
+	} else {
+		${3:/* else body */}
+	}
+	
+
+" vim: ts=8:noet:sw=8:fdm=indent
