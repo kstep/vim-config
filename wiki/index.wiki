@@ -1,10 +1,20 @@
 
-    * СмыслМонад
+    * БольшаяВики
 
+    * ПланыИПроекты
+
+    * ИдеиПоUnite
+    * РасширениеДиалектаPostgreSQL
+    * OpenAuth
+    * PythonMigrate
+
+    * GitGraphPlugin
     * GitGraphStatusView
+    * GitGraphPlans
 
     * TodoList
     * OptimizationTasks
+    * СервисыOpenID
 
     * GitSync
 
@@ -13,7 +23,13 @@
     * ISCEmailOrderNotify
 
     * ТребованияКСистемеТаймМенеджмента
+    * ТребованияКФайлМенеджеру
+
     * УютненькийБложег
+    * СмыслМонад
+
+    * FusqlFS
+    * IgetBy
 
 = Текущие задачи =
 
