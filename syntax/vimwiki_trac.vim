@@ -40,7 +40,7 @@ syn region wikiPreCode matchgroup=wikiCodeQuote start="^{{{$" end="^}}}$" contai
 
 for wikilang in ['python', 'perl', 'php', 'c', 'crontab', 'sh', 'zsh', 'cpp', 'sql', 'ruby', 'lisp', 'scheme', 'javascript', 'vim']
     exec 'syn include @wikiLang' . wikilang . ' syntax/' . wikilang . '.vim'
-    exec 'syn region wikiCode' . wikilang . ' matchgroup=wikiCodeQuote start="^#!' . wikilang . '$" end="\(^}}}$\)\@=" contains=@wikiLang' . wikilang . ' contained'
+    exec 'syn region wikiCode' . wikilang . ' matchgroup=wikiCodeQuote start="^#!\(code \)\{0,1}' . wikilang . '$" end="\(^}}}$\)\@=" contains=@wikiLang' . wikilang . ' contained'
     exec 'syn cluster wikiCodeLang add=wikiCode' . wikilang
     unlet b:current_syntax
 endfor
