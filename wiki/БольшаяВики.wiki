@@ -1,0 +1,115 @@
+В [[Информатика|информатике]] '''преобразование Шварца''' — [[Perl|перловая]] [[programming idiom|идиома]], используемая для улучшения производительности [[Сортировка|сортировки]] списка элементов. Идиома подходит для сортировки основанной на сравнении элементов, при условии, что операция сравнения является очень дорогой и должна быть совершена минимальное количество раз. Преобразование Шварца замечательно тем, что не использует временные именованые массивы.
+
+Идиома названа в честь Рэндела Л. Шварца ([[Randal L. Schwartz]]), который первым её продемонстрировал на [[Perl|перле]] почтри сразу после выхода Perl 5 в [[1994]] году. Несколько лет после изобретения термин «Преобразование Шварца» использовался только при [[Программирование|программировании]] на перле, но затем был принят программистами на других языках, таких как [[Python]], для обозначения похожих идиом, реализованных на этих языках. Этот алгоритм, однако, использовался и ранее (без каких-либо особых названий), до того, как был популяризрван в виде конкретной идиомы среди сообщества перл-программистов Шварцем. Сам термин «Преобразрвание Шварца» обозначает конкретную идиому, но никак не алгоритм в целом.
+
+The Schwartzian Transform is a version of a [[Lisp programming language|Lisp]] idiom known as ''decorate-sort-undecorate'', which avoids recomputing the sort keys by temporarily associating them with the  input items. This approach is similar to [[memoization]], which avoids repeating the calculation of the key corresponding to a specific input value. By comparison, this idiom assures that each input item's key is calculated exactly once, which may still result in repeating some calculations if the input data contains duplicate items. And in the 1960s sort generators<ref>[[Donald Knuth]], ''[[The Art of Computer Programming]]'', volume 3 ''Sorting and Searching'', section 5.4.6 subsection Sort generators, first edition, 1973, ISBN 0-201-03803-X, page 342</ref> "own coding" features facilitated similar input/output transformations for ease of comparing records (among other things).
+
+==The Perl idiom==
+The general form of the Schwartzian Transform is:
+
+<source lang="perl">
+@sorted = map  { $_->[0] }
+          sort { $a->[1] cmp $b->[1] }
+          map  { [$_, foo($_)] }
+               @unsorted;
+</source>
+
+Where foo($_) represents an expression that takes $_ (each item of the list in turn) and produces the corresponding value that is to be compared in its stead.
+
+Reading from right to left (or from the bottom to the top):
+* the original list @unsorted is fed into a map operation that wraps each item into a (reference to an anonymous 2-element) array consisting of itself and the calculated value that will determine its sort order (list of item becomes a list of [item=>value]);
+* then the list of lists produced by map is fed into sort, which sorts it according to the values previously calculated (list of [item, value] => sorted list of [item, value]);
+* finally, another map operation unwraps the values (from the anonymous array) used for the sorting, producing the items of the original list in the sorted order (sorted list of [item, value] => sorted list of item).
+
+The use of anonymous arrays ensures that memory will be reclaimed by the Perl garbage collector immediately after the sorting is done.
+
+The computational savings obtained by the Schwartzian transform depend strongly on the structure of the inner function.  For an efficient ordinary sort function, the number of invocations of the transform function goes from an average of <math>2n\log n</math> to <math>n</math>; one should carefully consider on a case-by-case basis whether the extra implementation complexity is justified by this efficiency saving.
+
+==Example==
+
+For example, to sort a list of files by their modification times, a naive approach might be as follows:
+
+<code>
+  '''function''' naiveCompare(file a, file b) {
+      '''return''' modificationTime(a) < modificationTime(b)
+  }
+  
+  ''// Assume that sort(list, comparisonPredicate) sorts the given list using''
+  ''// the comparisonPredicate to compare two elements.''
+  sortedArray := sort(filesArray, naiveCompare)
+</code>
+
+Unless the modification times are memoized for each file, this method requires their re-computing every time a file is compared in the sort. Using the Schwartzian transform, the modification time is calculated only once per file.
+
+A Schwartzian transform involves the functional idiom described above, which does not use temporary arrays.
+
+The same algorithm can be written procedurally to better illustrate how it works, but this requires using temporary arrays, and is not a Schwartzian transform. The following example pseudo-code implements the algorithm in this way:
+
+<code>
+  '''for each''' file '''in''' filesArray
+      insert array(file, modificationTime(file)) at end of transformedArray
+  
+  '''function''' simpleCompare(array a, array b) {
+      '''return''' a[2] < b[2]
+  }
+  
+  transformedArray := sort(transformedArray, simpleCompare)
+  
+  '''for each''' file '''in''' transformedArray
+      insert file[1] at end of sortedArray
+</code>
+
+==History==
+
+The first known online appearance of the Schwartzian Transform is a December 16, 1994 [http://groups.google.com/group/comp.unix.shell/browse_frm/thread/31da970cebb30c6d?hl=en posting by Randal Schwartz] to a thread in [[comp.unix.shell]], crossposted to [[comp.lang.perl]]. (The current version of the [http://history.perl.org/PerlTimeline.html Perl Timeline] is incorrect and refers to a later date in 1995.) The thread began with a question about how to sort a list of lines by their "last" word:
+
+<code>
+  adjn:Joshua Ng
+  adktk:KaLap Timothy Kwong
+  admg:Mahalingam Gobieramanan
+  admln:Martha L. Nangalama
+</code>
+
+Schwartz responded with:
+
+<source lang="perl">
+#!/usr/bin/perl
+require 5; # new features, new bugs!
+print
+    map { $_->[0] }
+    sort { $a->[1] cmp $b->[1] }
+    map { [$_, /(\S+)$/] }
+    <>; 
+</source>
+
+This code produces the result:
+
+<code>
+  admg:Mahalingam Gobieramanan
+  adktk:KaLap Timothy Kwong
+  admln:Martha L. Nangalama
+  adjn:Joshua Ng
+</code>
+
+Schwartz noted in the post that he was "Speak[ing] with a lisp in Perl," a reference to the idiom's [[Lisp (programming language)|Lisp]] origins.
+
+The term "Schwartzian Transform" itself was coined by [[Tom Christiansen]] in a followup reply.  Later posts by Christiansen made it clear that he had not intended to ''name'' the construct, but merely to refer to it from the original post: his attempt to finally name it "The Black Transform" did not take hold ("Black" here being a pun on "schwar[t]z", which means black in German).
+
+==References==
+<references/>
+
+==External links==
+{{Wikibooks|Algorithm implementation|Sorting/Schwartzian transform|Schwartzian transform}}
+*[http://www.stonehenge.com/merlyn/UnixReview/col64.html Sorting with the Schwartzian Transform by Randal L. Schwartz]
+*[http://perl.plover.com/TPC/1998/Hardware-notes.html#Schwartzian_Transform Mark-Jason Dominus explains the Schwartzian Transform]
+* http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/52234
+* Python Software Foundation ([[2005]]). [http://www.python.org/doc/faq/programming/#i-want-to-do-a-complicated-sort-can-you-do-a-schwartzian-transform-in-python 1.5.2   I want to do a complicated sort: can you do a Schwartzian Transform in Python?]. Retrieved June 22, 2005.
+*[http://search.cpan.org/dist/Memoize/Memoize.pm Memoize Perl module - making expensive functions faster by caching their results.]
+
+[[Category:Programming idioms]]
+[[Category:Sorting algorithms]]
+[[Category:Articles with example Perl code]]
+[[Category:Perl]]
+
+[[ca:Transformada schwartziana]]
+

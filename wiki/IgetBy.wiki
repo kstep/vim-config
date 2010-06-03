@@ -1,0 +1,6 @@
+http://www.iget.by/shared.htm
+page=digit
+tagid=id,...
+search=string
+category=digit
+sort=digit

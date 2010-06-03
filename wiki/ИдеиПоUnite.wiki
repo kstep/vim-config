@@ -1,0 +1,2 @@
+
+    1. Добавить цели build (stopserver, prebuildbackup, loadfiles, cleartmplfiles, upgradedb, startserver), prebuildbackup (база и файлы), cleartmplfiles (data/templates).

@@ -1,0 +1,64 @@
+
+
+    * Список файлов,
+    * Расширенная информация о файле (например теги для мп3, метаинфо о видефайлах),
+    * Миниатюры,
+    * Возможность запускать программу на группу файлов,
+    * Возможность отображать заданный список файлов, полученный из программы,
+    * Дерево файлов,
+    * Закладки,
+    * Выполнение команд при некоторых условиях (например заход в каталог -> запуск команды на монтирование).
+
+    1. Получение метаинформации: запуск внешней программы с именем файла на входе и списком атрибутов на выходе,
+    например:
+{{{
+#!vim
+autocmd ReadMetaData *.mp3 set metaformat=\(\w\+\)\s*:\s\+\(.{-1,}\) | !id3v2 -R <sfile>
+autocmd WriteMetaData *.mp3 !id3v2 <meta> <sfile>
+}}}
+
+    2. Миниатюры аналогично:
+{{{
+#!vim
+autocmd ShowThumbnail *.pdf !evince-thumbnailer -s <size> <sfile> <tfile>
+}}}
+
+    3. Фильтрация командой:
+{{{
+#!vim
+:!find . -name "*.<cfile>:e" -type f " поиск файлов с расширением из текущего
+:!cat ~/filelist.txt " показать только файлы из списка
+:!ls -l | sort -n -k 5 -r " отсортировать по убыванию размера
+:set sort=size sortasc " то же замое средствами самого файл-менеджера
+:%!sed -i.bak -e 's/one/two/g' <cfile> " заменить во всех выбранных файлах строку one на two
+:%!test ! -d <cfile> " скрыть все каталоги
+:set visible=?not(~d) " то же средствами файл-менеджера
+:%!grep -v \.txt$ " скрыть все текстовые файлы
+}}}
+
+    4. Поиск с заменой:
+{{{
+#!vim
+:%s/one/two/gc " заменить во всех именах показанных файлов строку one на two
+}}}
+
+    5. Команда на событие:
+{{{
+#!vim
+autocmd DirEnter remote/ssh/* !sshfs <sfile>:t: <sfile>:p
+autocmd DirLeave remote/ssh/* !sudo umount <sfile>:p
+autocmd FileRun *.txt !gvim <sfile>:p
+autocmd FileEnter *.zip !fuse-zip <sfile>:p <sfile>:d " смонтировать архив в каталог
+autocmd FileLeave *.zip !fusermount -u <sfile>:d " размонтировать архив
+autocmd DirMovedIn * ... " файл из каталога
+autocmd DirMovedOut * ... " файл в каталоге
+autocmd DirCreated * ... " каталог создан
+autocmd FileCreated * ... " файл создан
+autocmd FileMoved * ... " файл перемещён
+autocmd FileRemoved * ... " файл удалён
+autocmd DirMoved * ... " каталог перемещён
+autocmd DirRemoved * ... " каталог удалён
+}}}
+
+
+

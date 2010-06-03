@@ -1,0 +1,153 @@
+
+= Структура данных =
+
+== Обозначения ==
+
+    * <role> — экземпляр, подставляется реальное имя сущности,
+    * [role] — символьная ссылка на данную сущность с именем этой сущности,
+    * owner->[role] — символьная ссылка с именем owner на данную сущность,
+    * roles/ — имя каталога (/ в конце),
+    * when — имя файла (без / в конце),
+    * data.sql? — (? в конце) ещё не решено, как именно это реализовать, да и нужно ли.
+
+== Дерево ==
+
+ * / ($fusqlfs)
+    * roles/<role>/ ($fusqlfs->{"roles"}->get($role))
+        * owner->[role] (->{"owner"})
+        * owned/ (->{"owned"})
+            * tables/[table] (->{"tables"}->{$table})
+            * views/[view] (->{"views"}->{$view})
+            * roles/[role] (->{"roles"}->{$role})
+            * functions/[function] (->{"functions"}->{$function})
+        * password
+        * permissions/<permission>/ (->{"permissions"}->get($role, $permission) | ->{"permissions"}->{$permission})
+            * tables/[table] (->{"tables"}->{$table})
+            * views/[view] (->{"views"}->{$view})
+            * functions/[function] (->{"functions"}->{$function})
+        * create.sql
+    * tables/<table>/ ($fusqlfs->{"tables"}->get($table))
+        * struct/<field> (->{"struct"}->get($table, $field))
+        * indices/<index>/ (->{"indices"}->get($table, $index))
+            * [field] (->{$field})
+        * data/<id> (->{"data"}->get($table, $id))
+        * triggers/<trigger>/ (->{"triggers"}->get($table, $trigger))
+            * [function] (->{"function"})
+            * when (before/after insert/delete/update for each row/statement)
+            * create.sql
+        * create.sql
+        * owner->[role] (->{"owner"})
+        * data.sql?
+    * views/<view>/ ($fusqlfs->{"views"}->get($view))
+        * data.sql
+        * create.sql
+        * owner->[role] (->{"owner"})
+        * tables/[table] (->{"tables"}->{$table})
+    * functions/<function>/ ($fusqlfs->{"functions"}->get($function))
+        * create.sql
+        * owner->[role] (->{"owner"})
+        * call
+    * query.sql
+    * queries/<query> (->{"queries"}->get($query))
+
+== Черновик структуры ==
+
+ * / 
+    * roles/<role>/ $_->{'roles'}->list(), $o = $_->{'roles'}->get($role), $o == { 'owner' => \"...", 'owned' => {'tables' => [...], ...}, 'password' => sub, 'permissions' => { 'select' => { 'tables' => [...], ...} }, 'create.sql' => "..." }
+        * owner->[role] 
+        * owned/ 
+            * tables/[table] 
+            * views/[view] 
+            * roles/[role] 
+            * functions/[function] 
+        * password
+        * permissions/<permission>/ 
+            * tables/[table] 
+            * views/[view] 
+            * functions/[function] 
+        * create.sql
+    * tables/<table>/ $_->{'tables'}->list(), $_->{'tables'}->get($table) == { 'struct' => mod, 'indices' => mod, 'data' => mod, 'triggers' => mod, 'owner' => "...", data.sql => sub }
+        * struct/<field> $_->{'tables'}->get($table)->{'struct'} ->list($table) | ->get($table, $field) == { '.'=>'.', ... }
+        * indices/<index>/  ->{'indices'}->list($table)->get($table, $index)
+            * [field] 
+        * data/<id>
+        * triggers/<trigger>/ ->{'triggers'} ->list($table)|->get($table, $trigger)
+            * [function]
+            * when
+            * create.sql
+        * create.sql
+        * owner->[role] 
+        * data.sql?
+    * views/<view>/ ->{'views'}->get($view)
+        * data.sql
+        * create.sql
+        * owner->[role] 
+        * tables/[table] ->{'views'}->get($view)->{'tables'}->{$table}
+    * functions/<function>/ ->{'functions'}->get($function)->{'call'}->sub($function, $data)
+        * create.sql
+        * owner->[role] 
+        * call
+    * query.sql
+    * queries/<query> 
+
+    1. Модуль — активный каталог, листинг ->list(все имена полученные get-ом в предыдущих модулях), элемент ->get(все имена полученные get-ом в предыдущих модулях, имя для получения в этом модуле)
+    2. Скаляр — символьная ссылка, если не содержит подстрок ".." или "/", то это объект в модуле с именем по тому ключу в хеше, по которому находится ссылка,
+    3. Хеш или массив — статический каталог: ключи = имена, значения = содержимое, для массива содержимое совпадает с именами (обычно массив ссылок),
+    4. Процедура — файл для записи-чтения, вызов: ->(все имена из get-а предыдущих модулей, данные для записи, возвращённое значение можно прочитать на выходе,
+    5. Хеш с элементом "." — файл, запись с помощью вышестоящего модуля через ->set(...), чтение — дамп данных ямлом.
+
+= Интерфейс модулей =
+
+- $indices ----------------------------------|
+$fusqlfs->{'tables'}->get($table)->{'indices'}->get($table, $index) — каталог,
+$fusqlfs->{'tables'}->get($table)->{'struct'}->get($table, $field) — файл.
+- $struct ----------------------------------|
+
+$indices->drop($table, $index) => rmdir("/tables/$table/indices/$index"),
+$struct->drop($table, $field) => unlink("/tables/$table/struct/$field").
+
+$indices->store($table, $index, $data) => symlink|unlink("/tables/$table/indices/$index/$field")
+$struct->store($table, $field, $data) => open/write/flush("/tables/$table/struct/$field")
+
+
+    * ::list() — список объектов,
+    * ::get($name) — hashref с описанием объекта по его имени,
+    * ::create($name[, $hashref]) — создать пустой объект с заданным именем,
+    * ::drop($name) — удалить объект по имени,
+    * ::rename($name, $newname) — переименовать объект,
+    * ::store($name, $hashref) — записать объект из его данных в виде hashref (создать если надо),
+    * ::set_owner($name, $role) — установить владельца объекта,
+    * ::get_sql($name[, $hashref]) — получить SQL-выражение для создания этого объекта
+        (данные либо из hashref, либо напрямую из базы по имени),
+    * ::get_perms($name, $role) — список прав на объект для данной роли,
+    * ::grant($name, $role, $action) — дать право роли role на действие action для объекта с данным именем,
+    * ::revoke($name, $role, $action) — то же, что и grant(), но отобрать право,
+    * ::$has_files — если истина, то хеши, полученные методом get(), считаются файлами, инача — каталогами.
+
+= Возможный интерфейс с использованием Fuse::Simple =
+
+    * / = { 'tables' => sub, 'roles' => sub, 'views' => sub, 'functions' => sub, 'query.sql' => sub, queries => sub }
+        * {'tables'}->() = map { $_ => { 'indices' => sub, 'struct' => sub, 'data' => sub, 'triggers' => sub, 'create.sql' => sub, 'owner' => \"../../roles/<role>", 'data.sql' => sub } } list_tables()
+        * {'roles'}->() = map { $_ => { 'owner' => \"../<role>", 'owned' => { 'tables' => sub, 'views' => sub, 'roles' => sub, 'functions' => sub }, 'password' => sub, 'permissions' => { 'select' => sub, ... }, 'create.sql' => sub } } list_roles()
+        * ...
+
+Минус такого подхода: на каждую таблицу, вьюшку, роль и т.д. будет создано по хешу с абсолютно одинаковыми ключами и фактически одинковыми кодрефами (отличатся будут только взятыми в замыкание переменными), а это достаточно большие издержки по памяти, особенно для больших БД.
+
+Плюс такого подхода: относительная простота реализации, с учётом того, что Fuse::Simple берёт на себя большинство забот по общению с фьюзом на низком уровне.
+
+Почему я не смогу использовать Fuse::Simple (увы):
+
+NOTES
+       Most things apart from coderefs can't be written, and nothing can be renamed, chown()ed, deleted, etc. This is not considered a bug, but I reserve the right to add something clever in a later release :-)
+
+Для меня это не приемлемо, т.к. мне необходима поддержка переименований, удалений и созданий.
+
+= Цели и задачи =
+
+Мне нужно:
+    1. Отделить метаданные о структуре каталогов от метаданных о таблице.
+        * для того, чтобы можно было легко расширять структуру каталогов новыми модулями для работы с объектами БД,
+        * для того, чтобы можно было легко адаптировать всю систему для работы с новой БД с минимальным переписыванием кода.
+    Таким образом нужно две структуры:
+        1. Структура, описывающая подключённые модули работы с объектами в БД, их размещение в структуре каталогов и зависимости друг с другом,
+        2. Отдельные структуры, хранящие метаинформацию о конкретных объектах в БД, достаточно ценную и быстрообрабатываемую для отдельного кеширование.

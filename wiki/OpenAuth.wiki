@@ -1,0 +1,14 @@
+
+== Facebook ==
+
+    1. authorization_url: https://graph.facebook.com/oauth/authorize?client_id=:client_id&redirect_uri=:callback_uri
+        * :callback_uri?code=:code
+    2. access_token_url: https://graph.facebook.com/oauth/access_token?client_id=:client_id&redirect_uri=:callback_uri&client_secret=:client_secret&code=:code
+        * :callback_uri?access_token=:access_token (???)
+    3. access_url: https://graph.facebook.com/me?access_token=:access_token
+
+    1. Юзер жмёт кнопку «авторизоваться на FB».
+    2. Юзер редиректиться на authorization_url (https://graph.facebook.com/oauth/authorize?client_id=:client_id&redirect_uri=:callback_uri),
+        где он вводит свои логин и пароль и редиректиться обратно на нас на callback_uri,
+    3. Мы получаем code,
+
