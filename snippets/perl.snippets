@@ -7,7 +7,8 @@ snippet .
 	 =>
 # Function
 snippet sub
-	sub ${1:function_name} {
+	sub ${1:function_name}
+	{
 		${2:#body ...}
 	}
 # Conditional
@@ -74,18 +75,29 @@ snippet xfore
 # Package
 snippet cl
 	package ${1:ClassName};
+	use base '${2:ParentClass}';
 	
-	use base qw(${2:ParentClass});
-	
-	sub new {
+	sub new
+	{
 		my $class = shift;
-		$class = ref $class if ref $class;
-		my $self = bless {}, $class;
-		$self;
+		my $self = {};
+		
+		${3:#Body}
+		
+		bless $self, $class;
 	}
 	
-	1;${3}
+	1;${4}
 # Read File
 snippet slurp
 	my $${1:var};
 	{ local $/ = undef; local *FILE; open FILE, "<${2:file}"; $$1 = <FILE>; close FILE }${3}
+
+# Inline test
+snippet test
+	=begin testing ${1:name}
+
+	${2:# body}
+
+	=end testing
+	=cut
