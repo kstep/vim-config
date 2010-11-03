@@ -23,17 +23,20 @@ set spelllang=en,ru
 set iminsert=0
 set imsearch=0
 set incsearch
+set hlsearch
 set grepprg=find\ %:p:h\ -xdev\ -name\ '*.%:e'\ -exec\ grep\ -Hn\ $*\ \{}\ +
 set diffopt=filler,vertical
 
 set tabstop=8
 set shiftwidth=4
 set softtabstop=4
+set colorcolumn=120
 set smarttab
 set expandtab
 set autoindent
 set smartindent
 set listchars=tab:»\ ,eol:¶,trail:·,precedes:…,extends:…
+set backspace=start,eol,indent
 
 set foldmethod=marker
 set foldlevelstart=1
@@ -54,6 +57,8 @@ set wildmenu
 set modeline
 set nobackup nowritebackup
 set noswapfile
+set undofile
+set undodir=~/.vim/undofiles
 
 " }}}
 
