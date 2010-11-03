@@ -1,6 +1,7 @@
 .*
 update/*
 doc/tags
+bundle/*/doc/tags
 doc/*.dat
 undofiles/*
 git*
