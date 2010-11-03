@@ -90,6 +90,14 @@ fun! TableToModel()
     '<,'>s/^\s*)\s*$//e
 endfun
 
+" a:1 - lang
+fun! ScanText(...)
+    let lang = exists('a:1') ? a:1 : 'ruseng'
+    setl enc=latin1
+    exec 'read !cuneiform -f smarttext -l '.lang.' -o /dev/stdout <(scanimage --format=tiff --resolution=300dpi --mode=Gray)'
+    setl enc=utf8
+endfun
+
 fun! MigrateScript()
     if !exists('g:project_dir') || empty(g:project_dir)
         echoerr "Set g:project_dir to project directory in order to create new migration script!"
