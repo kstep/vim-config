@@ -1,3 +1,21 @@
+=== Проекты ===
+
+    * DvkByЗадачи
+
+=== Разное ===
+
+
+    * DbusCron
+    * TmpX
+    * ПочтаНаUniteTest
+
+    * ЗаявлениеНаЗагранпаспорт
+
+    * UniteСпекаПоФидам
+    * UniteVotings
+    * UniteRatings
+
+    * UniteOAuthUserManual
 
     * БольшаяВики
 
@@ -29,7 +47,10 @@
     * СмыслМонад
 
     * FusqlFS
+    * PurpleFS
     * IgetBy
+
+    * ГурьевскаяКаша
 
 = Текущие задачи =
 
@@ -122,3 +143,19 @@ FROM profiles_vs_tags JOIN profiles_vs_tags AS profiles_vs_tags_1 ON profiles_vs
 WHERE profiles_vs_tags.object_id = :object_id_1 AND profiles_vs_tags_1.object_id != :object_id_2 AND communities_vs_tags.tag_id IS NULL GROUP BY soc_ts_tags.name, profiles_vs_tags_1.tag_id ORDER BY count(profiles_vs_tags_1.tag_id) DESC 
  LIMIT 5
 }}}
+
+
+
+
+{{{
+#!sql
+
+select * from oauth_vs_users;
+select * from openid_vs_users;
+
+}}}
+
+
+
+
+

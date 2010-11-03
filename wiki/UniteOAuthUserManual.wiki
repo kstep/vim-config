@@ -1,0 +1,154 @@
+== Russian ==
+
+Unite реализует [[http://github.com/theRazorBlade/draft-ietf-oauth/raw/master/draft-ietf-oauth-v2.txt|OAuth 2.0]] для авторизации внешних сервисов. Для того, чтобы ваше приложение могло авторизоваться в Unite, его необходимо зарегистрировать на странице [[http://unite.com/oauth/manage|Управления OAuth-сервисами]]. Имя сервиса нужно только для вас, чтобы вы могли различать свои сервисы, URL сервиса используется системой для проверки корректности запросов во время авторизации и должен быть базовым для URL-а, заданного в '''redirect_uri'''.
+
+После регистрации сервиса вам будут выданы два параметра: '''client_id''' и '''client_secret'''. Берегите их и никому не показывайте, в особенности '''client_secret'''.
+
+Для авторизации пользователя Unite в вашем онлайн-приложении оно должно совершить три шага:
+
+    1. Отредиректить пользователя на специальную страницу авторизации на сервере Unite,
+    2. дождаться возвращения пользователя с нашей страницы авторизации с кодом подтверждения авторизации,
+    3. обменять код авторизации на '''access token''' запросом на сервер Unite.
+
+После этого '''access token''' может быть использован для доступа к различным данным авторизовавшегося пользователя Unite через Unite API. 
+
+Вам понадобятся следующие ссылки:
+
+    1. http://unite.com/oauth/authorize — для авторизации пользователя,
+    2. http://unite.com/oauth/access_token — для обмена кода авторизации на '''access token''',
+    3. http://unite.com/oauth/user_info — единственный, пока что, доступный вызов Unite API для получения информации о пользователе.
+
+Разберём процесс на простом примере.
+
+Предположим, что вы зарегистрировали своё онлайн-приложение под именем ''Мой сайт'' c URL-ом ''http://example.com/'' и вам выдали '''client_id''' ''17'' и '''client_secret''' ''a4d0b58f7f61a84921681dd9960f54da''.
+
+Теперь в вам пришёл пользователь Unite и хочет авторизоваться. Вы выдаёте ему обычный HTTP-редирект:
+
+{{{
+302 Redirect
+Location: http://unite.com/oauth/authorize?type=web_server&client_id=17&redirect_uri=http://example.com/oauth/verified
+}}}
+
+Как видите пока всё просто. Обратите внимание, однако, на параметр ''redirect_uri'': он должен начинаться на строку, заданную в URL-е сайта, который вы указали при регистрации своего приложения.
+
+Кроме того вы можете указать в том же запросе опциональный параметр ''state'':
+
+{{{
+Location: http://unite.com/oauth/authorize?type=web_server&client_id=17&redirect_uri=http://example.com/oauth/verified&state=123
+}}}
+
+Он никак не обрабатывается сервером Unite и просто возвращается к вам в первозданном виде, так что можете его использовать для хранения своего сессионного ключа, например.
+
+После того, как пользователь попал на нашу страницу и авторизовался, сервер Unite выдаст пользователю редирект на страницу вашего приложения, указанную в ''redirect_uri'', дополнив этот URL параметром ''code''. В нашем случае это будет что-то такое:
+
+{{{
+http://example.com/oauth/verified?code=f23bf098f0526dda8ae6e6b4fe531523b20271c25b717005fb6ae8dc4d16c590&state=123
+}}}
+
+Итак, вы получили секретный одноразовый ''code'', который теперь необходимо обменять на '''access token'''. Для этого ваше приложение должно выполнить такой запрос к http://unite.com/oauth/access_token:
+
+{{{
+POST http://unite.com/oauth/access_token
+
+type=web_server&client_id=17&client_secret=a4d0b58f7f61a84921681dd9960f54da&code=f23bf098f0526dda8ae6e6b4fe531523b20271c25b717005fb6ae8dc4d16c590&redirect_uri=http://example.com/oauth/verified
+}}}
+
+Здесь ''redirect_uri'' должен совпадать с тем, что вы передали пользователю в первом редиректе на наш сервер.
+
+Если всё прошло успешно, наш сервер ответит таким JSON-документом:
+
+{{{
+{"access_token": "0cfb3ef24c1cbb9995f17ad1a8c59ee05b290e6b87215c89b252195b71fc0203", "expires_in": 3600}
+}}}
+
+Где '''access_token''' именно то, что вам понадобится для доступа к ресурсам Unite от имени авторизовавшего пользователя Unite, а '''expires_in''' — число секунд, через которое истечёт время действия этого token-а, после чего придётся повторить процесс и получить новый '''access token'''.
+
+Теперь вы можете послать запрос для получения данных об авторизовавшемся пользователе:
+
+{{{
+GET http://unite.com/oauth/user_info?access_token=0cfb3ef24c1cbb9995f17ad1a8c59ee05b290e6b87215c89b252195b71fc0203
+}}}
+
+В ответ, если всё пройдёт успешно, вы получите такой JSON-документ:
+
+{{{
+{"id": 12345, "profile_id": 45678, "sex": "M", "type": 2, "name": "nickname"}
+}}}
+
+
+== English ==
+
+Unite implements [[http://github.com/theRazorBlade/draft-ietf-oauth/raw/master/draft-ietf-oauth-v2.txt|OAuth 2.0]] protocol to authorize external web-applications. At first you must register your application at the [[/oauth/manage|OAuth services management]] page and get a pair of '''client_id''' and '''client_secret''', which you should keep safe from other world (especially '''client_secret'''). Service name is up to you, so you can indentify each of your services in common list, while service URL must be base URL for '''redirect_uri''' parameter (mentioned below) for security reasons.
+
+In order to authorize Unite user at your web-application, it must follow three simple steps:
+
+    1. Redirect user to special Unite authorization page,
+    2. wait for user to come back from this page with special secret session code,
+    3. exchange this code for '''access token''' with another request to Unite authorization server.
+
+After you get this '''access token''' you can make different Unite API requests on bahalf of authorized Unite user.
+
+You will need following URLs:
+
+    1. http://unite.com/oauth/authorize — to redirect Unite user for authorization,
+    2. http://unite.com/oauth/access_token — to exchange session code for '''access token''',
+    3. http://unite.com/oauth/user_info — the only Unite API call available at the moment used to get authorized Unite user info.
+
+Let's walk through process in a small tutorial.
+
+Let's imagine for the moment you registered your web-application (presumably Web site) with name ''My site'' and URL ''http://example.com'' and you got a pair of '''client_id''' of ''17'' and '''client_secret''' of ''a4d0b58f7f61a84921681dd9960f54da''.
+
+Now imagine that Unite user have came to your Web site and wants to authorize with her Unite login. You give him simple HTTP-redirect:
+
+{{{
+302 Redirect
+Location: http://unite.com/oauth/authorize?type=web_server&client_id=17&redirect_uri=http://example.com/oauth/verified
+}}}
+
+Please note ''redirect_uri'' parameter must be based upon service URL you've given to Unite when you registered your service.
+
+Besides that you can pass optional ''state'' parameter:
+
+{{{
+Location: http://unite.com/oauth/authorize?type=web_server&client_id=17&redirect_uri=http://example.com/oauth/verified&state=123
+}}}
+
+This parameter is not processed by Unite in any way (not even stored anywhere) and is just passed through back to your web-application, so you can use it for your session key or any other data you might think of.
+
+After user is authorized at our page, Unite redirects her back to your application, using URL given in ''redirect_uri'' parameter and appending it with additional GET parameters:
+
+{{{
+http://example.com/oauth/verified?code=f23bf098f0526dda8ae6e6b4fe531523b20271c25b717005fb6ae8dc4d16c590&state=123
+}}}
+
+Here you've got secret session one-time ''code'', and now you must exchange it for '''access token'''. To do it you must invoke Unite server with following POST request to http://unite.com/oauth/access_token:
+
+{{{
+POST http://unite.com/oauth/access_token
+
+type=web_server&client_id=17&client_secret=a4d0b58f7f61a84921681dd9960f54da&code=f23bf098f0526dda8ae6e6b4fe531523b20271c25b717005fb6ae8dc4d16c590&redirect_uri=http://example.com/oauth/verified
+}}}
+
+Here ''redirect_uri'' must match the one you passed to Unite in your first user redirect.
+
+If everything is OK you should get the following JSON document:
+
+{{{
+{"access_token": "0cfb3ef24c1cbb9995f17ad1a8c59ee05b290e6b87215c89b252195b71fc0203", "expires_in": 3600}
+}}}
+
+Here '''access_token''' is the thing you will need to access Unite resources on behalf of authorized Unite user, and '''expires_in''' is the number of seconds this token will be valid, after this time you must get another '''access token''' in order to go on with your session.
+
+Now you can request user data with following Unite API request:
+
+{{{
+GET http://unite.com/oauth/user_info?access_token=0cfb3ef24c1cbb9995f17ad1a8c59ee05b290e6b87215c89b252195b71fc0203
+}}}
+
+And again, if everything's OK, you will get the following JSON document:
+
+{{{
+{"id": 12345, "profile_id": 45678, "sex": "M", "type": 2, "name": "nickname"}
+}}}
+
+

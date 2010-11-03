@@ -1,0 +1,16 @@
+
+    * bus: system=S|session=s|*,
+    * type: signal=s|call=c|return=r|error=e|*,
+    * class: *|dbus.class,
+    * iface: *|dbus.iface,
+    * path: *|/dbus/iface
+    * member: *|member
+    * program: shell command
+
+== Идеи ==
+
+    * обработка сигнала HUP: перечитывание конфига,
+    * логгинг, несколько уровней:
+        0. нет логгинга,
+        1. логгинг пойманных событий,
+        2. логгинг всех событий.

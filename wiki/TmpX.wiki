@@ -1,0 +1,12 @@
+
+686, 233, 778
+
+789
+
+SELECT blogs.id AS blogs_id, blogs.create_date AS blogs_create_date, blogs.update_date AS blogs_update_date, blogs.owner_id AS blogs_owner_id, blogs.owner_type AS blogs_owner_type, blogs.title AS blogs_title, blogs.description AS blogs_description, blogs.author_id AS blogs_author_id, blogs.editor_id AS blogs_editor_id, blogs.subcategory_id AS blogs_subcategory_id, blogs.category_id AS blogs_category_id 
+FROM blogs 
+WHERE blogs.author_id = 3 OR blogs.id IN (SELECT blogs_vs_pgroups.object_id 
+FROM blogs_vs_pgroups LEFT OUTER JOIN profile_groups_by_profile ON (idx(profile_groups_by_profile.profile_groups_id, blogs_vs_pgroups.group_id) > 0) 
+WHERE (profile_groups_by_profile.profile_id = 3 OR blogs_vs_pgroups.type IN (99,100)) AND ((blogs_vs_pgroups.mask & 4) != 0)) OR blogs.owner_id = 3 AND blogs.owner_type = 1 ORDER BY (SELECT count(blog_entries.id)
+FROM blog_entries 
+WHERE blog_entries.blog_id = blogs.id) DESC

@@ -1,0 +1,24 @@
+File '<string>', line 2 in register_submit
+File '/usr/lib/pymodules/python2.5/pylons/decorators/__init__.py', line 207 in wrapper
+  return func(self, *args, **kwargs)
+File '/var/unite_dev/revisions/g7bcf050/unite/controllers/openauth/oauth.py', line 187 in register_submit
+  self.__send_activate_email(user, oauth)
+File '/var/unite_dev/revisions/g7bcf050/unite/controllers/openauth/oauth.py', line 193 in __send_activate_email
+  oauth_info=oauth)
+File '/var/unite_dev/revisions/g7bcf050/unite/lib/mail/message.py', line 240 in send_letter
+  message.send()
+File '/var/unite_dev/revisions/g7bcf050/unite/lib/mail/message.py', line 166 in send
+  return self.get_connection(fail_silently).send_messages([self])
+File '/var/unite_dev/revisions/g7bcf050/unite/lib/mail/backends/smtp.py', line 80 in send_messages
+  new_conn_created = self.open()
+File '/var/unite_dev/revisions/g7bcf050/unite/lib/mail/backends/smtp.py', line 43 in open
+  local_hostname=DNS_NAME.get_fqdn())
+File '/usr/lib/python2.5/smtplib.py', line 244 in __init__
+  (code, msg) = self.connect(host, port)
+File '/usr/lib/python2.5/smtplib.py', line 310 in connect
+  raise socket.error, msg
+error: (111, '\xd0\x92 \xd1\x81\xd0\xbe\xd0\xb5\xd0\xb4\xd0\xb8\xd0\xbd\xd0\xb5\xd0\xbd\xd0\xb8\xd0\xb8 \xd0\xbe\xd1\x82\xd0\xba\xd0\xb0\xd0\xb7\xd0\xb0\xd0\xbd\xd0\xbe')
+
+>>> print '\xd0\x92 \xd1\x81\xd0\xbe\xd0\xb5\xd0\xb4\xd0\xb8\xd0\xbd\xd0\xb5\xd0\xbd\xd0\xb8\xd0\xb8 \xd0\xbe\xd1\x82\xd0\xba\xd0\xb0\xd0\xb7\xd0\xb0\xd0\xbd\xd0\xbe'
+В соединении отказано
+

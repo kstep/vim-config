@@ -21,6 +21,8 @@
             * roles/[role] (->{"roles"}->{$role})
             * functions/[function] (->{"functions"}->{$function})
         * password
+        * acl/<kind>/
+            * [<kind>]
         * permissions/<permission>/ (->{"permissions"}->get($role, $permission) | ->{"permissions"}->{$permission})
             * tables/[table] (->{"tables"}->{$table})
             * views/[view] (->{"views"}->{$view})
