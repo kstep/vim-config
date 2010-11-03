@@ -1,6 +1,8 @@
 " .vimrc file
 
 " Basic config & plugins loading {{{
+call pathogen#runtime_append_all_bundles()
+
 syntax on
 filetype plugin on
 filetype indent on
