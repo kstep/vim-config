@@ -5,6 +5,7 @@ errormarker-changelog	errormarker.txt	/*errormarker-changelog*
 errormarker-credits	errormarker.txt	/*errormarker-credits*
 errormarker-customization	errormarker.txt	/*errormarker-customization*
 errormarker-usage	errormarker.txt	/*errormarker-usage*
+errormarker_disablemappings	errormarker.txt	/*errormarker_disablemappings*
 errormarker_errorgroup	errormarker.txt	/*errormarker_errorgroup*
 errormarker_erroricon	errormarker.txt	/*errormarker_erroricon*
 errormarker_errortext	errormarker.txt	/*errormarker_errortext*
