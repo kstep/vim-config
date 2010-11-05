@@ -290,15 +290,7 @@ let g:user_zen_settings = { 'mako': { 'extends': 'html' } }
 " }}}
 
 " Custom highlighting {{{
-colorscheme earendel
-set background=dark
-if &term == 'screen'
-    "let &t_SI = '[4h'
-    "let &t_EI = '[4l'
-elseif &term == 'rxvt-256color'
-    "let &t_SI = ']12;orange'
-    "let &t_EI = ']12;green'
-endif
+colorscheme molokai
 " }}}
 
 " vim: set ft=vim :
