@@ -15,6 +15,15 @@ let g:vimwiki_rxCode = '`[^`]\+`'
 let g:vimwiki_rxHR = '^-\{4,}$'
 let g:vimwiki_rxDelText = '\~\~[^~]\+\~\~'
 
+let g:vimwiki_char_bold = "'''"
+let g:vimwiki_char_italic = "''"
+let g:vimwiki_char_bolditalic = "'''''"
+let g:vimwiki_char_italicbold = "'''''"
+let g:vimwiki_char_code = "`"
+let g:vimwiki_char_deltext = '\~\~'
+let g:vimwiki_char_subscript = ',,'
+let g:vimwiki_char_superscript = '^'
+
 let g:vimwiki_rxH1 = '^=\{1} [^=]\+ =\{1}$'
 let g:vimwiki_rxH2 = '^=\{2} [^=]\+ =\{2}$'
 let g:vimwiki_rxH3 = '^=\{3} [^=]\+ =\{3}$'
