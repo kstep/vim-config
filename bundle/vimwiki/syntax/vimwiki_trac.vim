@@ -47,7 +47,7 @@ let g:vimwiki_rxPreEnd = '^}}}$'
 
 syn region wikiPreCode matchgroup=wikiCodeQuote start="^{{{$" end="^}}}$" contains=@wikiCodeLang fold
 
-for wikilang in ['python', 'perl', 'php', 'c', 'crontab', 'sh', 'zsh', 'cpp', 'sql', 'ruby', 'lisp', 'scheme', 'javascript', 'vim']
+for wikilang in ['python', 'perl', 'php', 'c', 'crontab', 'sh', 'zsh', 'cpp', 'sql', 'ruby', 'lisp', 'scheme', 'javascript', 'vim', 'xml']
     exec 'syn include @wikiLang' . wikilang . ' syntax/' . wikilang . '.vim'
     exec 'syn region wikiCode' . wikilang . ' matchgroup=wikiCodeQuote start="^#!\(code \)\{0,1}' . wikilang . '$" end="\(^}}}$\)\@=" contains=@wikiLang' . wikilang . ' contained'
     exec 'syn cluster wikiCodeLang add=wikiCode' . wikilang
