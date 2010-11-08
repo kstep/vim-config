@@ -17,13 +17,12 @@ set icon iconstring=Vim
 set nohlsearch
 set ignorecase
 set smartcase
+set imsearch=0
+set incsearch
 
 set keymap=russian-jcukenwin
 set spelllang=en,ru
 set iminsert=0
-set imsearch=0
-set incsearch
-set hlsearch
 set grepprg=find\ %:p:h\ -xdev\ -name\ '*.%:e'\ -exec\ grep\ -Hn\ $*\ \{}\ +
 set diffopt=filler,vertical
 
