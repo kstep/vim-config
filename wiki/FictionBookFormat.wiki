@@ -1,0 +1,89 @@
+{{{
+#!xml
+<?xml version="1.0" encoding="UTF-8"?>
+<FictionBook xmlns="http://www.gribuser.ru/xml/fictionbook/2.0" xmlns:l="http://www.w3.org/1999/xlink">
+
+<description><!-- Описание книги -->
+
+    <title-info><!-- Информация о книги -->
+        <genre>жанр</genre>
+        <book-title>название книги</book-title>
+        <lang>язык</lang>
+        <date>год издания</date>
+        
+        <coverpage><!-- Обложка -->
+            <image l:href="ссылка-на-обложку" />
+        </coverpage>
+        
+        <sequence number="номер в серии" name="название серии" /><!-- Серия -->
+
+        <author><!-- Автор -->
+            <first-name>Имя</first-name>
+            <last-name>Фамилия</last-name>
+            <nickname>Псевдоним</nickname>
+            <id>id автора</id>
+        </author>
+        
+        <annotation><!-- Аннотация -->
+            <p>текст аннотации</p>
+        </annotation>
+    </title-info>
+    
+    <document-info><!-- Информация о документе -->
+        <author>...</author><!-- Создатель документа -->
+        <program-used>Используемая программа</program-used>
+        <date value="yyyy-mm-dd">дата создания</date>
+        <src-url>URL откуда получено</src-url>
+        <src-ocr>Откуда скан текста</src-ocr>
+        <id>id документа</id>
+        <version>версия документа</version>
+        <history><!-- История документа -->
+            <p>версия 1</p>
+            <p>версия 2</p>
+        </history>
+    </document-info>
+
+    <publish-info><!-- Информация об издателе -->
+        <book-name>название книги</book-name>
+        <publisher>Название издательства</publisher>
+        <city>город издания</city>
+        <year>год издания</year>
+        <isbn>международный ISBN код книги</isbn>
+        <sequence number="номер в серии" name="название серии" /><!-- Серия -->
+    </publish-info>
+
+</description>
+
+<body><!-- Содержание книги -->
+
+    <section><!-- Раздел -->
+        <title><!-- Заголовок -->
+            <p>текст заголовка</p>
+        </title>
+        <epigraph><!-- Эпиграф -->
+            <p>текст эпиграфа</p>
+            <text-author>автор эпиграфа</text-author>
+        </epigraph>
+        <section><!-- Подраздел -->
+            <title><p>...</p></title>
+
+            <p>текст книги</p>
+            <subtitle>* * *</subtitle>
+            <p><emphasis>выделенный текст</emphasis> <a l:href="ссылка">текст ссылки</a></p>
+            <p>...</p>
+        </section>
+    </section>
+
+</body>
+
+<body name="имя">
+...
+</body>
+
+<binary content-type="mime/type" id="id"><!-- Бинарные данные (например обложка) -->
+Base64 encoded data
+</binary>
+
+</FictionBook>
+}}}
+
