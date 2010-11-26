@@ -153,6 +153,7 @@ endfunction
 function! HighlightLine(s,l)
     exec 'syn match '.a:s.' /\%'.a:l.'l.*$/'
 endfunction
+
 " }}}
 
 " Mappings & abbrevs {{{
@@ -226,6 +227,11 @@ vmap ,aa :Align =><CR>
 vmap ,a= :Align =<CR>
 
 nmap ,fc :if stridx(&syntax,'.conflict')<0<Bar>setl syntax+=.conflict<Bar>endif<CR>:vimgrep "^<<<<<<<" %:p<CR>:copen<CR><CR>
+
+imap <Delete> <C-^>
+cmap <Delete> <C-^>
+smap <Delete> <C-^>
+nmap <Delete> a<C-^>
 
 cabbr W w
 cabbr Q q
