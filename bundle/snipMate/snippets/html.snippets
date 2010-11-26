@@ -153,6 +153,14 @@ snippet h1
 	<h1 id="${1:heading}">${2:$1}</h1>
 snippet input
 	<input type="${1:text/submit/hidden/button}" name="${2:some_name}" value="${3}"`Close()`>${4}
+snippet chkb
+	<input type="checkbox" name="${1:some_name}" value="${2}"`Close()`>${3}
+snippet radio
+	<input type="radio" name="${1:some_name}" value="${2}"`Close()`>${3}
+snippet textinp
+	<input type="text" name="${1:some_name}" value="${2}"`Close()`>${3}
+snippet passinp
+	<input type="password" name="${1:some_name}" value="${2}"`Close()`>${3}
 snippet label
 	<label for="${2:$1}">${1:name}</label><input type="${3:text/submit/hidden/button}" name="${4:$2}" value="${5}" id="${6:$2}"`Close()`>${7}
 snippet link
