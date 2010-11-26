@@ -17,11 +17,12 @@ set icon iconstring=Vim
 set nohlsearch
 set ignorecase
 set smartcase
-set imsearch=0
 set incsearch
 
 set keymap=russian-jcukenwin
+"set langmap=йцукенгшщзхъфывапролджэячсмитьбюЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ;qwertyuiop\[\]asdfghjkl\\;\'zxcvbnm\\,\.QWERTYUIOP\{\}ASDFGHJKL\:\"ZXCVBNM\<\>
 set spelllang=en,ru
+set imsearch=0
 set iminsert=0
 set grepprg=find\ %:p:h\ -xdev\ -name\ '*.%:e'\ -exec\ grep\ -Hn\ $*\ \{}\ +
 set diffopt=filler,vertical
