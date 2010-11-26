@@ -289,7 +289,8 @@ let g:user_zen_settings = { 'mako': { 'extends': 'html' } }
 " }}}
 
 " Custom highlighting {{{
-colorscheme molokai
+set background=dark
+colorscheme peaksea
 " }}}
 
 " vim: set ft=vim :

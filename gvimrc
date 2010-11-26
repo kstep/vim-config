@@ -1,4 +1,4 @@
-colorscheme molokai
+colorscheme peaksea
 set background=dark
 set guioptions=aeir
 set guifont=Liberation\ Mono\ 11
