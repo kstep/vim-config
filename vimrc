@@ -286,6 +286,7 @@ let g:perl_include_pod=1
 let g:perl_fold=1
 let g:perl_nofold_subs=1
 
+let g:syntastic_enable_signs=1
 let g:localvimrc_ask=0
 let g:localvimrc_sandbox=0
 let g:gitgraph_layout = { 'g':[20,'la'], 's':[-30,'tl'], 't':[5,'rb'], 'd':[0,'br'],
