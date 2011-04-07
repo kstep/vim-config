@@ -256,7 +256,7 @@ let g:NERDShutUp=1
 let g:NERDTreeHijackNetrw=0
 let g:NERDTreeChDirMode=2
 
-let g:vimwiki_list = [{'path': '~/.vim/wiki/', 'path_html': '~/.vim/wiki_html/', 'syntax': 'trac'}]
+let g:vimwiki_list = [{'path': '~/.vim/wiki/', 'path_html': '~/.vim/wiki_html/', 'syntax': 'redmine'}]
 
 let g:netrw_winsize=45
 let g:netrw_list_hide='^\.,\.pyc'
