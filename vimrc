@@ -295,3 +295,48 @@ colorscheme peaksea
 
 " vim: set ft=vim :
 
+fun! GenTabLine()
+    let s = ''
+    for j in range(1, tabpagenr('$'))
+        if j == tabpagenr()
+            let s .= '%#TabLineSel#'
+        else
+            let s .= '%#TabLine#'
+        endif
+
+        let s .= '%' . j . 'T %{GenTabLabel(' . j . ')} '
+    endfor
+
+    let s .= '%#TabLineFill#%T'
+
+    if tabpagenr('$') > 1
+        let s .= '%=%#TabLine#%999X×%X'
+    endif
+
+    return s
+endfun
+
+fun! IsTabModified(t)
+    let wins = tabpagewinnr(a:t, '$')
+    for w in range(1, wins)
+        if gettabwinvar(a:t, w, '&modified')
+            return 1
+        endif
+    endfor
+    return 0
+endfun
+
+fun! GenTabLabel(n)
+    let buflist = tabpagebuflist(a:n)
+    let winnr = tabpagewinnr(a:n)
+    "let bufnr = bufnr(buflist[winnr-1])
+    let bufname = bufname(buflist[winnr - 1])
+    let bufname = substitute(fnamemodify(bufname, ':~:.'), '\([^/]\)[^/]\+/', '\1/', 'g')
+    if IsTabModified(a:n)
+        let bufname = bufname . 'º'
+    endif
+    return a:n . ' ' . bufname
+endfun
+
+set tabline=%!GenTabLine()
+
