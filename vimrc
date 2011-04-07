@@ -34,15 +34,17 @@ set smarttab
 set expandtab
 set autoindent
 set smartindent
-set listchars=tab:»\ ,eol:¶,trail:·,precedes:…,extends:…
+set listchars=tab:»\ ,eol:¶,trail:·,precedes:«,extends:»
 set backspace=start,eol,indent
 
 set foldmethod=marker
 set foldlevelstart=1
+set foldcolumn=1
 
 set window=39
 set winminheight=0
 set noequalalways
+set ruler
 
 set tildeop
 set encoding=utf-8
@@ -50,7 +52,7 @@ set encoding=utf-8
 set linebreak
 set nojoinspaces
 
-set sessionoptions+=globals,localoptions,resize,winpos
+set sessionoptions=buffers,curdir,folds,tabpages,winsize
 set wildmenu
 
 set modeline
