@@ -1,0 +1,282 @@
+
+= Общая структура данных =
+
+{{{
+#!sql
+
+drop table if exists groups cascade;
+drop table if exists profiles cascade;
+drop table if exists members cascade;
+drop table if exists entities cascade;
+drop table if exists perms cascade;
+
+create table groups (
+    id serial not null,
+    name varchar(255) not null default '',
+    primary key (id)
+);
+
+create table profiles (
+    id serial not null,
+    name varchar(255) not null default '',
+    primary key (id)
+);
+
+create table members (
+    id serial not null,
+    grp_id int not null,
+    pro_id int not null,
+    primary key (id)
+);
+create index members_pro_idx on members (pro_id);
+
+create table entities (
+    id serial not null,
+    name varchar(255) not null default '',
+    primary key (id)
+);
+
+-- Вариант 1
+create table perms (
+    id serial not null,
+    mask int not null default 0,
+    grp_id int not null,
+    ent_id int not null,
+    primary key (id)
+);
+create index perms_ent_idx on perms (ent_id);
+create index perms_grp_idx on perms (grp_id);
+
+-- Вариант 2
+create table perms (
+    id serial not null,
+    mask int not null default 0,
+    grp_id int not null,
+    ent_id int not null,
+    pro_id int[] not null default '{}'::int[],
+    primary key (id)
+);
+create index perms_grp_ent_idx on perms (grp_id, ent_id, pro_id);
+
+}}}
+
+{{{
+#!perl
+use strict;
+
+# Число обычных групп
+my $groups_num = 1000;
+# Число профилей
+my $profiles_num = 1000000;
+# Число членов в каждой группе
+my $members_per_group_num = 300;
+
+# Число сущностей с правами
+my $entities_num = 10000;
+# Число групп, которым выделено право на каждую сущность
+my $groups_per_entity_num = 10;
+# Число профилей, которым выделено право на каждую сущность
+my $profiles_per_entity_num = 5;
+
+sub generator
+{
+    my ($title, $max, $commit, $sub) = @_;
+    print STDERR "$title generation... ";
+    print "START TRANSACTION;\n";
+    for (local $a = 1; $a <= $max; $a++) {
+        $sub->();
+        if ($a % $commit == 0) {
+            print "COMMIT;\nSTART TRANSACTION;\n";
+            printf STDERR "%d... ", $a * 100 / $max;
+        }
+    }
+    print "COMMIT;\n";
+    print STDERR "done!\n";
+};
+
+generator "Profiles", $profiles_num, 100, sub {
+    print "INSERT INTO profiles (id, name) VALUES ($a, 'Profile #$a');\n";
+};
+
+generator "Groups & members", $groups_num, 10, sub {
+    print "INSERT INTO groups (id, name) VALUES ($a, 'Group #$a');\n";
+    for (my $j = 1; $j <= $members_per_group_num; $j++) {
+        my $k = int(rand($profiles_num)) + 1;
+        print "INSERT INTO members (grp_id, pro_id) VALUES ($a, $k);\n";
+    }
+};
+
+generator "Entities", $entities_num, 100, sub {
+    print "INSERT INTO entities (id, name) VALUES ($a, 'Entity #$a');\n";
+    for (my $j = 1; $j <= $groups_per_entity_num; $j++) {
+        my $k = int(rand($groups_num)) + 1;
+        my $m = int(rand(2));
+        print "INSERT INTO perms (mask, grp_id, ent_id) VALUES ($m, $k, $a);\n";
+    }
+};
+
+###################
+
+# Вариант 1
+generator "Entity groups", 3 * $entities_num, 100, sub {
+    my $i = $groups_num + $a;
+    my $e = int(($a - 1) / 3) + 1;
+    my $m = int(rand(2));
+
+    print "INSERT INTO groups (id, name) VALUES ($i, 'Entity group $a');\n";
+    print "INSERT INTO perms (mask, grp_id, ent_id) VALUES ($m, $i, $e);\n";
+
+    for (my $j = 1; $j <= $profiles_per_entity_num; $j++) {
+        my $k = int(rand($profiles_num)) + 1;
+        print "INSERT INTO members (grp_id, pro_id) VALUES ($i, $k);\n";
+    }
+};
+
+# Вариант 2
+generator "Entity groups", 3 * $entities_num, 100, sub {
+    my $m = int(rand(2));
+    my $e = int(($a - 1) / 3) + 1;
+    my @x = ();
+
+    for (my $j = 1; $j <= $profiles_per_entity_num; $j++) {
+        push @x, int(rand($profiles_num)) + 1;
+    }
+    my $x = join ",", @x;
+
+    print "INSERT INTO perms (mask, pro_id, ent_id) VALUES ($m, '{$x}'::int[], $e);\n";
+};
+
+}}}
+
+Результаты:
+
+Вариант 1:
+
+unite_acl_test=# explain SELECT e.id FROM members m, entities e, perms p WHERE
+m.pro_id = 1000 AND m.grp_id = p.grp_id AND p.ent_id = e.id AND p.mask & 1 !=
+0;
+
+                                           QUERY PLAN                                           
+------------------------------------------------------------------------------------------------
+ Nested Loop  (cost=0.00..60.37 rows=11 width=4)
+   ->  Nested Loop  (cost=0.00..57.25 rows=11 width=4)
+         ->  Index Scan using members_pro_idx on members m  (cost=0.00..8.33 rows=1 width=4)
+               Index Cond: (pro_id = 1000)
+         ->  Index Scan using perms_grp_mask_idx on perms p  (cost=0.00..48.75 rows=13 width=8)
+               Index Cond: (p.grp_id = m.grp_id)
+               Filter: ((p.mask & 1) <> 0)
+   ->  Index Scan using entities_pkey on entities e  (cost=0.00..0.27 rows=1 width=4)
+         Index Cond: (e.id = p.ent_id)
+
+time ./test_acl_objgroups.pl test | psql -q -Upostgres unite_acl_test > /dev/null
+Running query 
+    SELECT e.id FROM members m, entities e, perms p
+        WHERE m.pro_id = ? AND m.grp_id = p.grp_id AND p.ent_id = e.id AND p.mask & 1 != 0;
+ 10000 times... 100.0%...done!
+
+real    0m10.092s
+user    0m0.796s
+sys     0m0.196s
+
+real    0m10.009s
+user    0m0.792s
+sys     0m0.152s
+
+real    0m10.076s
+user    0m0.784s
+sys     0m0.196s
+
+Вариант 2:
+
+unite_acl_test=#
+{{{
+#!sql
+explain SELECT e.id FROM members m, entities e, perms p WHERE
+((m.pro_id = 1000 AND m.grp_id = p.grp_id) OR (1000 = ANY(p.pro_id))) AND
+p.ent_id = e.id AND p.mask & 1 != 0;
+
+select * from entities where name like '...%' and ccount = 1 and id in (select p.ent_id from ...)
+
+explain SELECT p.ent_id FROM perms p WHERE
+(p.grp_id IN (...) OR (p.pro_id @@ '1000'::query_int)) AND p.mask & 1 != 0;
+}}}
+                                         QUERY PLAN                                         
+--------------------------------------------------------------------------------------------
+ Nested Loop  (cost=6094.00..1604260180.22 rows=1894140881 width=4)
+   Join Filter: (((m.pro_id = 1000) AND (m.grp_id = p.grp_id)) OR (1000 = ANY (p.pro_id)))
+   ->  Nested Loop  (cost=0.00..39740.22 rows=129143 width=27)
+         ->  Seq Scan on perms p  (cost=0.00..2995.00 rows=129350 width=27)
+               Filter: ((mask & 1) <> 0)
+         ->  Index Scan using entities_pkey on entities e  (cost=0.00..0.27 rows=1 width=4)
+               Index Cond: (e.id = p.ent_id)
+   ->  Materialize  (cost=6094.00..10266.00 rows=300000 width=8)
+         ->  Seq Scan on members m  (cost=0.00..4622.00 rows=300000 width=8)
+
+
+explain select e.id from entities e, perms p where e.id =
+p.ent_id and (p.grp_id in (select m.grp_id from members m where m.pro_id =
+1000) or 1000 = any(p.pro_id));
+
+                                          QUERY PLAN                                           
+-----------------------------------------------------------------------------------------------
+ Hash Join  (cost=296.31..6295.76 rows=68178 width=4)
+   Hash Cond: (p.ent_id = e.id)
+   ->  Seq Scan on perms p  (cost=8.31..4303.31 rows=68178 width=4)
+         Filter: ((hashed SubPlan 1) OR (1000 = ANY (pro_id)))
+         SubPlan 1
+           ->  Index Scan using members_pro_idx on members m  (cost=0.00..8.31 rows=1 width=4)
+                 Index Cond: (pro_id = 1000)
+   ->  Hash  (cost=163.00..163.00 rows=10000 width=4)
+         ->  Seq Scan on entities e  (cost=0.00..163.00 rows=10000 width=4)
+
+
+{{{
+#!sql
+EXPLAIN SELECT e.id FROM members m, entities e, perms p WHERE m.pro_id = 1000
+AND m.grp_id = p.grp_id AND p.ent_id = e.id AND p.mask & 1 != 0
+UNION
+SELECT e.id FROM entities e, perms p WHERE p.pro_id @@ '1000'::query_int AND
+p.mask & 1 != 0;
+}}}
+
+                                                  QUERY PLAN                                                   
+---------------------------------------------------------------------------------------------------------------
+ Unique  (cost=205887.34..212337.98 rows=1290127 width=4)
+   ->  Sort  (cost=205887.34..209112.66 rows=1290127 width=4)
+         Sort Key: e.id
+         ->  Append  (cost=0.00..39665.38 rows=1290127 width=4)
+               ->  Nested Loop  (cost=0.00..412.23 rows=127 width=4)
+                     ->  Nested Loop  (cost=0.00..376.16 rows=127 width=4)
+                           ->  Index Scan using members_pro_idx on members m  (cost=0.00..8.31 rows=1 width=4)
+                                 Index Cond: (pro_id = 1000)
+                           ->  Index Scan using perms_grp_idx on perms p  (cost=0.00..366.23 rows=129 width=8)
+                                 Index Cond: (p.grp_id = m.grp_id)
+                                 Filter: ((p.mask & 1) <> 0)
+                     ->  Index Scan using entities_pkey on entities e  (cost=0.00..0.27 rows=1 width=4)
+                           Index Cond: (e.id = p.ent_id)
+               ->  Nested Loop  (cost=182.30..26351.87 rows=1290000 width=4)
+                     ->  Bitmap Heap Scan on perms p  (cost=9.30..378.87 rows=129 width=0)
+                           Recheck Cond: (pro_id @@ '1000'::query_int)
+                           Filter: ((mask & 1) <> 0)
+                           ->  Bitmap Index Scan on perms_pro_idx  (cost=0.00..9.27 rows=130 width=0)
+                                 Index Cond: (pro_id @@ '1000'::query_int)
+                     ->  Materialize  (cost=173.00..273.00 rows=10000 width=4)
+                           ->  Seq Scan on entities e  (cost=0.00..163.00 rows=10000 width=4)
+
+explain SELECT p.ent_id FROM members m, perms p WHERE
+((m.pro_id = 1000 AND m.grp_id = p.grp_id) OR (p.pro_id @@ '1000'::query_int))
+AND p.mask & 1 != 0;
+
+                                            QUERY PLAN                                             
+---------------------------------------------------------------------------------------------------
+ Nested Loop  (cost=2.60..4518260.00 rows=38805157 width=4)
+   Join Filter: (((m.pro_id = 1000) AND (m.grp_id = p.grp_id)) OR (p.pro_id @@ '1000'::query_int))
+   ->  Seq Scan on members m  (cost=0.00..4622.00 rows=300000 width=8)
+   ->  Bitmap Heap Scan on perms p  (cost=2.60..10.50 rows=260 width=27)
+         Recheck Cond: ((m.grp_id = p.grp_id) OR (p.pro_id @@ '1000'::query_int))
+         Filter: ((p.mask & 1) <> 0)
+         ->  BitmapOr  (cost=2.60..2.60 rows=260 width=0)
+               ->  Bitmap Index Scan on perms_grp_idx  (cost=0.00..1.25 rows=130 width=0)
+                     Index Cond: (m.grp_id = p.grp_id)
+               ->  Bitmap Index Scan on perms_pro_idx  (cost=0.00..1.28 rows=130 width=0)
+                     Index Cond: (p.pro_id @@ '1000'::query_int)

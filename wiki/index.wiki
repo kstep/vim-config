@@ -1,3 +1,263 @@
+
+    * AclOpPermagroups
+    * КрасныеЛинии
+    * AclOpArticle
+
+
+<pre>
+[Thu Mar 17 10:09:42 2011] [error] UPDATE blogs SET id=%(id)s, owner_id=%(owner_id)s, owner_type=%(owner_type)s, create_date=%(create_date)s, update_date=%(update_date)s, title=%(title)s, description=%(description)s, author_id=%(author_id)s, editor_id=%(editor_id)s, posts_count=%(posts_count)s WHERE blogs.id = %(blogs_id)s
+
+[Thu Mar 17 10:09:42 2011] [error] [UOWTask(0xba41d88cL) Mapper: '<Mapper at 0xb99f9c2c; Profile>', UOWTask(0xba41d7ccL) Mapper: '<Mapper at 0xb9a133ac; ProfileGroup>', UOWTask(0xba41ddecL) Mapper: '<Mapper at 0xb9c3870c; AclRecord>', UOWTask(0xba41d74cL) Mapper: '<sqlalchemy.orm.dependency.MapperStub object at 0xba48d16c>']
+
+>>>>> [Thu Mar 17 10:09:42 2011] [error] UPDATE blogs_vs_pgroups SET id=%(id)s, object_id=%(object_id)s, group_id=%(group_id)s, profiles_id=%(profiles_id)s, type=%(type)s, e_mask=%(e_mask)s, u_mask=%(u_mask)s WHERE blogs_vs_pgroups.id = %(blogs_vs_pgroups_id)s
+
+[Thu Mar 17 10:09:42 2011] [error] [UOWTask(0xba41d5ccL) Mapper: '<Mapper at 0xb99f9c2c; Profile>', UOWTask(0xba41dfecL) Mapper: '<Mapper at 0xb9a133ac; ProfileGroup>', UOWTask(0xba41726cL) Mapper: '<Mapper at 0xb9c3870c; AclRecord>', UOWTask(0xba41d46cL) Mapper: '<sqlalchemy.orm.dependency.MapperStub object at 0xba48d16c>']
+
+>>>>> [Thu Mar 17 10:09:42 2011] [error] UPDATE blogs_vs_pgroups SET id=%(id)s, object_id=%(object_id)s, group_id=%(group_id)s, profiles_id=%(profiles_id)s, type=%(type)s, e_mask=%(e_mask)s, u_mask=%(u_mask)s WHERE blogs_vs_pgroups.id = %(blogs_vs_pgroups_id)s
+[Thu Mar 17 10:09:42 2011] [error] [client 127.0.0.1] mod_wsgi (pid=11135): Exception occurred processing WSGI script '/home/kstep/projects/work/unite/www/unite.wsgi'.
+</pre>
+
+    * WeLinux
+    * WeLinuxLua2
+    * WeLinuxLua3
+    * WelinuxLua4
+    
+    * WelinuxLua5
+    * WelinuxLua6
+
+var f = new F();
+
+alert(f instanceof F);
+alert(f())
+
+
+var F;
+F = function () {
+    var f = function (arg, func) {
+        return function () {
+            return func.apply(arg);
+        };
+    }(this, function () {
+        return this;    
+    });
+    f.__proto__ = F.prototype;
+    return f
+};
+
+'...' imported but unused
+undefined name '...'
+'...' is assigned but never used
+
+
+    * NewACL
+
+
+    * UniteInstallation
+    * ТестыACL
+    * AclSelector
+
+{{{
+#!javascript
+{
+    groups: [ group1, group2, ... ],
+    users: [ user1, user2, ... ]
+}
+}}}
+
+
+
+    * группа 1 => все подгруппы 1,
+    * группа 0 => хоть одна подгруппа 1, то группа 2, иначе группа 0
+
+{{{
+#!code javascript
+(function(){
+  var cache = {};
+ 
+  this.tmpl = function tmpl(str, data){
+    // Figure out if we're getting a template, or if we need to
+    // load the template - and be sure to cache the result.
+    var fn = !/\W/.test(str) ?
+      cache[str] = cache[str] ||
+        tmpl(document.getElementById(str).innerHTML) :
+     
+      // Generate a reusable function that will serve as a template
+      // generator (and which will be cached).
+      new Function("obj",
+        "var p=[],print=function(){p.push.apply(p,arguments);};" +
+       
+        // Introduce the data as local variables using with(){}
+        "with(obj){p.push('" +
+       
+        // Convert the template into pure JavaScript
+        str
+          .replace(/[\r\t\n]/g, " ")
+          .split("<%").join("\t")
+          .replace(/((^|%>)[^\t]*)'/g, "$1\r")
+          .replace(/\t=(.*?)%>/g, "',$1,'")
+          .split("\t").join("');")
+          .split("%>").join("p.push('")
+          .split("\r").join("\\'")
+      + "');}return p.join('');");
+   
+    // Provide some basic currying to the user
+    return data ? fn( data ) : fn;
+  };
+})(); 
+}}}
+
+{{{
+#!code javascript
+{
+    "current": 0,
+    "extended": -2,
+    "users": [],
+    "groups": [
+    {"chosen": true, "subgroups": null, "id": 0, "name": "\u0412\u0441\u0435"},
+    {"chosen": true, "subgroups": null, "id": -1, "name": "\u0412\u0441\u0435 \u0437\u0430\u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u0435"},
+    {"chosen": true, "subgroups": null, "id": 10, "name": "\u041a\u043e\u043d\u0442\u0430\u043a\u0442\u044b"},
+    {"chosen": true, "subgroups": null, "id": 12, "name": "\u0414\u0440\u0443\u0437\u044c\u044f"},
+    {"chosen": true, "subgroups": null, "id": 9, "name": "\u0411\u043b\u0438\u0437\u043a\u0438\u0435 \u0434\u0440\u0443\u0437\u044c\u044f"}],
+
+    "metagroups": [
+    [
+    {"id": 0, "name": "\u0412\u0441\u0435"},
+    {"id": -1, "name": "\u0412\u0441\u0435 \u0437\u0430\u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u0435"},
+    {"id": -2, "name": "\u0412\u044b\u0431\u0440\u0430\u0442\u044c"}
+    ],
+    [
+    {"id": -255, "name": "\u0422\u043e\u043b\u044c\u043a\u043e \u044f"}
+    ]
+    ]
+}
+
+
+
+{
+    current: 1,
+    extended: 2,
+    metagroups: [
+        [
+            { id: x, name: y },
+            ...,
+        ],
+        [
+            { id: x, name: y },
+            ...
+        ]
+    ],
+    groups: null | [
+        { id: x, name: y, chosen: z, subgroups: null | [
+            { id: x, name: y, chosen: z },
+            ...
+        ] },
+        ...
+    ],
+    users: null | [
+        { id: x, name: y },
+        ...
+    ]
+}
+
+}}}
+
+
+
+    * если есть A-F, то точно 16
+    * если есть >7, то либо 10, либо 16
+    * если есть >1, то либо 8, либо 10, либо 16
+    * если есть только 0 и 1, то может быть любой (2, 8, 10, 16)
+
+Если подпадает под условие, то либо стандартной установленной базы,
+либо минимальной допустимой для условия.
+
+Явное задание базы через начало на 0+база:
+
+    * 0A => 16,
+    * 08 => 8,
+    * 02 => 2.
+
+Это приемлемо, т.к. цифра после 0, являясь базой для системы счисления,
+не может входить в само число. Исключение для 16, т.к. системы с большим
+основанием не поддерживаются, соотв-но нельзя выразить число 16 одним символом.
+
+{{{
+#!code python
+class PDUMessage(object):
+
+    def __init__(self, number, message):
+	self.__number = number
+	self.__message = message
+
+	self.__pdu_number = self.to_semi_octets(number)
+	self.__pdu_message = self.to_octets(message)
+    
+    @staticmethod
+    def to_semi_octets(value):
+	return [ (int(value[i]) & 0xff) | ((int(value[i+1]) & 0xff) << 4) for i in range(0, len(value), 2) ]
+    
+    @staticmethod
+    def to_octets(value):
+	result = []
+
+
+}}}
+
+
+{{{
+#!code python
+
+class signal(object):
+    __subscribers = []
+    __method = None
+
+    def __init__(self, method):
+        self.__method = method
+
+    def __call__(self, *args, **kw):
+        for s in self.__subscribers:
+            s(*args, **kw)
+        self.__method(*args, **kw)
+
+    def connect(self, subscriber):
+        self.__subscribers.append(subscriber)
+        return subscriber
+
+class Acl(object):
+    @classmethod
+    @signal
+    def updated(self, sender, emask, umask):
+        pass
+    updated = signal(updated)
+    
+    def grant:
+        self.updated(emask, umask)
+
+
+
+
+class HitrayaModel(OwnedModel):
+
+    @Acl.updated.connect
+    def handle_acl(self, sender, emask, umask):
+        self.select....
+
+
+class Contrl:
+    def act:
+        obj.grant()
+}}}
+
+    * 
+
+{{{
+#!sql
+explain SELECT communities.id AS id, communities.owner_type AS owner_type, communities.create_date AS create_date, communities.update_date AS update_date, communities.rating AS rating, communities.title AS title, communities.descr AS descr, communities.cat_id AS cat_id, communities.subcat_id AS subcat_id, communities.owner_id AS owner_id, communities.perm_join AS perm_join, communities.state AS state, communities.masters_id AS masters_id FROM communities,communities_vs_pgroups WHERE communities.id = communities_vs_pgroups.object_id and (communities_vs_pgroups.group_id IN (166, 91, -1, 82, 101, 51, 61, 26, 21, 193, 56, 94, 161, 0) AND ((communities_vs_pgroups.mask & 4) != 0)) OR communities.owner_id = 3 AND communities.owner_type = 0
+
+
+}}}
+
+
 {{{
 #!sql
 
@@ -182,6 +442,7 @@ object at 0x99fadcc>, 'paste.evalexception':
 === Разное ===
 
     * FictionBookFormat
+    * Water202Form
 
 
     * PublicStatic

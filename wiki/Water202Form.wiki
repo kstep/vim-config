@@ -1,0 +1,16 @@
+
+http://202.by/order/home/page_check/
+
+    * dog_num 1/18309
+    * dog_person Вера
+    * dog_email 
+    * dog_phone
+
+    * ndateInput дата заказа, кроме воскресенья, минимум на завтра (вторник, 14 декабря, 2010)
+    * from время дня, часы (число 0-23)
+    * to то же, что и from, to >= from
+
+    * count[23] оригинал
+    * count[24] бамбини
+    * count[25] актив
+

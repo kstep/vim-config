@@ -1,0 +1,13 @@
+
+<pre>
+apt-get install unzip python-pylons python-tz python-recaptcha python-carrot python-magic python-psycopg2 python-pythonmagick
+dpkg -i ./python-sqlalchemy_0.5.8-1_all.deb && echo python-sqlalchemy hold | dpkg --set-selections
+</pre>
+
+ln -sf /bin/bash /bin/sh
+
+mkdir -p /var/run/unite_modules && chown unite /var/run/unite_modules
+</pre>
+ 
+
+

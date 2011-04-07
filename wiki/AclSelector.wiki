@@ -1,0 +1,57 @@
+
+
+1. метагруппа 1  |  + группа   4
+2. метагруппа 2  |      группа 5
+3. метагруппа 3  |  а ещё
+4. псевдогруппа> |    петя  20
+5. никто         |    вася  30
+
+выход:
+{
+    groups: [ 4, 5, 20 ]
+    users: [ 20, 30 ]
+}
+
+вход:
+{
+    current: null,
+    metagroups: [
+        [
+        { name: "метагруппа 1", id: 1, extended: true },
+        { name: "метагруппа 2", id: 2, extended: true },
+        { name: "метагруппа 3", id: 3, extended: true },
+        { name: "псевдогруппа", id: null, extended: true }
+        ]
+        ,
+        [
+        { name: "никто", id: -255 }
+        ]
+    ],
+    groups: [
+        { name: ..., id: ..., chosen: true, subgroups: [ ... ] | null },
+        ...
+    ],
+    users: [
+        { name: ..., id: ... },
+        ...
+    ]
+}
+
+
+-> group1 +
+-> group2 +
+-> group3 + 
+---users
+user1
+user2
+user3
++more
+|
+V
+-> group1 
+-> group2
+-> group3
+---users
+user1
+user2
++user3

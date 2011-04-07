@@ -1,0 +1,127 @@
+
+    1. @group_types=[a, b, c, d, e]; max_visible_group=c@
+        [+] простота, можно описывать группы на уровне шаблона
+            [-] легко обойти прямой модификацией input-а на странице
+        [-] надо описывать для всех градусников, хотя это может быть настройка на уровне класса-владельца
+    2. @group_types=[a, b, c]; fixed_group_types=[d, e]@
+    3. @OwnerModel.GTYPES_ACL_FIXED=[d, e]; group_types=[a, b, c]@
+
+
+<pre>
+<code class="sql">
+
+
+select (
+
+SELECT (sum_mask_agr(site_vs_pgroups.e_mask) & 4) != 0 AS anon_1 
+FROM site_vs_pgroups
+WHERE site_vs_pgroups.object_id = site.id AND (site_vs_pgroups.group_id IN (1,2,3) OR (site_vs_pgroups.profiles_id @@ '3'::query_int))
+
+) OR
+CASE site.owner_type WHEN 1 THEN
+(SELECT communities.owner_id 
+FROM communities
+WHERE communities.id = site.owner_id)
+WHEN 0 THEN site.owner_id END = 3 OR site.author_id = 3
+from site
+
+
+SELECT site.id AS site_id, site.owner_id AS site_owner_id, site.owner_type AS site_owner_type, site.create_date AS site_create_date, site.update_date AS site_update_date, site.author_id AS site_author_id, site.editor_id AS site_editor_id, site.language_code AS site_language_code, site.template_id AS site_template_id, site.start_page_id AS site_start_page_id,
+    (
+        (SELECT (sum_mask_agr(site_vs_pgroups.e_mask) & %(sum_mask_agr_1)s) != %(param_1)s AS anon_1 FROM site_vs_pgroups 
+            WHERE site_vs_pgroups.object_id = site.id AND (site_vs_pgroups.group_id IN (...) OR (site_vs_pgroups.profiles_id @@ '3'::query_int)))
+        OR CASE site.owner_type
+        WHEN 1 THEN
+            SELECT communities.owner_id FROM communities WHERE communities.id = site.owner_id
+        WHEN 0 THEN site.owner_id END) = %(param_4)s
+    OR site.author_id = %(param_5)s AS can_update_value 
+
+FROM site, (SELECT communities.owner_id AS owner_id 
+FROM communities 
+WHERE communities.id = site.owner_id) 
+WHERE site.owner_type = %(owner_type_1)s AND site.owner_id = %(owner_id_1)s AND True
+
+
+SELECT site_page.owner_id AS site_page_owner_id, site_page.owner_type AS site_page_owner_type, site_page.create_date AS site_page_create_date, site_page.update_date AS site_page_update_date, site_page.views_count AS site_page_views_count, site_page.author_id AS site_page_author_id, site_page.editor_id AS site_page_editor_id, site_page.id AS site_page_id, site_page.site_id AS site_page_site_id, site_page.group_id AS site_page_group_id, site_page.parent_id AS site_page_parent_id, site_page.sort_index AS site_page_sort_index, site_page.title AS site_page_title, site_page.url_part AS site_page_url_part, site_page.template_id AS site_page_template_id,
+    (SELECT (sum_mask_agr(site_page_vs_pgroups.e_mask) & %(sum_mask_agr_1)s) != %(param_1)s AS anon_1 FROM site_page_vs_pgroups 
+WHERE site_page_vs_pgroups.object_id = site_page.id AND (site_page_vs_pgroups.group_id IN (%(group_id_1)s, %(group_id_2)s, %(group_id_3)s) OR (site_page_vs_pgroups.profiles_id @@ '5'::query_int))) OR site_page.owner_type = %(owner_type_1)s AND site_page.owner_id = %(owner_id_1)s OR site_page.author_id = %(param_2)s AS can_update_value 
+FROM site_page 
+WHERE site_page.owner_type = %(owner_type_2)s AND site_page.owner_id = %(owner_id_2)s AND True ORDER BY site_page.sort_index ASC
+
+
+SELECT site_page.owner_id AS site_page_owner_id, site_page.owner_type AS site_page_owner_type, site_page.create_date AS site_page_create_date, site_page.update_date AS site_page_update_date, site_page.views_count AS site_page_views_count, site_page.author_id AS site_page_author_id, site_page.editor_id AS site_page_editor_id, site_page.id AS site_page_id, site_page.site_id AS site_page_site_id, site_page.group_id AS site_page_group_id, site_page.parent_id AS site_page_parent_id, site_page.sort_index AS site_page_sort_index, site_page.title AS site_page_title, site_page.url_part AS site_page_url_part, site_page.template_id AS site_page_template_id, EXISTS
+    (SELECT site_page.id FROM site_page
+        WHERE site_page.author_id = %(author_id_1)s
+            OR site_page.id IN
+                (SELECT site_page_vs_pgroups.object_id FROM site_page_vs_pgroups 
+                    WHERE (site_page_vs_pgroups.group_id IN (...)
+                        OR (site_page_vs_pgroups.profiles_id @@ '5'::query_int))
+                    AND ((site_page_vs_pgroups.e_mask & 2) != 0))
+                    OR site_page.owner_id = %(owner_id_1)s AND site_page.owner_type = %(owner_type_1)s
+    ) AS anon_1 
+FROM site_page 
+WHERE site_page.owner_type = %(owner_type_2)s AND site_page.owner_id = %(owner_id_2)s AND True ORDER BY site_page.sort_index ASC
+
+
+EXISTS (
+SELECT site.id
+FROM site 
+WHERE site.author_id = 3 OR site.id IN
+    (SELECT site_vs_pgroups.object_id FROM site_vs_pgroups WHERE
+        (site_vs_pgroups.group_id IN (1)
+            OR (site_vs_pgroups.profiles_id @@ '3'::query_int))
+        AND ((site_vs_pgroups.e_mask & 2) != 0))
+    OR site.owner_id = 3 AND site.owner_type = 0
+    )
+
+select * from site_page where url_part like 'page%' order by title
+
+select * from site_page_vs_pgroups where object_id = 20
+                
+                (SELECT site_page.id FROM site_page WHERE site_page.parent_id IN
+
+SELECT site_page_vs_pgroups.id, site_page_vs_pgroups.object_id, site_page_vs_pgroups.group_id, site_page_vs_pgroups.profiles_id, site_page_vs_pgroups.type, site_page_vs_pgroups.e_mask, site_page_vs_pgroups.u_mask 
+FROM site_page_vs_pgroups,site_page
+    WHERE site_page_vs_pgroups.object_id IN
+                (SELECT site_page.id FROM site_page WHERE site_page.parent_id IN
+                (SELECT site_page.id FROM site_page WHERE site_page.parent_id IN
+                    (SELECT site_page.id FROM site_page WHERE 9 = site_page.parent_id)))
+    and site_page.id = site_page_vs_pgroups.object_id
+    AND exists (select site_page_vs_pgroups_1.id from site_page_vs_pgroups AS site_page_vs_pgroups_1, site_page AS site_page_1
+    where site_page_vs_pgroups_1.u_mask & 4 != 0
+    AND site_page_vs_pgroups_1.object_id = site_page_1.id
+    AND site_page_1.id = site_page.parent_id and site_page_vs_pgroups_1.group_id in (0,-1))
+
+select * from site_page_vs_pgroups where object_id = 5 and e_mask & 4 != 0
+                
+                (SELECT site_page.id FROM site_page WHERE site_page.parent_id IN 
+
+SELECT site_page_vs_pgroups.id, site_page_vs_pgroups.group_id, site_page_vs_pgroups.type, site_page_vs_pgroups.object_id
+    FROM site_page_vs_pgroups, site_page, site_page as parent_site_page
+        WHERE site_page_vs_pgroups.object_id IN
+                    (SELECT site_page.id FROM site_page WHERE 5 = site_page.parent_id)
+                        AND site_page.parent_id = parent_site_page.id
+                        AND site_page_vs_pgroups.object_id = parent_site_page.id
+                        AND site_page_vs_pgroups.e_mask & 4 != 0
+        AND site_page_vs_pgroups.group_id IN
+            (SELECT site_page_vs_pgroups_1.group_id FROM site_page_vs_pgroups AS site_page_vs_pgroups_1, site_page 
+                WHERE (site_page_vs_pgroups_1.e_mask & 4) != 0 AND site_page.parent_id = site_page_vs_pgroups_1.object_id)
+
+
+SELECT site_page_vs_pgroups.id, site_page_vs_pgroups.object_id, site_page_vs_pgroups.group_id, site_page_vs_pgroups.profiles_id, site_page_vs_pgroups.type, site_page_vs_pgroups.e_mask, site_page_vs_pgroups.u_mask 
+    FROM site_page_vs_pgroups, site_page WHERE true
+    AND site_page_vs_pgroups.object_id = site_page.id
+    AND site_page_vs_pgroups.object_id in
+        (SELECT site_page.id from site_page where site_page.parent_id IN
+        (SELECT site_page.id from site_page where site_page.parent_id IN
+        (SELECT site_page.id from site_page where site_page.parent_id = 15)))
+ --   and site_page_vs_pgroups.group_id in (91,90,0,-1)
+    and site_page_vs_pgroups.group_id in
+        (SELECT site_page_vs_pgroups_1.group_id FROM site_page_vs_pgroups AS site_page_vs_pgroups_1, site_page AS site_page_1
+            WHERE
+                (site_page_vs_pgroups_1.e_mask & 4) != 0
+                AND site_page_vs_pgroups_1.object_id = site_page_1.id
+                AND site_page_1.id = site_page.parent_id
+                AND site_page_vs_pgroups_1.group_id IN (91,90,0,-1))
+</code>
+</pre>
