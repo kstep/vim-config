@@ -74,7 +74,6 @@ fun! BugzSearch(params)
         setl enc=utf-8
 endfun
 
-
 fun! UscorePluralToCamelSingle(value)
     let value = substitute(a:value, '_\(.\)', '\U\1', 'g')
     let value = substitute(value, '^\(.\)', '\U\1', '')
@@ -129,6 +128,7 @@ function! MirrorExchange(delim)
 	let sel = substitute(sel, '\(.\{-}\)\('.a:delim.'\)\(.*\)', '\3\2\1', '')
 	exe "norm gvc".sel."\<esc>"
 endfunction
+command! -range -nargs=1 MirrorExchange :call MirrorExchange(<f-args>)
 
 function! SignMark(type)
     let bufno = bufnr('%')
