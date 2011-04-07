@@ -82,7 +82,7 @@ let utl__file_rc =    expand("<sfile>")	    " Do not remove this line
 	    "	Firefox
 	    "	Check if an instance is already running, and if yes use it, else start firefox.
 	    "	See <URL:http://www.mozilla.org/unix/remote.html> for mozilla/firefox -remote control
-	    "let g:utl_cfg_hdl_scm_http_system = "silent !firefox -remote 'ping()' && firefox -remote 'openURL( %u )' || firefox '%u#%f' &"
+	    let g:utl_cfg_hdl_scm_http_system = "silent !firefox -remote 'ping()' && firefox -remote 'openURL( %u )' || firefox '%u#%f' &"
 
 	endif
 	" else if MacOS
