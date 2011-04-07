@@ -1,7 +1,7 @@
-colorscheme peaksea
-set background=dark
-set guioptions=aeir
-set guifont=Liberation\ Mono\ 11
+colorscheme thegoodluck
+set background=light
+set guioptions=air
+set guifont=DejaVu\ Sans\ Mono\ 11
 set noicon
 
 sign define SyntasticError text=!! icon=/usr/share/icons/gnome/16x16/status/dialog-error.png
