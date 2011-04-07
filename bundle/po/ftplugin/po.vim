@@ -108,6 +108,7 @@ if has("gui_running")
 else
    let gui = 0
 endif
+let gui = 0
 
 " Move to the first untranslated msgstr string forward.
 if !hasmapto('<Plug>NextTransFwd')
