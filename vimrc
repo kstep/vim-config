@@ -259,7 +259,7 @@ let g:NERDTreeChDirMode=2
 let g:vimwiki_list = [{'path': '~/.vim/wiki/', 'path_html': '~/.vim/wiki_html/', 'syntax': 'redmine'}]
 
 let g:netrw_winsize=45
-let g:netrw_list_hide='^\.,\.pyc'
+let g:netrw_list_hide='^\.,\.pyc,\.pyo'
 let g:netrw_cursorline=1
 let g:netrw_liststyle=1
 let g:netrw_timefmt="%a, %e %b %Y %H:%M"
@@ -267,6 +267,7 @@ let g:netrw_keepdir=0
 let g:netrw_sort_options='ni /[0-9]\+/'
 let g:netrw_maxfilenamelen=64
 let g:netrw_xstrlen=3
+let g:netrw_list_cmd='ssh HOSTNAME ls -La'
 
 let g:perl_include_pod=1
 let g:perl_fold=1
