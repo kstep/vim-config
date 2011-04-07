@@ -143,8 +143,10 @@ function! UnSignMark(type)
     exe 'sign unplace '.(lineno*100000+bufno*100+a:type).' buffer='.bufno
 endfunction
 
-function! GetSynName(l, c)
-    echo synIDattr(synID(line(a:l), col(a:c), 1), "name")
+function! GetSynName(...)
+    let l = exists('a:1') ? a:1 : '.'
+    let c = exists('a:2') ? a:2 : '.'
+    return synIDattr(synID(line(l), col(c), 1), "name")
 endfunction
 
 " Interface functions
