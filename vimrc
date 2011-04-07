@@ -163,21 +163,12 @@ endfunction
 " Mappings & abbrevs {{{
 map <C-w><C-]> <C-w><C-]><C-w>T
 map vA ggVG
-imap <A-q> <C-^>
 map <A-w> :!pkill -USR1 fusqlfs.pl<CR>
+map <Leader>p :exec 'tabedit '.getreg('*')<CR>
+map <Leader>ss <Plug>(scratch-open)
 "noremap by "+y
 "noremap bp "+p
 
-map <A-1> 1gt
-map <A-2> 2gt
-map <A-3> 3gt
-map <A-4> 4gt
-map <A-5> 5gt
-map <A-6> 6gt
-map <A-7> 7gt
-map <A-8> 8gt
-map <A-9> 9gt
-map <A--> :tabedit<CR>
 map <S-PageUp> gT
 map <S-PageDown> gt
 map <S-Up> <C-W>k
@@ -189,22 +180,13 @@ map <C-Down> <C-W>-
 map <C-Left> <C-W><
 map <C-Right> <C-W>>
 
-imap <A-1> <Esc>1gti
-imap <A-2> <Esc>2gti
-imap <A-3> <Esc>3gti
-imap <A-4> <Esc>4gti
-imap <A-5> <Esc>5gti
-imap <A-6> <Esc>6gti
-imap <A-7> <Esc>7gti
-imap <A-8> <Esc>8gti
-imap <A-9> <Esc>9gti
-imap <A--> <Esc>:tabedit<CR>i
 imap <S-PageUp> <Esc>gTi
 imap <S-PageDown> <Esc>gti
+imap <S-Insert> <C-R>=getreg('*')<CR>
 
 vnoremap gw <Esc>`>a')}<Esc>`<i${_(u'<Esc>
-vmap gx, :call MirrorExchange(", ")<cr>
-vmap gx= :call MirrorExchange(" = ")<cr>
+vmap gx, :MirrorExchange ", "<cr>
+vmap gx= :MirrorExchange " = "<cr>
 map <Leader>mm :call MigrateScript()<CR>
 
 vmap ,s" <Esc>`>a"<Esc>`<i"<Esc>
@@ -232,10 +214,10 @@ vmap ,a= :Align =<CR>
 
 nmap ,fc :if stridx(&syntax,'.conflict')<0<Bar>setl syntax+=.conflict<Bar>endif<CR>:vimgrep "^<<<<<<<" %:p<CR>:copen<CR><CR>
 
-imap <Delete> <C-^>
-cmap <Delete> <C-^>
-smap <Delete> <C-^>
-nmap <Delete> a<C-^>
+imap <C-Space> <C-^>
+cmap <C-Space> <C-^>
+smap <C-Space> <C-^>
+nmap <C-Space> a<C-^><Esc>
 
 cabbr W w
 cabbr Q q
