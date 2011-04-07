@@ -225,7 +225,7 @@ cabbr Wq wq
 cabbr WQ wq
 cabbr Tabe tabe
 
-command! WW write !sudo tee %:p > /dev/null
+command! WW silent! write !sudo tee %:p > /dev/null
 " }}}
 
 " Signs {{{
