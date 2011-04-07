@@ -273,6 +273,9 @@ let g:perl_include_pod=1
 let g:perl_fold=1
 let g:perl_nofold_subs=1
 
+let g:pydiction_location = '~/.vim/bundle/pydiction/dict/complete-dict'
+
+let g:po_translator = 'Konstantin Stepanov <kstep@p-nut.info>'
 let g:syntastic_enable_signs=1
 let g:localvimrc_ask=0
 let g:localvimrc_sandbox=0
