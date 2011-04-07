@@ -290,7 +290,8 @@ let g:user_zen_settings = { 'mako': { 'extends': 'html' } }
 
 " Custom highlighting {{{
 set background=dark
-colorscheme peaksea
+"colorscheme xoria256
+colorscheme thegoodluck
 " }}}
 
 " vim: set ft=vim :
