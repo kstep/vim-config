@@ -10,6 +10,7 @@ runtime macros/matchit.vim
 " }}}
 
 " Options {{{
+silent !stty -ixon -ixoff
 set helplang=ru
 set t_IS=]0; t_IE=
 set icon iconstring=Vim
