@@ -218,10 +218,10 @@ vmap ,a= :Align =<CR>
 
 nmap ,fc :if stridx(&syntax,'.conflict')<0<Bar>setl syntax+=.conflict<Bar>endif<CR>:vimgrep "^<<<<<<<" %:p<CR>:copen<CR><CR>
 
-imap <C-Space> <C-^>
-cmap <C-Space> <C-^>
-smap <C-Space> <C-^>
-nmap <C-Space> a<C-^><Esc>
+"imap <C-Space> <C-^>
+"cmap <C-Space> <C-^>
+"smap <C-Space> <C-^>
+"nmap <C-Space> a<C-^><Esc>
 
 cabbr W w
 cabbr Q q
