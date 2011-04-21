@@ -1,8 +1,10 @@
-"let test_path = "~/pk/vi/plu/c"
+"let test_path = "pk/vi/plu/c"
 
 function! ZshLikeComplete(path, cmd, pos)
     let parts = split(a:path, '/', 1)
-    let variants = [remove(parts, 0)]
+    let variants = (parts[0] == '~' || parts[0] == '.' || parts[0] == '..' || parts[0] == '') ?
+                \ remove(parts, 0, 0) :
+                \ split(globpath(&path, remove(parts, 0).'*'), '\n')
 
     for part in parts
         let newvars = []
