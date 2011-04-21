@@ -343,5 +343,9 @@ fun! GenTabLabel(n)
     return a:n . ' ' . bufname
 endfun
 
+fun! OpenFile(fn)
+    silent! exec 'edit! ' . a:fn
+endfun
+
 set tabline=%!GenTabLine()
 
