@@ -35,12 +35,15 @@ set smarttab
 set expandtab
 set autoindent
 set smartindent
-set listchars=tab:»\ ,eol:¶,trail:·,precedes:«,extends:»
+set listchars=tab:»\ ,eol:↲,trail:·,precedes:«,extends:»
 set backspace=start,eol,indent
 
 set foldmethod=marker
 set foldlevelstart=1
 set foldcolumn=1
+set foldminlines=5
+set numberwidth=2
+set relativenumber
 
 set window=39
 set winminheight=0
