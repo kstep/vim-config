@@ -1,21 +1,11 @@
 
+    * ToDO
+
     * AclOpPermagroups
     * КрасныеЛинии
     * AclOpArticle
-
-
-<pre>
-[Thu Mar 17 10:09:42 2011] [error] UPDATE blogs SET id=%(id)s, owner_id=%(owner_id)s, owner_type=%(owner_type)s, create_date=%(create_date)s, update_date=%(update_date)s, title=%(title)s, description=%(description)s, author_id=%(author_id)s, editor_id=%(editor_id)s, posts_count=%(posts_count)s WHERE blogs.id = %(blogs_id)s
-
-[Thu Mar 17 10:09:42 2011] [error] [UOWTask(0xba41d88cL) Mapper: '<Mapper at 0xb99f9c2c; Profile>', UOWTask(0xba41d7ccL) Mapper: '<Mapper at 0xb9a133ac; ProfileGroup>', UOWTask(0xba41ddecL) Mapper: '<Mapper at 0xb9c3870c; AclRecord>', UOWTask(0xba41d74cL) Mapper: '<sqlalchemy.orm.dependency.MapperStub object at 0xba48d16c>']
-
->>>>> [Thu Mar 17 10:09:42 2011] [error] UPDATE blogs_vs_pgroups SET id=%(id)s, object_id=%(object_id)s, group_id=%(group_id)s, profiles_id=%(profiles_id)s, type=%(type)s, e_mask=%(e_mask)s, u_mask=%(u_mask)s WHERE blogs_vs_pgroups.id = %(blogs_vs_pgroups_id)s
-
-[Thu Mar 17 10:09:42 2011] [error] [UOWTask(0xba41d5ccL) Mapper: '<Mapper at 0xb99f9c2c; Profile>', UOWTask(0xba41dfecL) Mapper: '<Mapper at 0xb9a133ac; ProfileGroup>', UOWTask(0xba41726cL) Mapper: '<Mapper at 0xb9c3870c; AclRecord>', UOWTask(0xba41d46cL) Mapper: '<sqlalchemy.orm.dependency.MapperStub object at 0xba48d16c>']
-
->>>>> [Thu Mar 17 10:09:42 2011] [error] UPDATE blogs_vs_pgroups SET id=%(id)s, object_id=%(object_id)s, group_id=%(group_id)s, profiles_id=%(profiles_id)s, type=%(type)s, e_mask=%(e_mask)s, u_mask=%(u_mask)s WHERE blogs_vs_pgroups.id = %(blogs_vs_pgroups_id)s
-[Thu Mar 17 10:09:42 2011] [error] [client 127.0.0.1] mod_wsgi (pid=11135): Exception occurred processing WSGI script '/home/kstep/projects/work/unite/www/unite.wsgi'.
-</pre>
+    
+FUPPES for Ubuntu http://www.ubuntuupdates.org/packages/show/197972
 
     * WeLinux
     * WeLinuxLua2
@@ -66,103 +56,6 @@ undefined name '...'
 
 
 
-    * группа 1 => все подгруппы 1,
-    * группа 0 => хоть одна подгруппа 1, то группа 2, иначе группа 0
-
-{{{
-#!code javascript
-(function(){
-  var cache = {};
- 
-  this.tmpl = function tmpl(str, data){
-    // Figure out if we're getting a template, or if we need to
-    // load the template - and be sure to cache the result.
-    var fn = !/\W/.test(str) ?
-      cache[str] = cache[str] ||
-        tmpl(document.getElementById(str).innerHTML) :
-     
-      // Generate a reusable function that will serve as a template
-      // generator (and which will be cached).
-      new Function("obj",
-        "var p=[],print=function(){p.push.apply(p,arguments);};" +
-       
-        // Introduce the data as local variables using with(){}
-        "with(obj){p.push('" +
-       
-        // Convert the template into pure JavaScript
-        str
-          .replace(/[\r\t\n]/g, " ")
-          .split("<%").join("\t")
-          .replace(/((^|%>)[^\t]*)'/g, "$1\r")
-          .replace(/\t=(.*?)%>/g, "',$1,'")
-          .split("\t").join("');")
-          .split("%>").join("p.push('")
-          .split("\r").join("\\'")
-      + "');}return p.join('');");
-   
-    // Provide some basic currying to the user
-    return data ? fn( data ) : fn;
-  };
-})(); 
-}}}
-
-{{{
-#!code javascript
-{
-    "current": 0,
-    "extended": -2,
-    "users": [],
-    "groups": [
-    {"chosen": true, "subgroups": null, "id": 0, "name": "\u0412\u0441\u0435"},
-    {"chosen": true, "subgroups": null, "id": -1, "name": "\u0412\u0441\u0435 \u0437\u0430\u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u0435"},
-    {"chosen": true, "subgroups": null, "id": 10, "name": "\u041a\u043e\u043d\u0442\u0430\u043a\u0442\u044b"},
-    {"chosen": true, "subgroups": null, "id": 12, "name": "\u0414\u0440\u0443\u0437\u044c\u044f"},
-    {"chosen": true, "subgroups": null, "id": 9, "name": "\u0411\u043b\u0438\u0437\u043a\u0438\u0435 \u0434\u0440\u0443\u0437\u044c\u044f"}],
-
-    "metagroups": [
-    [
-    {"id": 0, "name": "\u0412\u0441\u0435"},
-    {"id": -1, "name": "\u0412\u0441\u0435 \u0437\u0430\u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u0435"},
-    {"id": -2, "name": "\u0412\u044b\u0431\u0440\u0430\u0442\u044c"}
-    ],
-    [
-    {"id": -255, "name": "\u0422\u043e\u043b\u044c\u043a\u043e \u044f"}
-    ]
-    ]
-}
-
-
-
-{
-    current: 1,
-    extended: 2,
-    metagroups: [
-        [
-            { id: x, name: y },
-            ...,
-        ],
-        [
-            { id: x, name: y },
-            ...
-        ]
-    ],
-    groups: null | [
-        { id: x, name: y, chosen: z, subgroups: null | [
-            { id: x, name: y, chosen: z },
-            ...
-        ] },
-        ...
-    ],
-    users: null | [
-        { id: x, name: y },
-        ...
-    ]
-}
-
-}}}
-
-
-
     * если есть A-F, то точно 16
     * если есть >7, то либо 10, либо 16
     * если есть >1, то либо 8, либо 10, либо 16
@@ -204,49 +97,6 @@ class PDUMessage(object):
 }}}
 
 
-{{{
-#!code python
-
-class signal(object):
-    __subscribers = []
-    __method = None
-
-    def __init__(self, method):
-        self.__method = method
-
-    def __call__(self, *args, **kw):
-        for s in self.__subscribers:
-            s(*args, **kw)
-        self.__method(*args, **kw)
-
-    def connect(self, subscriber):
-        self.__subscribers.append(subscriber)
-        return subscriber
-
-class Acl(object):
-    @classmethod
-    @signal
-    def updated(self, sender, emask, umask):
-        pass
-    updated = signal(updated)
-    
-    def grant:
-        self.updated(emask, umask)
-
-
-
-
-class HitrayaModel(OwnedModel):
-
-    @Acl.updated.connect
-    def handle_acl(self, sender, emask, umask):
-        self.select....
-
-
-class Contrl:
-    def act:
-        obj.grant()
-}}}
 
     * 
 
@@ -496,110 +346,8 @@ object at 0x99fadcc>, 'paste.evalexception':
 
     * ГурьевскаяКаша
 
-= Текущие задачи =
-
-рекомендательный механизм
-
-интересы у юзера и сообщ-ва
-=> рекомендуем общества, у к-х интересы пересекаются с интерсеами юзера, но он не в них
-=> рекомендация юзеров юзеру по тегам,
-=> рекомендация организовать сообщ-ва юзерам с общими тегами.
-
-загрузка аватарки вместо дефолтной
-
-контент
-
-======
-22:30
-01:00
-итого 2.5 часа
-
-=====
-ключевые слова альфата.бай:
-
-теплообменник Альфа Лаваль Alfa Laval пластинчатый теплообменник расчет теплообменника водоподогреватель ГВС теплообменное энергосберегающее котельное оборудование отопление теплообмен ЦТП ИТП паро-водяной водо-водяной
 
 Формат ссылки на список пакетов в репе:
 [Первая колонка]------------------------------------------[Вторая колонка]-----[Третья и далее]--------------------------------------------
 [базовый урл репа: http://dl.google.com/linux/deb/] dists/[версия оси: stable]/[имя репа: main]/[архитектура репа: binary-i386]/Packages.gz
-
-=====
-
-дано: id профиля
-нужно подсчитать *количество* профилей, связанных с такими же тегами, что и данный профиль.
-То есть нет нужды опрашивать таблицу профилей, достаточно опросить таблицу-связку profiles_vs_tags.
-
-{{{
-#!sql
-select count(pt2.tag_id) from profiles_vs_tags as pt1 join profiles_vs_tags as pt2 on pt1.tag_id = pt2.tag_id where pt1.object_id = :id: and pt2.object_id <> :id: order by count(pt2.tag_id) desc limit 10
-}}}
-
-теперь отсюда надо исключить те теги, которые уже есть в таблице communities_vs_tags:
-
-{{{
-#!sql
-select distinct ct.tag_id from communities_vs_tags as ct
-}}}
-
-{{{
-#!sql
-select count(pt2.tag_id) from profiles_vs_tags as pt1 join profiles_vs_tags as pt2 on pt1.tag_id = pt2.tag_id where pt1.object_id = :id: and pt2.object_id <> :id: and pt2.tag_id not in (select distinct ct.tag_id from communities_vs_tags as ct) group by pt2.tag_id order by count(pt2.tag_id) desc limit 10
-}}}
-
-теперь нам нужны собственно имена тегов, а не только количество:
-
-{{{
-#!sql
-explain select t.name, count(pt2.tag_id) from profiles_vs_tags as pt1 join profiles_vs_tags as pt2 on pt1.tag_id = pt2.tag_id join soc_ts_tags as t on t.id = pt2.tag_id where pt1.object_id = 1 and pt2.object_id <> 1 and pt2.tag_id not in (select distinct ct.tag_id from communities_vs_tags as ct) group by t.name, pt2.tag_id order by count(pt2.tag_id) desc limit 10
-}}}
-
-вариант отторжения тегов сообществ:
-
-{{{
-#!sql
-explain select t.name, count(pt2.tag_id) from profiles_vs_tags as pt1 join profiles_vs_tags as pt2 on pt1.tag_id = pt2.tag_id left join communities_vs_tags as ct on ct.tag_id = pt2.tag_id join soc_ts_tags as t on t.id = pt2.tag_id where pt1.object_id = 1 and pt2.object_id <> 1 and ct.tag_id is null group by t.name, pt2.tag_id order by count(pt2.tag_id) desc limit 10
-}}}
-
-Судя по explain'у, второй вариант раза в 1.4-1.5 быстрее первого (стоимость 142 против 200 без индексной оптимизации). Судя по быстрым тестам их результаты совпадают и соответствуют ожиданиям.
-
-Вывод: использовать второй запрос (с 3 join'ами и проверкой ct.tag_id is not null, а не с 2 join'ами и одним подзапросом).
-
-Ещё вариант в двумя подзапросами и одним join'ом:
-
-{{{
-#!sql
-explain select t.name, count(pt2.tag_id) from profiles_vs_tags as pt2 join soc_ts_tags as t on t.id = pt2.tag_id where pt2.object_id <> 1 and pt2.tag_id in (select distinct pt1.tag_id from profiles_vs_tags as pt1 where pt1.object_id = 1) and pt2.tag_id not in (select distinct ct.tag_id from communities_vs_tags as ct) group by t.name, pt2.tag_id order by count(pt2.tag_id) desc limit 10
-}}}
-
-Стоимость почти как у первого (примерно 199).
-
-Итого: подзапросы зло. Использовать второй вариант:
-
-{{{
-#!sql
-select t.name, count(pt2.tag_id) from profiles_vs_tags as pt1 join profiles_vs_tags as pt2 on pt1.tag_id = pt2.tag_id left join communities_vs_tags as ct on ct.tag_id = pt2.tag_id join soc_ts_tags as t on t.id = pt2.tag_id where pt1.object_id = :id and pt2.object_id <> :id and ct.tag_id is null group by t.name, pt2.tag_id order by count(pt2.tag_id) desc limit 10
-}}}
-
-{{{
-#!sql
-SELECT count(profiles_vs_tags_1.tag_id) AS count_1, soc_ts_tags.name 
-FROM profiles_vs_tags JOIN profiles_vs_tags AS profiles_vs_tags_1 ON profiles_vs_tags_1.tag_id = profiles_vs_tags.tag_id LEFT OUTER JOIN communities_vs_tags ON communities_vs_tags.tag_id = profiles_vs_tags_1.tag_id JOIN soc_ts_tags ON soc_ts_tags.id = profiles_vs_tags_1.tag_id 
-WHERE profiles_vs_tags.object_id = :object_id_1 AND profiles_vs_tags_1.object_id != :object_id_2 AND communities_vs_tags.tag_id IS NULL GROUP BY soc_ts_tags.name, profiles_vs_tags_1.tag_id ORDER BY count(profiles_vs_tags_1.tag_id) DESC 
- LIMIT 5
-}}}
-
-
-
-
-{{{
-#!sql
-
-select * from oauth_vs_users;
-select * from openid_vs_users;
-
-}}}
-
-
-
-
 
