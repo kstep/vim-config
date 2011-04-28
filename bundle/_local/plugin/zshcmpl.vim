@@ -24,9 +24,9 @@ endfun
 
 for [alias, cmd] in [
             \['E', 'edit'],
-            \['TE', 'tabedit'],
+            \['T', 'tabedit'],
             \['S', 'split'],
-            \['SV', 'vsplit'],
+            \['V', 'vsplit'],
             \['R', 'read']
             \]
     call ZshCmplWrap(alias, cmd)
