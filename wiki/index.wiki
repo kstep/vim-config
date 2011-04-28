@@ -1,11 +1,13 @@
 
-    * ToDO
+    * ToDo
+    * [[Идеи]]
+    * [[Functional_programming]]
 
     * AclOpPermagroups
     * КрасныеЛинии
     * AclOpArticle
     
-FUPPES for Ubuntu http://www.ubuntuupdates.org/packages/show/197972
+"FUPPES for Ubuntu":http://www.ubuntuupdates.org/packages/show/197972
 
     * WeLinux
     * WeLinuxLua2
@@ -15,46 +17,11 @@ FUPPES for Ubuntu http://www.ubuntuupdates.org/packages/show/197972
     * WelinuxLua5
     * WelinuxLua6
 
-var f = new F();
-
-alert(f instanceof F);
-alert(f())
-
-
-var F;
-F = function () {
-    var f = function (arg, func) {
-        return function () {
-            return func.apply(arg);
-        };
-    }(this, function () {
-        return this;    
-    });
-    f.__proto__ = F.prototype;
-    return f
-};
-
-'...' imported but unused
-undefined name '...'
-'...' is assigned but never used
-
-
     * NewACL
-
 
     * UniteInstallation
     * ТестыACL
     * AclSelector
-
-{{{
-#!javascript
-{
-    groups: [ group1, group2, ... ],
-    users: [ user1, user2, ... ]
-}
-}}}
-
-
 
     * если есть A-F, то точно 16
     * если есть >7, то либо 10, либо 16
@@ -73,217 +40,6 @@ undefined name '...'
 Это приемлемо, т.к. цифра после 0, являясь базой для системы счисления,
 не может входить в само число. Исключение для 16, т.к. системы с большим
 основанием не поддерживаются, соотв-но нельзя выразить число 16 одним символом.
-
-{{{
-#!code python
-class PDUMessage(object):
-
-    def __init__(self, number, message):
-	self.__number = number
-	self.__message = message
-
-	self.__pdu_number = self.to_semi_octets(number)
-	self.__pdu_message = self.to_octets(message)
-    
-    @staticmethod
-    def to_semi_octets(value):
-	return [ (int(value[i]) & 0xff) | ((int(value[i+1]) & 0xff) << 4) for i in range(0, len(value), 2) ]
-    
-    @staticmethod
-    def to_octets(value):
-	result = []
-
-
-}}}
-
-
-
-    * 
-
-{{{
-#!sql
-explain SELECT communities.id AS id, communities.owner_type AS owner_type, communities.create_date AS create_date, communities.update_date AS update_date, communities.rating AS rating, communities.title AS title, communities.descr AS descr, communities.cat_id AS cat_id, communities.subcat_id AS subcat_id, communities.owner_id AS owner_id, communities.perm_join AS perm_join, communities.state AS state, communities.masters_id AS masters_id FROM communities,communities_vs_pgroups WHERE communities.id = communities_vs_pgroups.object_id and (communities_vs_pgroups.group_id IN (166, 91, -1, 82, 101, 51, 61, 26, 21, 193, 56, 94, 161, 0) AND ((communities_vs_pgroups.mask & 4) != 0)) OR communities.owner_id = 3 AND communities.owner_type = 0
-
-
-}}}
-
-
-{{{
-#!sql
-
-SELECT count(E'*') AS count_1 
-	FROM (SELECT DISTINCT blog_entries.id AS id, blog_entries.owner_id AS owner_id, blog_entries.owner_type AS owner_type, blog_entries.create_date AS create_date, blog_entries.update_date AS update_date, blog_entries.moderate_status AS moderate_status, blog_entries.comments_count AS comments_count, blog_entries.views_count AS views_count, blog_entries.votes_sum AS votes_sum, blog_entries.votes_count AS votes_count, blog_entries.title AS title, blog_entries.content AS content, blog_entries.blog_id AS blog_id, blog_entries.author_id AS author_id, blog_entries.editor_id AS editor_id, blog_entries.comments_total AS comments_total 
-	FROM blog_entries, blogs, communities 
-	WHERE blog_entries.blog_id IN (SELECT blogs.id 
-	FROM blogs LEFT OUTER JOIN blogs_vs_pgroups ON blogs.id = blogs_vs_pgroups.object_id 
-	WHERE (blogs.author_id = 22228 OR blogs.id IN (SELECT blogs_vs_pgroups.object_id 
-	FROM blogs_vs_pgroups LEFT OUTER JOIN profile_groups_by_profile ON (idx(profile_groups_by_profile.profile_groups_id, blogs_vs_pgroups.group_id) > 0) 
-	WHERE (profile_groups_by_profile.profile_id = 22228 OR blogs_vs_pgroups.type IN (99, 100)) AND ((blogs_vs_pgroups.mask & 4) != 0)) OR blogs.owner_id = 22228 AND blogs.owner_type = 0) AND (blogs.owner_type = 0 OR blogs.owner_type = 1 AND blogs.owner_id = communities.id AND (communities.id IN (SELECT communities_vs_pgroups.object_id 
-	FROM communities_vs_pgroups LEFT OUTER JOIN profile_groups_by_profile ON (idx(profile_groups_by_profile.profile_groups_id, communities_vs_pgroups.group_id) > 0) 
-	WHERE (profile_groups_by_profile.profile_id = 22228 OR communities_vs_pgroups.type IN (99, 100)) AND ((communities_vs_pgroups.mask & 65536) != 0)) OR communities.owner_id = 22228 AND communities.owner_type = 0))) AND blog_entries.blog_id = blogs.id AND (blog_entries.author_id = 22228 OR blog_entries.id IN (SELECT blog_entries_vs_pgroups.object_id 
-	FROM blog_entries_vs_pgroups LEFT OUTER JOIN profile_groups_by_profile ON (idx(profile_groups_by_profile.profile_groups_id, blog_entries_vs_pgroups.group_id) > 0) 
-	WHERE (profile_groups_by_profile.profile_id = 22228 OR blog_entries_vs_pgroups.type IN (99, 100)) AND ((blog_entries_vs_pgroups.mask & 4) != 0)) OR blog_entries.owner_id = 22228 AND blog_entries.owner_type = 0) AND (blogs.author_id = 22228 OR blogs.id IN (SELECT blogs_vs_pgroups.object_id 
-	FROM blogs_vs_pgroups LEFT OUTER JOIN profile_groups_by_profile ON (idx(profile_groups_by_profile.profile_groups_id, blogs_vs_pgroups.group_id) > 0) 
-	WHERE (profile_groups_by_profile.profile_id = 22228 OR blogs_vs_pgroups.type IN (99, 100)) AND ((blogs_vs_pgroups.mask & 4) != 0)) OR blogs.owner_id = 22228 AND blogs.owner_type = 0) AND (blogs.owner_type = 0 OR blogs.owner_type = 1 AND blogs.owner_id = communities.id AND (communities.id IN (SELECT communities_vs_pgroups.object_id 
-	FROM communities_vs_pgroups LEFT OUTER JOIN profile_groups_by_profile ON (idx(profile_groups_by_profile.profile_groups_id, communities_vs_pgroups.group_id) > 0) 
-	WHERE (profile_groups_by_profile.profile_id = 22228 OR communities_vs_pgroups.type IN (99, 100)) AND ((communities_vs_pgroups.mask & 65536) != 0)) OR communities.owner_id = 22228 AND communities.owner_type = 0)) AND (blog_entries.moderate_status != 1 OR blog_entries.author_id = 22228 OR blog_entries.owner_type = 1 AND blog_entries.owner_id IN (SELECT communities.id 
-	FROM profile_groups, profile_groups_vs_profiles, communities LEFT OUTER JOIN communities_vs_pgroups ON communities.id = communities_vs_pgroups.object_id 
-	WHERE profile_groups.owner_type = 1 AND profile_groups.owner_id = communities.id AND profile_groups.type IN (61, 60) AND profile_groups.id = profile_groups_vs_profiles.profile_group_id AND profile_groups_vs_profiles.profile_id = 22228)) ORDER BY blog_entries.create_date DESC) AS anon_1
-
-explain SELECT DISTINCT blog_entries.id AS blog_entries_id
-     , blog_entries.owner_id AS blog_entries_owner_id
-     , blog_entries.owner_type AS blog_entries_owner_type
-     , blog_entries.create_date AS blog_entries_create_date
-     , blog_entries.update_date AS blog_entries_update_date
-     , blog_entries.moderate_status AS blog_entries_moderate_status
-     , blog_entries.comments_count AS blog_entries_comments_count
-     , blog_entries.views_count AS blog_entries_views_count
-     , blog_entries.votes_sum AS blog_entries_votes_sum
-     , blog_entries.votes_count AS blog_entries_votes_count
-     , blog_entries.title AS blog_entries_title
-     , blog_entries.content AS blog_entries_content
-     , blog_entries.blog_id AS blog_entries_blog_id
-     , blog_entries.author_id AS blog_entries_author_id
-     , blog_entries.editor_id AS blog_entries_editor_id
-     , blog_entries.comments_total AS blog_entries_comments_total
-  FROM blog_entries
-     , blogs
-     , communities
- WHERE blog_entries.blog_id IN (
-        SELECT blogs.id
-          FROM blogs
-          LEFT OUTER JOIN blogs_vs_pgroups
-            ON blogs.id         =  blogs_vs_pgroups.object_id
-         WHERE (blogs.author_id =  22228
-            OR blogs.id IN (
-                SELECT blogs_vs_pgroups.object_id
-                  FROM blogs_vs_pgroups
-                  LEFT OUTER JOIN profile_groups_by_profile
-                    ON (idx(profile_groups_by_profile.profile_groups_id, blogs_vs_pgroups.group_id) >  0)
-                 WHERE (profile_groups_by_profile.profile_id =  22228
-                    OR blogs_vs_pgroups.type IN (99, 100))
-           AND ((blogs_vs_pgroups.mask & 4) != 0))
-            OR blogs.owner_id   =  22228
-           AND blogs.owner_type =  0)
-           AND (blogs.owner_type =  0
-            OR blogs.owner_type = 1
-           AND blogs.owner_id   = communities.id
-           AND (communities.id IN (
-                SELECT communities_vs_pgroups.object_id
-                  FROM communities_vs_pgroups
-                  LEFT OUTER JOIN profile_groups_by_profile
-                    ON (idx(profile_groups_by_profile.profile_groups_id, communities_vs_pgroups.group_id) > 0)
-                 WHERE (profile_groups_by_profile.profile_id =  22228
-                    OR communities_vs_pgroups.type IN (99, 100))
-           AND ((communities_vs_pgroups.mask & 65536) != 0))
-            OR communities.owner_id =  22228
-   AND communities.owner_type  =  0)))
-   AND blog_entries.blog_id    =  blogs.id
-   AND (blog_entries.author_id =  22228
-    OR blog_entries.id IN (
-        SELECT blog_entries_vs_pgroups.object_id
-          FROM blog_entries_vs_pgroups
-          LEFT OUTER JOIN profile_groups_by_profile
-            ON (idx(profile_groups_by_profile.profile_groups_id, blog_entries_vs_pgroups.group_id) >  0)
-         WHERE (profile_groups_by_profile.profile_id = 22228
-            OR blog_entries_vs_pgroups.type IN (99, 100))
-   AND ((blog_entries_vs_pgroups.mask & 4) != 0))
-    OR blog_entries.owner_id    =  22228
-   AND blog_entries.owner_type  =  0)
-   AND (blogs.author_id         =  22228
-    OR blogs.id IN (
-        SELECT blogs_vs_pgroups.object_id
-          FROM blogs_vs_pgroups
-          LEFT OUTER JOIN profile_groups_by_profile
-            ON (idx(profile_groups_by_profile.profile_groups_id, blogs_vs_pgroups.group_id) >  0)
-         WHERE (profile_groups_by_profile.profile_id =  22228
-            OR blogs_vs_pgroups.type IN (99, 100))
-   AND ((blogs_vs_pgroups.mask & 4) != 0))
-    OR blogs.owner_id    = 22228
-   AND blogs.owner_type  = 0)
-   AND (blogs.owner_type = 0
-    OR blogs.owner_type  = 1
-   AND blogs.owner_id    = communities.id
-   AND (communities.id IN (
-        SELECT communities_vs_pgroups.object_id
-          FROM communities_vs_pgroups
-          LEFT OUTER JOIN profile_groups_by_profile
-            ON (idx(profile_groups_by_profile.profile_groups_id, communities_vs_pgroups.group_id) > 0)
-         WHERE (profile_groups_by_profile.profile_id = 22228
-            OR communities_vs_pgroups.type IN (99, 100))
-   AND ((communities_vs_pgroups.mask & 65536) != 0))
-    OR communities.owner_id   =  22228
-   AND communities.owner_type =  0))
-   AND (blog_entries.moderate_status != 1
-    OR blog_entries.author_id  =  22228
-    OR blog_entries.owner_type =  1
-   AND blog_entries.owner_id IN (
-        SELECT communities.id
-          FROM profile_groups
-             , profile_groups_vs_profiles
-             , communities
-          LEFT OUTER JOIN communities_vs_pgroups
-            ON communities.id                         = communities_vs_pgroups.object_id
-            WHERE profile_groups.owner_type           = 1
-            AND profile_groups.owner_id               = communities.id
-            AND profile_groups.type IN (61, 60)
-            AND profile_groups.id                     = profile_groups_vs_profiles.profile_group_id
-            AND profile_groups_vs_profiles.profile_id = 22228))
- ORDER BY blog_entries.create_date DESC LIMIT 20 OFFSET 0;
-
-}}}
-{{{
-#!python
-
-
-class Cls(Base):
-
-    
-
-{'pylons.routes_dict': {'action': u'document', 'controller': u'error'},
-'SERVER_PROTOCOL': 'HTTP/1.0', 'SCRIPT_NAME': '', 'pylons.original_request':
-<Request at 0x9a2924c GET
-http://dev.unite.com/oauth/login?oauth_token=7icP1bLsweMY9UweE2VniJPuaWTvVi7LzIaooQmXe8&oauth_verifier=9TTzwnCoJ0iMI4lk1NFx7eZkDm6hfvscKS329wWs>,
-'webob.adhoc_attrs': {'language': 'en-us'}, 'REQUEST_METHOD': 'GET',
-'PATH_INFO': '/error/document', 'beaker.get_session': <bound method
-SessionMiddleware._get_session of <beaker.middleware.SessionMiddleware object
-at 0x951474c>>, 'QUERY_STRING':
-'oauth_token=7icP1bLsweMY9UweE2VniJPuaWTvVi7LzIaooQmXe8&oauth_verifier=9TTzwnCoJ0iMI4lk1NFx7eZkDm6hfvscKS329wWs',
-'paste.throw_errors': True, 'HTTP_X_REAL_IP': '93.84.120.101',
-'pylons.action_method': <bound method ErrorController.document of
-<unite.controllers.error.ErrorController object at 0x99fadcc>>,
-'CONTENT_LENGTH': '0', 'HTTP_ACCEPT_CHARSET':
-'windows-1251,utf-8;q=0.7,*;q=0.7', 'HTTP_USER_AGENT': 'Mozilla/5.0 (X11; U;
-Linux i686; ru; rv:1.9.2.8) Gecko/20100722 Firefox/3.6.8', 'HTTP_CONNECTION':
-'close', 'beaker.cache': <beaker.cache.CacheManager object at 0x95314cc>,
-'SERVER_NAME': '0.0.0.0', 'routes.route': <routes.route.Route object at
-0x92973cc>, 'pylons.environ_config': {'session': 'beaker.session', 'cache':
-'beaker.cache'}, 'pylons.pylons': <pylons.util.PylonsContext object at
-0x95a0b2c>, 'wsgi.url_scheme': 'http', 'wsgiorg.routing_args':
-(<routes.util.URLGenerator object at 0x953b10c>, {'action': u'document',
-'controller': u'error'}), 'SERVER_PORT': '8001', 'webob._parsed_query_vars':
-(GET([('oauth_token', '7icP1bLsweMY9UweE2VniJPuaWTvVi7LzIaooQmXe8'),
-('oauth_verifier', '9TTzwnCoJ0iMI4lk1NFx7eZkDm6hfvscKS329wWs')]),
-'oauth_token=7icP1bLsweMY9UweE2VniJPuaWTvVi7LzIaooQmXe8&oauth_verifier=9TTzwnCoJ0iMI4lk1NFx7eZkDm6hfvscKS329wWs'),
-'weberror.evalexception': <weberror.evalexception.EvalException object at
-0x95314ec>, 'pylons.controller': <unite.controllers.error.ErrorController
-object at 0x99fadcc>, 'paste.evalexception':
-<weberror.evalexception.EvalException object at 0x95314ec>, 'wsgi.input':
-<socket._fileobject object at 0x99416f4 length=0>, 'HTTP_HOST':
-'dev.unite.com', 'beaker.session': {'lang': 'ru', 'oauth_service': 17,
-'user_tz': pytz.FixedOffset(120), 'auth_service': u'Twitter', 'tz_offset':
--120, 's': 'unite', '_accessed_time': 1289472614.0818191, '_creation_time':
-1289470877.21522}, 'wsgi.multithread': True, 'routes.url':
-<routes.util.URLGenerator object at 0x953b10c>, 'HTTP_ACCEPT':
-'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-'wsgi.version': (1, 0), 'paste.registry': <paste.registry.Registry object at
-0x9a6504c>, 'wsgi.run_once': False, 'wsgi.errors': <open file '<stderr>', mode
-'w' at 0xb7d4d0b0>, 'REMOTE_ADDR': '127.0.0.1', 'HTTP_ACCEPT_LANGUAGE':
-'ru,en-us;q=0.7,en;q=0.3', 'HTTP_X_FORWARDED_FOR': '93.84.120.101',
-'CONTENT_TYPE': '', 'paste.httpserver.thread_pool':
-<paste.httpserver.ThreadPool object at 0x828df0c>, 'HTTP_ACCEPT_ENCODING':
-'gzip,deflate'}
-}}}
 
 === Проекты ===
 

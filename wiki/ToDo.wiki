@@ -1,0 +1,146 @@
+= Задачи =
+
+[[Архив]]
+
+* [.] Работа
+    * [X] Вчера
+        * [X] "#2659 (Не сохраняются права на вкладку контакты)":http://redmine.unite.com/issues/2659
+        * [X] "#1743 (Создаётся пустой профиль, если его не сохранять при создании)":http://redmine.unite.com/issues/1743
+              Пока просто скрыл неактивные профили из этого списка.
+        * [X] "#2672 (Права: Ошибка «egroups»)":http://redmine.unite.com/issues/2672
+              Для несуществующих объектов `AclOp.get_proxy(instance)` возвращал `None`,
+              так что новый алгоритм эмуляции множественного наследования градусников
+              глючил.
+        * [X] "#1655 (Список блогов: в колонке 'обновлен' показывается только время создания)":http://redmine.unite.com/issues/1655
+              И правильно, там дата изменения блога (`update_date`), а не дата последнего изменения
+              его контента.
+              Добавил поле `lastpost_date`.
+        * [X] "#1745 (IE 7.0. Открытие закладки "Настройки — Внешние аккаунты". Ошибка скрипта.)":http://redmine.unite.com/issues/1745
+              /accounts/external, строка 16, символ 5: объект не поддерживает это свойство или метод
+              Неповторимо.
+        * [X] "#1883 (Полный профиль и Адреса сообщества. Градусник карты только от города)":http://redmine.unite.com/issues/1883
+        * [X] "#2472 (Группы пользователей. Невозможно изменить права на просмотр контактов)":http://redmine.unite.com/issues/2472
+    * [ ] Сегодня
+        * [ ] Если внешний аккаунт (OAuth или !OpenID) переходит при добавлении
+              от одного аккаунта к другому, его статус suspended сохраняется,
+              должен сбрасываться в False.
+        * [ ] :TOMATO:2/1+1 Сделать часть TODO-шек по коду
+        * [ ] :TOMATO:0/1 !CherryPy — посмотреть изменения
+            * [ ] jsonify error on empty string from function
+            * [ ] datetime jsonification
+    * [ ] Обсудить
+        * [.] :TOMATO:1/3 :DISCUSS: "#1613 (Невозможно добавить пользователя к себе в контакты)":http://redmine.unite.com/issues/1613
+            * [X] Рассмотреть предложенный алгоритм подробнее
+                # Дано: юзер A и B взаимно дружат
+                    * A перемещает B в ЧС
+                        * Что должно быть? Они ссорятся (у B удаляется A из контактов)?
+                    * A перемещает B обратно в друзья
+                        * Слать приглашение? Добавлять сразу в друзья?
+                        * Как записывать «переходный» статус между ЧС и друзьями?
+                        * Как принимать сообщения от B к A, ведь до согласия B, он остаётся у A в ЧС?
+                # Дано: юзер B находится в ЧС у юзера A
+                    * A перемещает B в друзья
+                        * См. вопросы выше, начиная записи переходного статуса
+            * [ ] Обсудить алгоритм и принять решение, составить спецификацию
+            * [ ] Реализовать этот алгоритм
+    
+* [O] Личное пространство
+    * [X] CMus выключает звук на динамики при запуске
+    * [X] https:// выбирает ссылки в xterm
+    * [X] Поставить GVim на виртуалку
+    * [X] Включить сглаживание шрифтов на виртуалке
+    * [X] Настроить сниппеты для питона в минимальный вид
+    * [o] Интегрировать vimwiki с todo-списками в телефоне
+        * [X] изучить формат в котором храняться todo-списки в телефоне (sqlite?)
+            * файл ~/.calender/calenderdb
+            * таблица Components
+            * выборка `SELECT * FROM Components WHERE ComponentType = 2`
+            * схема таблицы:
+                * `Id INTEGER PRIMARY KEY AUTOINCREMENT`,
+                * `CalendarId INTEGER` по умолчанию 1,
+                * `ComponentType INTEGER` у меня 2,
+                * `Flags INTEGER` везде -1,
+                * `DateStart INTEGER` timestamp,
+                * `DateEnd INTEGER` timestamp, везде -1, видимо разовое событие,
+                * `Summary TEXT` само описание,
+                * `Location TEXT` место, для !ToDo пустое,
+                * `Description TEXT` описание, для !ToDo пустое,
+                * `Status INTEGER` 0 или 1, флаг завершённости,
+                * `Uid TEXT ` везде пусто,
+                * `Until INTEGER` везде -1,
+                * `AllDay INTEGER` флаг «на весь день», для !ToDo везде 0,
+                * `CreatedTime INTEGER` timestamp, когда создано,
+                * `ModifiedTime INTEGER` timestamp, когда изменено последний раз,
+                * `Tzid TEXT` имя временной зоны с префиксом двоеточием, :Europe/Minsk,
+                * `TzOffset INTEGER` смещение временной зоны от GMT, секунды, 7200/10800 (2/3 часа)
+        * [ ] создать конвертер в нужную схему (нужны даты в vimwiki, либо на сегодняшнюю пока что?)
+    * [ ] Добавить теги в vimwiki
+    * [ ] Добавить даты в vimwiki
+    * [X] Экспортировать vimwiki в git и залить на github
+    * [X] :TOMATO:1/1 Настроить нормальную почту me@kstep.me
+    * [ ] :TOMATO:0/1 Звук (mixer4): максимум 100%
+
+* [o] Личные дела
+    * [ ] Рассмотреть вакансию перловика в Епаме
+    * [o] Для Карманова: узнать про покупку машины
+        # [X] Поговорить с женой
+        # [ ] Поговорить с Алеком или Лерой
+            # [ ] Узнать про возможность покупки машины через них
+            # [ ] Узнать у Карманова, устраивают ли его такие условия
+            # [ ] Свести их вместе?
+    * [ ] Позвонить Полине и пригласить её пообедать в воскресенье
+
+* [o] Идеи
+    * [X] nosetests в качестве makeprg для автотестов — уже есть "vim-pyunit":http://www.vim.org/scripts/script.php?script_id=3258
+        * нужно корректно парсить трейсбеки (efm?), исключая лишние данные, а то они слишком длинные
+            * посмотреть логику перлового croak: включать в трейсбек только файлы из текущего проекта?
+    * [O] виджет для awesome реализующий логику томатной техники
+          по сути таймер с настраиваемым графиком чередования времени, например 25 → 5 → 25 → 5 → 25 → 5 → 25 → 30 → ...
+          c уведомлениями об истечении врмемени, функцией сброса и паузы, отображение оставшегося времени в виде числа минут
+          (последнюю минуту можно как секунды, но необязательно).
+      # [X] простейший таймер на 25 минут с оповещением
+      # [X] настраиваемый таймер с меню и выбором одного из заданных таймаутов, к каждому таймауту по текстовому статусу и цвету
+          * [X] не работает скрытие меню по :toggle() и :hide()
+      # [X] настройка серии таймаутов
+      # [X] подсчёт количества некоторых таймаутов
+      # [ ] отображать эти счётчики в меню
+      # [X] оповещать о начале таймера
+      # [ ] возможность клика для регистрации событий, подсчёт этих кликов
+
+= Мои проекты =
+
+* [ ] ProCalc (https://github.com/kstep/procalc)
+    * [ ] Починить инсталляцию: не генерировать *.py[co] файлы, пусть хук python-support это сделает
+    * [ ] Сделать нормальное выходное форматирование чисел
+    * [ ] Добавить комбинаторных функций: факториал, сочетания и перестановки
+
+* [ ] DbusCron (https://github.com/kstep/dbuscron)
+    * [ ] Faster command search algorithm (B-tree search of events) (https://github.com/kstep/dbuscron/issues/4)
+        I iterate through full list of rules on DBUS message received, looking for
+        the first match. It is rather ineffective (O(n) and depends on number of
+        rules in a list). Implement some better search algo, like B-tree or
+        something like this.
+    * [ ] Better arguments match (https://github.com/kstep/dbuscron/issues/3)
+        Arguments are placed into DBUS filter expression and thus matched only
+        as a whole string, or as a path (if it starts with "/"), so fnmatch()
+        does not really has a chance to come into scene.
+        Rewrite this arguments matching code in a way to filter messages with
+        standard DBUS filter expressions whenever possible (if argument is
+        obviously a path name or doesn't contain wildcards), or don't put them
+        into expression and check with fnmatch() in dbuscron code if arguments
+        do contain wildcards.
+
+* [ ] FusqlFS (https://github.com/kstep/fusqlfs)
+    * [ ] 0.006
+        * [ ] !MySQL support
+    * [ ] 0.007
+        * [ ] Add `FusqlFS::Backend::PgSQL::Table::Rules` module
+        * [ ] Add support to multi schema layout
+    * [ ] 0.008
+        * [ ] Sqlite support
+
+* [ ] GreenCSS (https://github.com/kstep/greencss)
+
+* [ ] GitGraph (https://github.com/kstep/gitgraph-vim-plugin)
+    * [ ] Документация
+

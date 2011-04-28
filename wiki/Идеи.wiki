@@ -1,0 +1,33 @@
+
+* [ ] Автозакрытие багов в Redmine-е по коммиту:
+    Bug|Bugs|Task|Tasks ##...{issue_id}[, {issue_id}...] {resolution:fixed|invalid|wontfix|duplicate|worksforme|obsolete} [in {number}h]
+    Note:
+        {notes}
+    POST http://redmine.unite.com/issues/<issue_id>
+    {{{
+    _method put
+    authenticity_token  nBcNGtXDTsvQG62nPqzzW/hioCi3s7bR43xkG9LmkS0=
+    issue[tracker_id]   1
+    issue[subject]  Создание профиля. Создается пустой профиль.
+    issue[parent_issue_id]  
+    issue[status_id]    4
+    issue[priority_id]  5
+    issue[assigned_to_id]   45
+    issue[category_id]  67
+    issue[fixed_version_id] 65
+    issue[start_date]   2011-01-10
+    issue[due_date] 
+    issue[estimated_hours]  
+    issue[done_ratio]   100
+    issue[custom_field_values][1] fixed
+    issue[custom_field_values][3]    0
+    time_entry[hours]   0.5
+    time_entry[activity_id] 23
+    time_entry[comments]    
+    notes   Просто скрыл неактивные профили из этой вкладки.
+    attachments[1][file]    
+    attachments[1][description]
+    issue[lock_version] 3
+    commit  Принять
+    }}}
+
