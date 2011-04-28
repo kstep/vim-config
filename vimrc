@@ -170,6 +170,7 @@ endfunction
 " Mappings & abbrevs {{{
 map <C-w><C-]> <C-w><C-]><C-w>T
 map vA ggVG
+map Y y$
 map <A-w> :!pkill -USR1 fusqlfs.pl<CR>
 map <Leader>p :exec 'tabedit '.getreg('*')<CR>
 map <Leader>ss <Plug>(scratch-open)
