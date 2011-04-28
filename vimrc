@@ -218,10 +218,10 @@ vmap ,a= :Align =<CR>
 
 nmap ,fc :if stridx(&syntax,'.conflict')<0<Bar>setl syntax+=.conflict<Bar>endif<CR>:vimgrep "^<<<<<<<" %:p<CR>:copen<CR><CR>
 
-"imap <C-Space> <C-^>
-"cmap <C-Space> <C-^>
-"smap <C-Space> <C-^>
-"nmap <C-Space> a<C-^><Esc>
+imap <C-\> <C-^>
+cmap <C-\> <C-^>
+smap <C-\> <C-^>
+nmap <C-\> a<C-^><Esc>
 
 cabbr W w
 cabbr Q q
@@ -288,7 +288,6 @@ let g:gitgraph_layout = { 'g':[20,'la'], 's':[-30,'tl'], 't':[5,'rb'], 'd':[0,'b
 
 
 let g:user_zen_settings = { 'mako': { 'extends': 'html' } }
-
 
 " }}}
 
