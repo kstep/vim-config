@@ -30,4 +30,18 @@
     issue[lock_version] 3
     commit  Принять
     }}}
-
+    # Залогиниться на /login, получить кукисы:
+        * извлечь authenticity_token и login,
+        * заполнить username и password
+        * заполнить autologin значением 1
+    # Загрузить страницу бага на /issues/<issueid>
+    # Извлечь содержимое формы <form action="/issues/<issueid>" id="issue-form">...</form>
+    # Заполнить поля:
+        * issues[custom_field_values][1] = $resolution,
+        * time_entry[hours] = $time_spent,
+        * time_entry[activity_id] = 23
+        * issue[done_ratio] = 100
+        * issue[status_id] = 4
+        * notes = $notes
+        * issue[fixed_version_id] = $next_version
+    # Засабмитить.
