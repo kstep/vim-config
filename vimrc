@@ -36,7 +36,7 @@ set smarttab
 set expandtab
 set autoindent
 set smartindent
-set listchars=tab:»\ ,eol:↲,trail:·,precedes:«,extends:»
+set listchars=tab:»┄,eol:↲,trail:·,precedes:«,extends:»
 set backspace=start,eol,indent
 
 set foldmethod=marker
