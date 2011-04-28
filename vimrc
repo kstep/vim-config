@@ -51,6 +51,7 @@ set noequalalways
 set ruler
 
 set tildeop
+set nrformats=hex,alpha
 set encoding=utf-8
 
 set linebreak
@@ -199,8 +200,9 @@ vmap ,s) <Esc>`>a)<Esc>`<i(<Esc>
 vmap ,s' <Esc>`>a'<Esc>`<i'<Esc>
 vmap ,s` <Esc>`>a`<Esc>`<i`<Esc>
 
-map <C-A-A> ciw<C-R>=getreg('')*2<CR><Esc>
-map <C-A-X> ciw<C-R>=getreg('')/2<CR><Esc>
+map <C-A-a> ciw<C-R>=getreg('')*2<CR><Esc>
+map <C-A-x> ciw<C-R>=getreg('')/2<CR><Esc>
+map <A-a> @="yyp"<CR>
 
 map <C-q> :quit<CR>
 map <Leader>\ :TlistToggle<CR>
