@@ -1,7 +1,8 @@
 "let test_path = "pk/vi/plu/c"
 
 function! ZshLikeComplete(path, cmd, pos)
-    let parts = split(a:path, '/', 1)
+    "if len(a:path) < 1 | return [ expand('%:p:h'), expand('%:p') ] | endif
+    let parts = split((len(a:path) > 0)? (a:path): expand('%:p:h'), '/', 1)
     let variants = (parts[0] == '~' || parts[0] == '.' || parts[0] == '..' || parts[0] == '') ?
                 \ remove(parts, 0, 0) :
                 \ split(globpath(&path, remove(parts, 0).'*'), '\n')
