@@ -267,6 +267,8 @@ let g:NERDTreeHijackNetrw=0
 let g:NERDTreeChDirMode=2
 
 let g:vimwiki_list = [{'path': '~/.vim/wiki/', 'path_html': '~/.vim/wiki_html/', 'syntax': 'default'}]
+let g:vimwiki_folding = 1
+let g:vimwiki_fold_lists = 1
 
 let g:netrw_winsize=45
 let g:netrw_list_hide='^\.,\.pyc,\.pyo'
