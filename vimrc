@@ -50,6 +50,7 @@ set window=39
 set winminheight=0
 set noequalalways
 set ruler
+set laststatus=2
 
 set tildeop
 set nrformats=hex,alpha
