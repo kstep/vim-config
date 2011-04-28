@@ -9,4 +9,4 @@ setl efm=%C%p^,%A\ %#File\ \"%f\"\\,\ line\ %l%.%#,%Z%[%^\ ]%\\@=%m,%+C\ %s
 setl fdm=indent
 setl cc=120 tw=110
 
-inoremap <buffer> _( _(u'')<Left><Left>
+"inoremap <buffer> _( _(u'')<Left><Left>
