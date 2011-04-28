@@ -346,7 +346,7 @@ fun! GenTabLabel(n)
     let bufname = bufname(buflist[winnr - 1])
     let bufname = substitute(fnamemodify(bufname, ':~:.'), '\([^/]\)[^/]\+/', '\1/', 'g')
     if IsTabModified(a:n)
-        let bufname = bufname . 'º'
+        let bufname = bufname . '°'
     endif
     return a:n . ' ' . bufname
 endfun
