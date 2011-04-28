@@ -18,8 +18,19 @@ function! ZshLikeComplete(path, cmd, pos)
     return variants
 endfun
 
-command! -complete=customlist,ZshLikeComplete -nargs=1 E edit <args>
-command! -complete=customlist,ZshLikeComplete -nargs=1 TE tabedit <args>
+function! ZshCmplWrap(alias, cmd)
+    exec 'command! -complete=customlist,ZshLikeComplete -nargs=? ' . a:alias . ' ' . a:cmd . ' <args>'
+endfun
+
+for [alias, cmd] in [
+            \['E', 'edit'],
+            \['TE', 'tabedit'],
+            \['S', 'split'],
+            \['SV', 'vsplit'],
+            \['R', 'read']
+            \]
+    call ZshCmplWrap(alias, cmd)
+endfor
 
 "echo ZshLikeComplete(test_path, '', 0)
 
