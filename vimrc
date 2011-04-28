@@ -252,6 +252,8 @@ let g:dbext_default_profile_pgsql_unite="type=PGSQL:user=postgres:dbname=unite_d
 let g:dbext_default_profile_mysql_icart_dev="type=MYSQL:user=root:dbname=icart_dev:passwd=vecrekhen"
 let g:dbext_default_DBI_max_rows=0
 
+let g:PyUnitTestsStructure='follow-hierarchy'
+
 let g:sql_type_default="mysql"
 let g:sqlutil_keyword_case='\l'
 let g:sqlutil_align_comma=1
