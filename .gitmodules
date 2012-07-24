@@ -7,3 +7,12 @@
 [submodule "bundle/pydiction"]
 	path = bundle/pydiction
 	url = git://github.com/vim-scripts/Pydiction.git
+[submodule "bundle/vim-indent-guides"]
+	path = bundle/vim-indent-guides
+	url = git://github.com/nathanaelkane/vim-indent-guides.git
+[submodule "bundle/zencoding"]
+	path = bundle/zencoding
+	url = git://github.com/mattn/zencoding-vim.git
+[submodule "bundle/perlomni"]
+	path = bundle/perlomni
+	url = git://github.com/c9s/perlomni.vim.git
