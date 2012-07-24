@@ -12,9 +12,9 @@ let g:colors_name = "chocolate"
 hi Normal		  guifg=#D0FFD0 guibg=#212121
 hi Scrollbar	  guifg=darkcyan guibg=cyan
 hi Menu			  guifg=black guibg=cyan
-hi SpecialKey	  term=bold  cterm=bold  ctermfg=darkred  guifg=Blue
+hi SpecialKey	  term=bold  cterm=bold  ctermfg=darkred  guifg=brown
 hi NonText		  term=bold  cterm=bold  ctermfg=darkred  gui=bold	guifg=white
-hi Directory	  term=bold  cterm=bold  ctermfg=brown	guifg=Blue
+hi Directory	  term=bold  cterm=bold  ctermfg=brown	guifg=brown
 hi ErrorMsg		  term=standout  cterm=bold  ctermfg=grey  ctermbg=blue  guifg=White  guibg=Red
 hi Search		  term=reverse	ctermfg=white  ctermbg=red	guifg=white  guibg=#7080dd gui=bold
 hi MoreMsg		  term=bold  cterm=bold  ctermfg=darkgreen	gui=bold  guifg=SeaGreen
@@ -27,6 +27,7 @@ hi Title		  term=bold  cterm=bold  ctermfg=darkmagenta  gui=bold	guifg=#a05000
 hi Visual		  term=reverse	cterm=reverse  gui=reverse
 hi WarningMsg	  term=standout  cterm=bold  ctermfg=darkblue  guifg=Red
 hi Cursor		  guifg=bg	guibg=Green
+hi CursorLine	  guifg=bg	guibg=grey30
 hi Comment		  term=bold  cterm=bold ctermfg=cyan  guifg=#30ff25
 hi Constant		  term=underline  cterm=bold ctermfg=magenta  guifg=#FFCC00
 hi Special		  term=bold  cterm=bold ctermfg=red  guifg=yellow gui=bold

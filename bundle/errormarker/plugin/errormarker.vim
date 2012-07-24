@@ -55,12 +55,12 @@ endfunction
 " Defines the icon to show for errors in the gui
 call s:DefineVariable("g:errormarker_erroricon",
             \ has('win32') ? expand("~/vimfiles/icons/error.bmp") :
-                \ "/usr/share/icons/gnome/16x16/status/dialog-error.png")
+                \ "/usr/share/icons/gnome/32x32/status/dialog-error.png")
 
 " Defines the icon to show for warnings in the gui
 call s:DefineVariable("g:errormarker_warningicon",
             \ has('win32') ? expand("~/vimfiles/icons/warning.bmp") :
-                \ "/usr/share/icons/gnome/16x16/status/dialog-warning.png")
+                \ "/usr/share/icons/gnome/32x32/status/dialog-warning.png")
 
 " Defines the text (two characters) to show for errors in the gui
 call s:DefineVariable("g:errormarker_errortext", "EE")

@@ -16,7 +16,7 @@ function! ZshLikeComplete(path, cmd, pos)
         if len(variants) < 1 | break | endif
     endfor
 
-    return variants
+    return map(variants, 'escape(v:val, " \\")')
 endfun
 
 function! ZshCmplWrap(alias, cmd)
