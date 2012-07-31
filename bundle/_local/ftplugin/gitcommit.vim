@@ -1,1 +1,1 @@
-setl textwidth=150
+setl textwidth=72
