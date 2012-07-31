@@ -2,7 +2,7 @@ colorscheme xoria256
 "colorscheme thegoodluck
 "colorscheme chocolate
 set background=dark
-set guioptions=aier
+set guioptions=aie
 set guifont=DejaVu\ Sans\ Mono\ 11
 set noicon
 
