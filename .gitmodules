@@ -16,3 +16,6 @@
 [submodule "bundle/perlomni"]
 	path = bundle/perlomni
 	url = git://github.com/c9s/perlomni.vim.git
+[submodule "bundle/vim-surround"]
+	path = bundle/vim-surround
+	url = http://github.com/tpope/vim-surround
