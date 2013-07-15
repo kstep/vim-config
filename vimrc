@@ -223,7 +223,7 @@ let g:indent_guides_start_level = 2
 
 " Custom highlighting {{{
 set background=dark
-colorscheme xoria256
+colorscheme solarized
 "colorscheme thegoodluck
 "colorscheme chocolate
 " }}}
