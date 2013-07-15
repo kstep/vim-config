@@ -175,7 +175,8 @@ let g:gitgraph_date_format="iso"
 let g:Tlist_Ctags_Cmd="/usr/bin/ctags"
 
 "let g:dbext_default_profile_mysql_buick="type=MYSQL:user=root:passwd=nownthen:dbname=zanby5_stepanov:host=buick:extra=-vvvt"
-"let g:dbext_default_profile_pgsql="type=PGSQL:user=postgres:dbname=postgres"
+let g:dbext_default_profile_pgsql="type=PGSQL:user=postgres:dbname=postgres"
+let g:dbext_default_profile_mysql="type=MYSQL:user=root:host=localhost"
 let g:dbext_default_DBI_max_rows=0
 
 let g:sql_type_default="mysql"
