@@ -193,7 +193,7 @@ let g:vimwiki_folding = 1
 let g:vimwiki_fold_lists = 1
 
 let g:netrw_winsize=45
-let g:netrw_list_hide='^\.,\.pyc,\.pyo'
+let g:netrw_list_hide='^\.,\.pyc,\.pyo,\.class'
 let g:netrw_cursor=2
 let g:netrw_liststyle=1
 let g:netrw_timefmt="%a, %e %b %Y %H:%M"
