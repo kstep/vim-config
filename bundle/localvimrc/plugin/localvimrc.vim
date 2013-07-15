@@ -112,6 +112,8 @@ function! s:localvimrc()
       " check the answer
       if (l:answer == "y" || l:answer == "a")
 
+        let b:localvimrc_file = l:rcfile
+
         " add 'sandbox' if requested
         if (g:localvimrc_sandbox != 0)
           let l:command = "sandbox "
