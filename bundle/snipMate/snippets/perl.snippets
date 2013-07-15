@@ -6,8 +6,13 @@ snippet #!
 snippet .
 	 =>
 # Function
+snippet subp
+	sub ${:function_name} (${2:@})
+	{
+		${3:#body ...}
+	}
 snippet sub
-	sub ${1:function_name} (${2:@})
+	sub ${1:function_name}
 	{
 		${3:#body ...}
 	}
