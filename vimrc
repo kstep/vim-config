@@ -296,3 +296,30 @@ endfun
 
 vmap S <Esc>call MassVisualChange()<CR>
 
+fun! JavaAddImport()
+    let word = expand('<cword>')
+    let variants = split(system('jcf -i ' . word), '\n')
+    if len(variants) == 0
+        echoerr 'No class or interface found!'
+    else
+        let variant = variants[0]
+        if len(variants) > 1
+            let variant = variants[inputlist(variants)]
+        endif
+
+        let pos = search('^import ', 'bn')
+        call append(pos, variant)
+    endif
+endfun
+
+fun! JavaDeleteUnusedImport()
+    let pos = getpos('.')
+    norm *
+    if pos[1] == getpos('.')[1]
+        delete
+    else
+        call setpos('.', pos)
+    endif
+endfun
+
+map ,i :call JavaAddImport()<CR>
