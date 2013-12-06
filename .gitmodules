@@ -22,3 +22,6 @@
 [submodule "bundle/vim-repeat"]
 	path = bundle/vim-repeat
 	url = https://github.com/tpope/vim-repeat.git
+[submodule "bundle/todo.txt"]
+	path = bundle/todo.txt
+	url = https://github.com/davidoc/todo.txt-vim.git
