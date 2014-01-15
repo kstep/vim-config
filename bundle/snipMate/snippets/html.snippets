@@ -188,3 +188,12 @@ snippet par
 	<p>${1}</p>
 snippet aref
 	<a href="http://${1:URL}" target="${2:_blank}" title="${3:title}">${4:text}</a>
+snippet ngfield
+	<div ng-class="{ error: form.$2.$dirty && form.$2.$invalid }" class="control-group">
+		<label class="control-label">${1:Label}</label>
+		<div class="controls">
+			<input name="${2:name}" type="${3:text}" ng-model="model.${4:$2}"${5: } />
+		</div>
+	</div>
+snippet ngerrmsg
+	<span ng-show="form.${1:name}.$error.${2:required} && form.$1.$dirty" class="help-inline">${3:$2}</span>

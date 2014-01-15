@@ -192,7 +192,6 @@ let g:vimwiki_list = [{'path': '~/.vim/wiki/', 'path_html': '~/.vim/wiki_html/',
 let g:vimwiki_folding = 1
 let g:vimwiki_fold_lists = 1
 
-let g:netrw_winsize=45
 let g:netrw_list_hide='^\.,\.pyc,\.pyo,\.class'
 let g:netrw_cursor=2
 let g:netrw_liststyle=1
@@ -200,15 +199,16 @@ let g:netrw_timefmt="%a, %e %b %Y %H:%M"
 let g:netrw_keepdir=0
 let g:netrw_sort_options='ni /[0-9]\+/'
 let g:netrw_maxfilenamelen=64
-let g:netrw_xstrlen=3
 let g:netrw_list_cmd='ssh HOSTNAME ls -La'
 
 let g:perl_include_pod=1
 let g:perl_fold=1
 let g:perl_nofold_subs=1
 
-let g:po_translator = 'Konstantin Stepanov <kstep@p-nut.info>'
+let g:po_translator = 'Konstantin Stepanov <me@kstep.me>'
 let g:syntastic_enable_signs=1
+let g:syntastic_python_flake8_args='--ignore=E501,W391'
+"let g:syntastic_python_flake8_args='--ignore=E302,E303,E501,W391,E127,E128,E221,E126,E251,E124,E261,E401,W404,E301,E123,E401'
 let g:localvimrc_ask=0
 let g:localvimrc_sandbox=0
 let g:gitgraph_layout = { 'g':[20,'la'], 's':[-30,'tl'], 't':[5,'rb'], 'd':[0,'br'],
@@ -222,7 +222,7 @@ let g:indent_guides_start_level = 2
 " }}}
 
 " Custom highlighting {{{
-set background=light
+set background=dark
 colorscheme solarized
 "colorscheme thegoodluck
 "colorscheme chocolate
@@ -298,7 +298,7 @@ vmap S <Esc>call MassVisualChange()<CR>
 
 fun! JavaAddImport()
     let word = expand('<cword>')
-    let variants = split(system('jcf -i ' . word), '\n')
+    let variants = split(system('jcf -i ' . word . ' 2>/dev/null | sort -u'), '\n')
     if len(variants) == 0
         echoerr 'No class or interface found!'
     else
@@ -323,3 +323,23 @@ fun! JavaDeleteUnusedImport()
 endfun
 
 map ,i :call JavaAddImport()<CR>
+
+fun! JavaReorganizeImports()
+    " find all imports and cut them into a dedicated register
+    let @a=''
+    g/^import /norm "Add
+
+    " sort them alphabetically
+    let imports=split(@a, "\n")
+    call sort(imports)
+    let @a="\n" . join(imports, "\n") . "\n\n"
+
+    " put them to the top of file, but below "package" statement
+    /^package /
+    norm j
+    while getline('.') == ''
+        delete
+    endwhile
+    norm k
+    put a
+endfun

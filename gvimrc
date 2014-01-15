@@ -1,9 +1,9 @@
-colorscheme xoria256
+colorscheme solarized
 "colorscheme thegoodluck
 "colorscheme chocolate
 set background=dark
 set guioptions=aie
-set guifont=DejaVu\ Sans\ Mono\ 11
+set guifont=Andale\ Mono\ 15
 set noicon
 
 let g:indent_guides_enable_on_vim_startup = 1
